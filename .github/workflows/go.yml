@@ -1,0 +1,38 @@
+name: Build and Test
+
+on:
+  push:
+  
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.17
+
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Run Revive Action
+      uses: docker://morphy/revive-action:v2
+      with:
+        config: revive.toml
+          
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
+
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Run Unit tests.
+        run: go test ./...
