@@ -8,6 +8,6 @@ type Node interface {
 	GetPublicKey() string
 	GetServiceURL() string
 	GetStakedTokens() string
-	GetStatus() StackingStatus
+	GetStatus() StakingStatus
 	GetUnstakingTime() string
 }

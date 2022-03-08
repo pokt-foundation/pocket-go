@@ -8,5 +8,5 @@ type App interface {
 	GetMaxRelays() string
 	GetPublicKey() string
 	GetStakedTokens() string
-	GetStatus() StackingStatus
+	GetStatus() StakingStatus
 }
