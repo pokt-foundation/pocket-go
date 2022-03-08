@@ -1,6 +1,6 @@
 package types
 
-// TransactionResponse interface that represents response of a transaction
+// TransactionResponse interface that represents the response of a transaction
 type TransactionResponse interface {
 	GetCode() int
 	GetCodeSpace() string
