@@ -1,8 +1,9 @@
 package types
 
-// Account interface that represents an Account
+// Account interface that represents a Pocket Network Protocol Account
 type Account interface {
 	GetAddress() string
 	GetBalance() string
 	GetPublicKey() string
+	GetPrivateKey() string
 }
