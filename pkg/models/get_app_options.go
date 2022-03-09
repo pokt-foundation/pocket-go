@@ -1,4 +1,4 @@
-package types
+package models
 
 // GetAppOptions not implemented
 // TODO: implement GetAppOptions interface

@@ -1,4 +1,4 @@
-package types
+package models
 
 // Session interface that represents a session
 type Session interface {

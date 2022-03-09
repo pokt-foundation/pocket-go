@@ -1,4 +1,4 @@
-package types
+package models
 
 // PocketAAT interface that represents a Pocket Application Authentication Token
 type PocketAAT interface {

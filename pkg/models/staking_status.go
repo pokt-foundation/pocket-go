@@ -1,4 +1,4 @@
-package types
+package models
 
 // StakingStatus enum that represents staking status
 type StakingStatus int

@@ -1,4 +1,4 @@
-package types
+package models
 
 // App interface that represents an app
 type App interface {

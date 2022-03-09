@@ -1,4 +1,4 @@
-package types
+package models
 
 // RelayResponse interface that represents relay response
 type RelayResponse interface {

@@ -1,4 +1,4 @@
-package types
+package models
 
 // SessionHeader interface that represent session header
 type SessionHeader interface {
