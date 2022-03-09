@@ -1,4 +1,4 @@
-package types
+package models
 
 // DispatchRequest interface represents a dispatch request
 type DispatchRequest interface {

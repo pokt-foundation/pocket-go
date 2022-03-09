@@ -1,4 +1,4 @@
-package types
+package models
 
 // Account interface that represents a Pocket Network Protocol Account
 type Account interface {

@@ -1,4 +1,4 @@
-package types
+package models
 
 // Block not implemented
 // TODO: implement Block interface

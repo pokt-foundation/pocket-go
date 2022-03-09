@@ -1,4 +1,4 @@
-package types
+package models
 
 // RelayPayload interface that represents
 type RelayPayload interface {

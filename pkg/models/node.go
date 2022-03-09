@@ -1,4 +1,4 @@
-package types
+package models
 
 // Node interface that represents a node
 type Node interface {

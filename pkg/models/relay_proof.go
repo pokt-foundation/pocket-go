@@ -1,4 +1,4 @@
-package types
+package models
 
 // RelayProof interface represents a relay proof
 type RelayProof interface {

@@ -1,4 +1,4 @@
-package types
+package models
 
 // AccountWithTransactions interface is a wrapper of an account and its transactions
 type AccountWithTransactions interface {

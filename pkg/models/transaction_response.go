@@ -1,4 +1,4 @@
-package types
+package models
 
 // TransactionResponse interface that represents the response of a transaction
 type TransactionResponse interface {
