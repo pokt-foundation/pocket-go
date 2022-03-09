@@ -11,6 +11,7 @@ const (
 	defaultHTTPClientRetries = 3
 )
 
+// Client is a wrapper for the heimdall client
 type Client struct {
 	*httpclient.Client
 }
