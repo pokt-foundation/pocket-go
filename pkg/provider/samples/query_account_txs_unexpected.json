@@ -1,0 +1,48 @@
+{
+    "txs": [
+      {
+        "hash": "string",
+        "height": 0,
+        "index": 0,
+        "tx_result": {
+          "code": 0,
+          "data": "string",
+          "log": "string",
+          "info": "string",
+          "events": [
+            "string"
+          ],
+          "codespace": "string",
+          "signer": "string",
+          "recipient": "string",
+          "message_type": "string"
+        },
+        "tx": "string",
+        "proof": {
+          "root_hash": "string",
+          "data": "string",
+          "proof": {
+            "total": 0,
+            "index": 0,
+            "leaf_hash": "string",
+            "aunts": [
+              "string"
+            ]
+          }
+        },
+        "stdTx": {
+          "entropy": 0,
+          "fee": {
+            "amount": "string",
+            "denom": "string"
+          },
+          "memo": "string",
+          "msg": {},
+          "signature": {
+            "pub_key": "string",
+            "signature": "string"
+          }
+        }
+      }
+    ]
+}

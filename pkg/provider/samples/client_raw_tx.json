@@ -1,0 +1,23 @@
+{
+    "height": "0",
+    "txhash": "5F7D1B8AA14025F6F5E50B35CE7BC7BD6F7153FCF4840138E3CB6C1E5B5C7E78",
+    "raw_log": "[{\"msg_index\":0,\"success\":true,\"log\":\"\",\"events\":[{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"send\"}]}]}]",
+    "logs": [
+      {
+        "msg_index": 0,
+        "success": true,
+        "log": "",
+        "events": [
+          {
+            "type": "message",
+            "attributes": [
+              {
+                "key": "action",
+                "value": "send"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+}

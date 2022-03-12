@@ -1,0 +1,73 @@
+{
+    "block_height": 1,
+    "session": {
+      "header": {
+        "app_public_key": "f6f1f166536c55d3ad7b1b2629f0bce8a0a3dbd455d576ccb235419bcbfed7fd",
+        "chain": "0001",
+        "session_height": 1
+      },
+      "key": "pY2rZUEkygFRUZ21iT0XiyQDkifIQC74IkoQN2YvisU=",
+      "nodes": [
+        {
+          "address": "ebea4171cee8eff0f388e1ed97c83a73022228d0",
+          "chains": [
+            "0001"
+          ],
+          "jailed": false,
+          "public_key": "b31b52daa582838b72d71628814e8523d5b9ea08bb0b49a438693eb5269b4635",
+          "service_url": "https://foo.bar:8080",
+          "status": 2,
+          "tokens": "10000000",
+          "unstaking_time": "0001-01-01T00:00:00Z"
+        },
+        {
+          "address": "8de67229b1232b2bb77dc2c3ab247a62f47968d3",
+          "chains": [
+            "0001"
+          ],
+          "jailed": false,
+          "public_key": "993366e5b648b1e9f544daab0652b8fc9b3657eb9a0ee54afc53852d66b1c2d5",
+          "service_url": "https://foo.bar:8080",
+          "status": 2,
+          "tokens": "10000000",
+          "unstaking_time": "0001-01-01T00:00:00Z"
+        },
+        {
+          "address": "fefe600f9b257e96633245731eff6c34efbb9a50",
+          "chains": [
+            "0001"
+          ],
+          "jailed": false,
+          "public_key": "f6f1f166536c55d3ad7b1b2629f0bce8a0a3dbd455d576ccb235419bcbfed7fd",
+          "service_url": "https://foo.bar:8080",
+          "status": 2,
+          "tokens": "10000000",
+          "unstaking_time": "0001-01-01T00:00:00Z"
+        },
+        {
+          "address": "fe6bff490b6dc4b2435c5c9d4960f2e79c792b1d",
+          "chains": [
+            "0001"
+          ],
+          "jailed": false,
+          "public_key": "5527f0f7f3d16bcec4e268a5fa8a9745f60e1497ea6745e58e2d985f2ac03875",
+          "service_url": "https://foo.bar:8080",
+          "status": 2,
+          "tokens": "1000000000000000000",
+          "unstaking_time": "0001-01-01T00:00:00Z"
+        },
+        {
+          "address": "b97de5e4da9bb3978b4afb76abef9e04e6b86605",
+          "chains": [
+            "0001"
+          ],
+          "jailed": false,
+          "public_key": "f11ab260c80cc835d5258c51f6aad69008bba1fd484f8c55d21e8bc85f737a21",
+          "service_url": "https://foo.bar:8080",
+          "status": 2,
+          "tokens": "10000000",
+          "unstaking_time": "0001-01-01T00:00:00Z"
+        }
+      ]
+    }
+}

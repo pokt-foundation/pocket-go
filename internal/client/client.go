@@ -54,10 +54,10 @@ func NewCustomClient(retries int, timeout time.Duration) *Client {
 }
 
 // PostWithURLJSONParams does post request with JSON param
-func (client *Client) PostWithURLJSONParams(url string, params map[string]string, headers http.Header) (*http.Response, error) {
+func (client *Client) PostWithURLJSONParams(url string, params interface{}, headers http.Header) (*http.Response, error) {
 	var body io.Reader
 
-	if len(params) != 0 {
+	if params != nil {
 		rawBody, err := json.Marshal(params)
 		if err != nil {
 			return nil, err
@@ -70,11 +70,4 @@ func (client *Client) PostWithURLJSONParams(url string, params map[string]string
 	headers.Set("Content-Type", "application/json")
 
 	return client.Post(url, body, headers)
-}
-
-func CloseBody(body io.ReadCloser) {
-	err := body.Close()
-	if err != nil {
-		panic(err)
-	}
 }
