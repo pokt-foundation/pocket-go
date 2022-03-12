@@ -92,8 +92,8 @@ type GetNodesResponse struct {
 	TotalPages int               `json:"total_pages"`
 }
 
-// SendTransactionReponse represents response for SendTransaction request
-type SendTransactionReponse struct {
+// SendTransactionResponse represents response for SendTransaction request
+type SendTransactionResponse struct {
 	Height string `json:"height"`
 	Txhash string `json:"txhash"`
 	RawLog string `json:"raw_log"`
@@ -196,8 +196,8 @@ type GetBlockResponse struct {
 	} `json:"block_meta"`
 }
 
-// GetTransactionReponse represents response for GetTransaction request
-type GetTransactionReponse struct {
+// GetTransactionResponse represents response for GetTransaction request
+type GetTransactionResponse struct {
 	Transaction struct {
 		Hash     string `json:"hash"`
 		Height   int    `json:"height"`
@@ -245,7 +245,7 @@ type queryHeightResponse struct {
 	Height *int `json:"height"`
 }
 
-// GetAccountReponse represents response for GetAccount request
+// GetAccountResponse represents response for GetAccount request
 type GetAccountResponse struct {
 	Address string `json:"address"`
 	Coins   []struct {
@@ -255,13 +255,13 @@ type GetAccountResponse struct {
 	PublicKey string `json:"public_key"`
 }
 
-// GetAccountWithTransactionsReponse represents response for GetAccountWithTransactions request
+// GetAccountWithTransactionsResponse represents response for GetAccountWithTransactions request
 type GetAccountWithTransactionsResponse struct {
 	Account      *GetAccountResponse
 	Transactions *queryAccountsTXsResponse
 }
 
-// DispatchReponse represents response for Dispatch request
+// DispatchResponse represents response for Dispatch request
 type DispatchResponse struct {
 	BlockHeight int `json:"block_height"`
 	Session     *struct {
@@ -284,7 +284,7 @@ type DispatchResponse struct {
 	} `json:"session"`
 }
 
-// RelayReponse represents response for Relay request
+// RelayResponse represents response for Relay request
 type RelayResponse struct {
 	Payload struct {
 		Data   string `json:"data"`

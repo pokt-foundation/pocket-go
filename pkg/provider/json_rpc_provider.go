@@ -163,7 +163,7 @@ func (p *JSONRPCProvider) GetType(address string) (AddressType, error) {
 }
 
 // SendTransaction sends raw transaction to be relayed to a target address
-func (p *JSONRPCProvider) SendTransaction(signerAddress, signedTransaction string) (*SendTransactionReponse, error) {
+func (p *JSONRPCProvider) SendTransaction(signerAddress, signedTransaction string) (*SendTransactionResponse, error) {
 	rawResponse, err := p.doPostRequest("", map[string]string{
 		"address":       signerAddress,
 		"raw_hex_bytes": signedTransaction,
@@ -179,7 +179,7 @@ func (p *JSONRPCProvider) SendTransaction(signerAddress, signedTransaction strin
 		return nil, err
 	}
 
-	response := SendTransactionReponse{}
+	response := SendTransactionResponse{}
 
 	err = json.Unmarshal(bodyBytes, &response)
 	if err != nil {
@@ -224,7 +224,7 @@ func (p *JSONRPCProvider) GetBlock(blockNumber int) (*GetBlockResponse, error) {
 }
 
 // GetTransaction returns the transaction by the given transaction hash
-func (p *JSONRPCProvider) GetTransaction(transactionHash string) (*GetTransactionReponse, error) {
+func (p *JSONRPCProvider) GetTransaction(transactionHash string) (*GetTransactionResponse, error) {
 	rawResponse, err := p.doPostRequest("", map[string]string{
 		"hash": transactionHash,
 	}, QueryTX)
@@ -239,7 +239,7 @@ func (p *JSONRPCProvider) GetTransaction(transactionHash string) (*GetTransactio
 		return nil, err
 	}
 
-	response := GetTransactionReponse{}
+	response := GetTransactionResponse{}
 
 	err = json.Unmarshal(bodyBytes, &response)
 	if err != nil {

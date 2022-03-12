@@ -14,7 +14,7 @@ const (
 	ClientRelay V1RPCRoute = "/v1/client/relay"
 	// QueryAccount represents query account route
 	QueryAccount V1RPCRoute = "/v1/query/account"
-	// QueryAccountsTXs represents query account TXs route
+	// QueryAccountTXs represents query account TXs route
 	QueryAccountTXs V1RPCRoute = "/v1/query/accounttxs"
 	// QueryAllParams represents query all params route
 	QueryAllParams V1RPCRoute = "/v1/query/allparams"
@@ -28,7 +28,7 @@ const (
 	QueryBalance V1RPCRoute = "/v1/query/balance"
 	// QueryBlock represents query block route
 	QueryBlock V1RPCRoute = "/v1/query/block"
-	// QueryBlocksTXs represents query block TXs route
+	// QueryBlockTXs represents query block TXs route
 	QueryBlockTXs V1RPCRoute = "/v1/query/blocktxs"
 	// QueryHeight represents query height route
 	QueryHeight V1RPCRoute = "/v1/query/height"
