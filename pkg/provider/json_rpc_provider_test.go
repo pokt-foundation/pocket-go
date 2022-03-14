@@ -37,13 +37,13 @@ func TestJSONRPCProvider_GetBalance(t *testing.T) {
 		client:      providerClient,
 	}
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryBalance), http.StatusOK, "samples/query_balance.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryBalanceRoute), http.StatusOK, "samples/query_balance.json")
 
 	balance, err := provider.GetBalance("pjog")
 	c.NoError(err)
 	c.Equal(big.NewInt(1000000000), balance)
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryBalance), http.StatusBadRequest, "samples/query_balance.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryBalanceRoute), http.StatusBadRequest, "samples/query_balance.json")
 
 	balance, err = provider.GetBalance("pjog")
 	c.Equal(Err4xxOnConnection, err)
@@ -64,13 +64,13 @@ func TestJSONRPCProvider_GetTransactionCount(t *testing.T) {
 		client:      providerClient,
 	}
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountTXs), http.StatusOK, "samples/query_account_txs.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountTXsRoute), http.StatusOK, "samples/query_account_txs.json")
 
 	count, err := provider.GetTransactionCount("pjog")
 	c.NoError(err)
 	c.Equal(21, count)
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountTXs), http.StatusInternalServerError, "samples/query_account_txs.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountTXsRoute), http.StatusInternalServerError, "samples/query_account_txs.json")
 
 	count, err = provider.GetTransactionCount("pjog")
 	c.Equal(Err5xxOnConnection, err)
@@ -91,20 +91,20 @@ func TestJSONRPCProvider_GetType(t *testing.T) {
 		client:      providerClient,
 	}
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryApp), http.StatusOK, "samples/query_app.json")
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryNode), http.StatusOK, "samples/query_node.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAppRoute), http.StatusOK, "samples/query_app.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryNodeRoute), http.StatusOK, "samples/query_node.json")
 
 	addressType, err := provider.GetType("pjog")
 	c.NoError(err)
 	c.Equal(Account, addressType)
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryNode), http.StatusBadRequest, "samples/query_node.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryNodeRoute), http.StatusBadRequest, "samples/query_node.json")
 
 	addressType, err = provider.GetType("pjog")
 	c.Equal(Err4xxOnConnection, err)
 	c.Empty(addressType)
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryApp), http.StatusMultipleChoices, "samples/query_app.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAppRoute), http.StatusMultipleChoices, "samples/query_app.json")
 
 	addressType, err = provider.GetType("pjog")
 	c.Equal(ErrUnexpectedCodeOnConnection, err)
@@ -149,13 +149,13 @@ func TestJSONRPCProvider_SendTransaction(t *testing.T) {
 	c.Contains(err.Error(), "Post \"https://dummy.com/v1/client/rawtx\": no responder found")
 	c.Empty(transaction)
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientRawTX), http.StatusOK, "samples/client_raw_tx.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientRawTXRoute), http.StatusOK, "samples/client_raw_tx.json")
 
 	transaction, err = provider.SendTransaction("pjog", "abcd")
 	c.NoError(err)
 	c.NotEmpty(transaction)
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientRawTX), http.StatusOK, "samples/client_raw_tx_unexpected.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientRawTXRoute), http.StatusOK, "samples/client_raw_tx_unexpected.json")
 
 	transaction, err = provider.SendTransaction("pjog", "abcd")
 	c.Equal(ErrUnexpectedResponse, err)
@@ -176,19 +176,19 @@ func TestJSONRPCProvider_GetBlock(t *testing.T) {
 		client:      providerClient,
 	}
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryBlock), http.StatusOK, "samples/query_block.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryBlockRoute), http.StatusOK, "samples/query_block.json")
 
 	block, err := provider.GetBlock(21)
 	c.NoError(err)
 	c.NotEmpty(block)
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryBlock), http.StatusInternalServerError, "samples/query_block.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryBlockRoute), http.StatusInternalServerError, "samples/query_block.json")
 
 	block, err = provider.GetBlock(21)
 	c.Equal(Err5xxOnConnection, err)
 	c.Empty(block)
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryBlock), http.StatusOK, "samples/query_block_unexpected.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryBlockRoute), http.StatusOK, "samples/query_block_unexpected.json")
 
 	block, err = provider.GetBlock(21)
 	c.Equal(ErrUnexpectedResponse, err)
@@ -209,19 +209,19 @@ func TestJSONRPCProvider_GetTransaction(t *testing.T) {
 		client:      providerClient,
 	}
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryTX), http.StatusOK, "samples/query_tx.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryTXRoute), http.StatusOK, "samples/query_tx.json")
 
 	transaction, err := provider.GetTransaction("abcd")
 	c.NoError(err)
 	c.NotEmpty(transaction)
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryTX), http.StatusInternalServerError, "samples/query_tx.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryTXRoute), http.StatusInternalServerError, "samples/query_tx.json")
 
 	transaction, err = provider.GetTransaction("abcd")
 	c.Equal(Err5xxOnConnection, err)
 	c.Empty(transaction)
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryTX), http.StatusOK, "samples/query_tx_unexpected.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryTXRoute), http.StatusOK, "samples/query_tx_unexpected.json")
 
 	transaction, err = provider.GetTransaction("abcd")
 	c.Equal(ErrUnexpectedResponse, err)
@@ -242,19 +242,19 @@ func TestJSONRPCProvider_GetBlockNumber(t *testing.T) {
 		client:      providerClient,
 	}
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryHeight), http.StatusOK, "samples/query_height.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryHeightRoute), http.StatusOK, "samples/query_height.json")
 
 	blockNumber, err := provider.GetBlockNumber()
 	c.NoError(err)
 	c.Equal(21, blockNumber)
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryHeight), http.StatusInternalServerError, "samples/query_height.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryHeightRoute), http.StatusInternalServerError, "samples/query_height.json")
 
 	blockNumber, err = provider.GetBlockNumber()
 	c.Equal(Err5xxOnConnection, err)
 	c.Empty(blockNumber)
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryHeight), http.StatusOK, "samples/query_height_unexpected.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryHeightRoute), http.StatusOK, "samples/query_height_unexpected.json")
 
 	blockNumber, err = provider.GetBlockNumber()
 	c.Equal(ErrUnexpectedResponse, err)
@@ -275,13 +275,13 @@ func TestJSONRPCProvider_GetNodes(t *testing.T) {
 		client:      providerClient,
 	}
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryNodes), http.StatusOK, "samples/query_nodes.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryNodesRoute), http.StatusOK, "samples/query_nodes.json")
 
 	nodes, err := provider.GetNodes(21, &GetNodesOptions{Page: 2})
 	c.NoError(err)
 	c.NotEmpty(nodes)
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryNodes), http.StatusInternalServerError, "samples/query_nodes.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryNodesRoute), http.StatusInternalServerError, "samples/query_nodes.json")
 
 	nodes, err = provider.GetNodes(21, &GetNodesOptions{Page: 2})
 	c.Equal(Err5xxOnConnection, err)
@@ -302,13 +302,13 @@ func TestJSONRPCProvider_GetApps(t *testing.T) {
 		client:      providerClient,
 	}
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryApps), http.StatusOK, "samples/query_apps.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAppsRoute), http.StatusOK, "samples/query_apps.json")
 
 	apps, err := provider.GetApps(21, &GetAppsOptions{Page: 2})
 	c.NoError(err)
 	c.NotEmpty(apps)
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryApps), http.StatusInternalServerError, "samples/query_apps.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAppsRoute), http.StatusInternalServerError, "samples/query_apps.json")
 
 	apps, err = provider.GetApps(21, &GetAppsOptions{Page: 2})
 	c.Equal(Err5xxOnConnection, err)
@@ -329,19 +329,19 @@ func TestJSONRPCProvider_GetNode(t *testing.T) {
 		client:      providerClient,
 	}
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryNode), http.StatusOK, "samples/query_node.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryNodeRoute), http.StatusOK, "samples/query_node.json")
 
 	node, err := provider.GetNode("pjog", &GetNodeOptions{Height: 2})
 	c.NoError(err)
 	c.NotEmpty(node)
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryNode), http.StatusInternalServerError, "samples/query_node.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryNodeRoute), http.StatusInternalServerError, "samples/query_node.json")
 
 	node, err = provider.GetNode("pjog", &GetNodeOptions{Height: 2})
 	c.Equal(Err5xxOnConnection, err)
 	c.Empty(node)
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryNode), http.StatusOK, "samples/query_node_unexpected.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryNodeRoute), http.StatusOK, "samples/query_node_unexpected.json")
 
 	node, err = provider.GetNode("pjog", &GetNodeOptions{Height: 2})
 	c.Equal(ErrUnexpectedResponse, err)
@@ -362,19 +362,19 @@ func TestJSONRPCProvider_GetApp(t *testing.T) {
 		client:      providerClient,
 	}
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryApp), http.StatusOK, "samples/query_app.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAppRoute), http.StatusOK, "samples/query_app.json")
 
 	app, err := provider.GetApp("pjog", &GetAppOptions{Height: 2})
 	c.NoError(err)
 	c.NotEmpty(app)
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryApp), http.StatusInternalServerError, "samples/query_app.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAppRoute), http.StatusInternalServerError, "samples/query_app.json")
 
 	app, err = provider.GetApp("pjog", &GetAppOptions{Height: 2})
 	c.Equal(Err5xxOnConnection, err)
 	c.Empty(app)
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryApp), http.StatusOK, "samples/query_app_unexpected.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAppRoute), http.StatusOK, "samples/query_app_unexpected.json")
 
 	app, err = provider.GetApp("pjog", &GetAppOptions{Height: 2})
 	c.Equal(ErrUnexpectedResponse, err)
@@ -395,19 +395,19 @@ func TestJSONRPCProvider_GetAccount(t *testing.T) {
 		client:      providerClient,
 	}
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccount), http.StatusOK, "samples/query_account.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountRoute), http.StatusOK, "samples/query_account.json")
 
 	account, err := provider.GetAccount("pjog")
 	c.NoError(err)
 	c.NotEmpty(account)
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccount), http.StatusInternalServerError, "samples/query_account.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountRoute), http.StatusInternalServerError, "samples/query_account.json")
 
 	account, err = provider.GetAccount("pjog")
 	c.Equal(Err5xxOnConnection, err)
 	c.Empty(account)
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccount), http.StatusOK, "samples/query_account_unexpected.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountRoute), http.StatusOK, "samples/query_account_unexpected.json")
 
 	account, err = provider.GetAccount("pjog")
 	c.Equal(ErrUnexpectedResponse, err)
@@ -428,20 +428,20 @@ func TestJSONRPCProvider_GetAccountWithTransactions(t *testing.T) {
 		client:      providerClient,
 	}
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccount), http.StatusOK, "samples/query_account.json")
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountTXs), http.StatusOK, "samples/query_account_txs.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountRoute), http.StatusOK, "samples/query_account.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountTXsRoute), http.StatusOK, "samples/query_account_txs.json")
 
 	account, err := provider.GetAccountWithTransactions("pjog")
 	c.NoError(err)
 	c.NotEmpty(account)
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountTXs), http.StatusOK, "samples/query_account_txs_unexpected.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountTXsRoute), http.StatusOK, "samples/query_account_txs_unexpected.json")
 
 	account, err = provider.GetAccountWithTransactions("pjog")
 	c.Equal(ErrUnexpectedResponse, err)
 	c.Empty(account)
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccount), http.StatusInternalServerError, "samples/query_account.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountRoute), http.StatusInternalServerError, "samples/query_account.json")
 
 	account, err = provider.GetAccountWithTransactions("pjog")
 	c.Equal(Err5xxOnConnection, err)
@@ -467,19 +467,19 @@ func TestJSONRPCProvider_Dispatch(t *testing.T) {
 
 	provider.dispatchers = []string{"https://dummy.com"}
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientDispatch), http.StatusOK, "samples/client_dispatch.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientDispatchRoute), http.StatusOK, "samples/client_dispatch.json")
 
 	dispatch, err = provider.Dispatch("pjog", "abcd", 21, nil)
 	c.NoError(err)
 	c.NotEmpty(dispatch)
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientDispatch), http.StatusInternalServerError, "samples/client_dispatch.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientDispatchRoute), http.StatusInternalServerError, "samples/client_dispatch.json")
 
 	dispatch, err = provider.Dispatch("pjog", "abcd", 21, nil)
 	c.Equal(Err5xxOnConnection, err)
 	c.Empty(dispatch)
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientDispatch), http.StatusOK, "samples/client_dispatch_unexpected.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientDispatchRoute), http.StatusOK, "samples/client_dispatch_unexpected.json")
 
 	dispatch, err = provider.Dispatch("pjog", "abcd", 21, nil)
 	c.Equal(ErrUnexpectedResponse, err)
@@ -500,13 +500,13 @@ func TestJSONRPCProvider_Relay(t *testing.T) {
 		client:      providerClient,
 	}
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientRelay), http.StatusOK, "samples/client_relay.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientRelayRoute), http.StatusOK, "samples/client_relay.json")
 
 	relay, err := provider.Relay("https://dummy.com", &RelayInput{}, nil)
 	c.NoError(err)
 	c.NotEmpty(relay)
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientRelay), http.StatusInternalServerError, "samples/client_relay.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientRelayRoute), http.StatusInternalServerError, "samples/client_relay.json")
 
 	relay, err = provider.Relay("https://dummy.com", &RelayInput{}, nil)
 	c.Equal(Err5xxOnConnection, err)

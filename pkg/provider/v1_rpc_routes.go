@@ -4,56 +4,56 @@ package provider
 type V1RPCRoute string
 
 const (
-	// ClientChallenge represents client challenge route
-	ClientChallenge V1RPCRoute = "/v1/client/challenge"
-	// ClientDispatch represents client dispatch route
-	ClientDispatch V1RPCRoute = "/v1/client/dispatch"
-	// ClientRawTX represents cliente raw TX route
-	ClientRawTX V1RPCRoute = "/v1/client/rawtx"
-	// ClientRelay represtns client realy route
-	ClientRelay V1RPCRoute = "/v1/client/relay"
-	// QueryAccount represents query account route
-	QueryAccount V1RPCRoute = "/v1/query/account"
-	// QueryAccountTXs represents query account TXs route
-	QueryAccountTXs V1RPCRoute = "/v1/query/accounttxs"
-	// QueryAllParams represents query all params route
-	QueryAllParams V1RPCRoute = "/v1/query/allparams"
-	// QueryApp represents query app route
-	QueryApp V1RPCRoute = "/v1/query/app"
-	// QueryAppParams represents query app params route
-	QueryAppParams V1RPCRoute = "/v1/query/appparams"
-	// QueryApps represents query apps route
-	QueryApps V1RPCRoute = "/v1/query/apps"
-	// QueryBalance represents query balance route
-	QueryBalance V1RPCRoute = "/v1/query/balance"
-	// QueryBlock represents query block route
-	QueryBlock V1RPCRoute = "/v1/query/block"
-	// QueryBlockTXs represents query block TXs route
-	QueryBlockTXs V1RPCRoute = "/v1/query/blocktxs"
-	// QueryHeight represents query height route
-	QueryHeight V1RPCRoute = "/v1/query/height"
-	// QueryNode represents query node route
-	QueryNode V1RPCRoute = "/v1/query/node"
-	// QueryNodeClaim represents query node claim route
-	QueryNodeClaim V1RPCRoute = "/v1/query/nodeclaim"
-	// QueryNodeClaims represents query node claims route
-	QueryNodeClaims V1RPCRoute = "/v1/query/nodeclaims"
-	// QueryNodeParams represents query node params route
-	QueryNodeParams V1RPCRoute = "/v1/query/nodeparams"
-	// QueryNodeReceipt represents query node receipt route
-	QueryNodeReceipt V1RPCRoute = "/v1/query/nodereceipt"
-	// QueryNodeReceipts represents query node receipts route
-	QueryNodeReceipts V1RPCRoute = "/v1/query/nodereceipts"
-	// QueryNodes represents query nodes route
-	QueryNodes V1RPCRoute = "/v1/query/nodes"
-	// QueryPocketParams represents query pocket params route
-	QueryPocketParams V1RPCRoute = "/v1/query/pocketparams"
-	// QuerySupply represents query supply route
-	QuerySupply V1RPCRoute = "/v1/query/supply"
-	// QuerySupportedChains represents query supported chains route
-	QuerySupportedChains V1RPCRoute = "/v1/query/supportedchains"
-	// QueryTX represents query TX route
-	QueryTX V1RPCRoute = "/v1/query/tx"
-	// QueryUpgrade reprents query upgrade route
-	QueryUpgrade V1RPCRoute = "/v1/query/upgrade"
+	// ClientChallengeRoute represents client challenge route
+	ClientChallengeRoute V1RPCRoute = "/v1/client/challenge"
+	// ClientDispatchRoute represents client dispatch route
+	ClientDispatchRoute V1RPCRoute = "/v1/client/dispatch"
+	// ClientRawTXRoute represents cliente raw TX route
+	ClientRawTXRoute V1RPCRoute = "/v1/client/rawtx"
+	// ClientRelayRoute represents client realy route
+	ClientRelayRoute V1RPCRoute = "/v1/client/relay"
+	// QueryAccountRoute represents query account route
+	QueryAccountRoute V1RPCRoute = "/v1/query/account"
+	// QueryAccountTXsRoute represents query account TXs route
+	QueryAccountTXsRoute V1RPCRoute = "/v1/query/accounttxs"
+	// QueryAllParamsRoute represents query all params route
+	QueryAllParamsRoute V1RPCRoute = "/v1/query/allparams"
+	// QueryAppRoute represents query app route
+	QueryAppRoute V1RPCRoute = "/v1/query/app"
+	// QueryAppParamsRoute represents query app params route
+	QueryAppParamsRoute V1RPCRoute = "/v1/query/appparams"
+	// QueryAppsRoute represents query apps route
+	QueryAppsRoute V1RPCRoute = "/v1/query/apps"
+	// QueryBalanceRoute represents query balance route
+	QueryBalanceRoute V1RPCRoute = "/v1/query/balance"
+	// QueryBlockRoute represents query block route
+	QueryBlockRoute V1RPCRoute = "/v1/query/block"
+	// QueryBlockTXsRoute represents query block TXs route
+	QueryBlockTXsRoute V1RPCRoute = "/v1/query/blocktxs"
+	// QueryHeightRoute represents query height route
+	QueryHeightRoute V1RPCRoute = "/v1/query/height"
+	// QueryNodeRoute represents query node route
+	QueryNodeRoute V1RPCRoute = "/v1/query/node"
+	// QueryNodeClaimRoute represents query node claim route
+	QueryNodeClaimRoute V1RPCRoute = "/v1/query/nodeclaim"
+	// QueryNodeClaimsRoute represents query node claims route
+	QueryNodeClaimsRoute V1RPCRoute = "/v1/query/nodeclaims"
+	// QueryNodeParamsRoute represents query node params route
+	QueryNodeParamsRoute V1RPCRoute = "/v1/query/nodeparams"
+	// QueryNodeReceiptRoute represents query node receipt route
+	QueryNodeReceiptRoute V1RPCRoute = "/v1/query/nodereceipt"
+	// QueryNodeReceiptsRoute represents query node receipts route
+	QueryNodeReceiptsRoute V1RPCRoute = "/v1/query/nodereceipts"
+	// QueryNodesRoute represents query nodes route
+	QueryNodesRoute V1RPCRoute = "/v1/query/nodes"
+	// QueryPocketParamsRoute represents query pocket params route
+	QueryPocketParamsRoute V1RPCRoute = "/v1/query/pocketparams"
+	// QuerySupplyRoute represents query supply route
+	QuerySupplyRoute V1RPCRoute = "/v1/query/supply"
+	// QuerySupportedChainsRoute represents query supported chains route
+	QuerySupportedChainsRoute V1RPCRoute = "/v1/query/supportedchains"
+	// QueryTXRoute represents query TX route
+	QueryTXRoute V1RPCRoute = "/v1/query/tx"
+	// QueryUpgradeRoute represents query upgrade route
+	QueryUpgradeRoute V1RPCRoute = "/v1/query/upgrade"
 )

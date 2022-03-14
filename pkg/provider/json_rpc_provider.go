@@ -40,7 +40,7 @@ func (p *JSONRPCProvider) getFinalRPCURL(rpcURL string, route V1RPCRoute) string
 		return rpcURL
 	}
 
-	if route == ClientDispatch {
+	if route == ClientDispatchRoute {
 		return p.dispatchers[int(math.Floor(rand.Float64()*100))%len(p.dispatchers)]
 	}
 
@@ -74,7 +74,7 @@ func (p *JSONRPCProvider) doPostRequest(rpcURL string, params interface{}, route
 func (p *JSONRPCProvider) GetBalance(address string) (*big.Int, error) {
 	rawResponse, err := p.doPostRequest("", map[string]string{
 		"address": address,
-	}, QueryBalance)
+	}, QueryBalanceRoute)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +99,7 @@ func (p *JSONRPCProvider) GetBalance(address string) (*big.Int, error) {
 func (p *JSONRPCProvider) queryAccountTXs(address string) (*queryAccountsTXsResponse, error) {
 	rawResponse, err := p.doPostRequest("", map[string]string{
 		"address": address,
-	}, QueryAccountTXs)
+	}, QueryAccountTXsRoute)
 	if err != nil {
 		return nil, err
 	}
@@ -167,7 +167,7 @@ func (p *JSONRPCProvider) SendTransaction(signerAddress, signedTransaction strin
 	rawResponse, err := p.doPostRequest("", map[string]string{
 		"address":       signerAddress,
 		"raw_hex_bytes": signedTransaction,
-	}, ClientRawTX)
+	}, ClientRawTXRoute)
 	if err != nil {
 		return nil, err
 	}
@@ -197,7 +197,7 @@ func (p *JSONRPCProvider) SendTransaction(signerAddress, signedTransaction strin
 func (p *JSONRPCProvider) GetBlock(blockNumber int) (*GetBlockResponse, error) {
 	rawResponse, err := p.doPostRequest("", map[string]int{
 		"height": blockNumber,
-	}, QueryBlock)
+	}, QueryBlockRoute)
 	if err != nil {
 		return nil, err
 	}
@@ -227,7 +227,7 @@ func (p *JSONRPCProvider) GetBlock(blockNumber int) (*GetBlockResponse, error) {
 func (p *JSONRPCProvider) GetTransaction(transactionHash string) (*GetTransactionResponse, error) {
 	rawResponse, err := p.doPostRequest("", map[string]string{
 		"hash": transactionHash,
-	}, QueryTX)
+	}, QueryTXRoute)
 	if err != nil {
 		return nil, err
 	}
@@ -255,7 +255,7 @@ func (p *JSONRPCProvider) GetTransaction(transactionHash string) (*GetTransactio
 
 // GetBlockNumber returns the current height
 func (p *JSONRPCProvider) GetBlockNumber() (int, error) {
-	rawResponse, err := p.doPostRequest("", nil, QueryHeight)
+	rawResponse, err := p.doPostRequest("", nil, QueryHeightRoute)
 	if err != nil {
 		return 0, err
 	}
@@ -299,7 +299,7 @@ func (p *JSONRPCProvider) GetNodes(height int, options *GetNodesOptions) (*GetNo
 		}
 	}
 
-	rawResponse, err := p.doPostRequest("", params, QueryNodes)
+	rawResponse, err := p.doPostRequest("", params, QueryNodesRoute)
 	if err != nil {
 		return nil, err
 	}
@@ -331,7 +331,7 @@ func (p *JSONRPCProvider) GetNode(address string, options *GetNodeOptions) (*Get
 		params["height"] = options.Height
 	}
 
-	rawResponse, err := p.doPostRequest("", params, QueryNode)
+	rawResponse, err := p.doPostRequest("", params, QueryNodeRoute)
 	if err != nil {
 		return nil, err
 	}
@@ -375,7 +375,7 @@ func (p *JSONRPCProvider) GetApps(height int, options *GetAppsOptions) (*GetApps
 		}
 	}
 
-	rawResponse, err := p.doPostRequest("", params, QueryApps)
+	rawResponse, err := p.doPostRequest("", params, QueryAppsRoute)
 	if err != nil {
 		return nil, err
 	}
@@ -407,7 +407,7 @@ func (p *JSONRPCProvider) GetApp(address string, options *GetAppOptions) (*GetAp
 		params["height"] = options.Height
 	}
 
-	rawResponse, err := p.doPostRequest("", params, QueryApp)
+	rawResponse, err := p.doPostRequest("", params, QueryAppRoute)
 	if err != nil {
 		return nil, err
 	}
@@ -437,7 +437,7 @@ func (p *JSONRPCProvider) GetApp(address string, options *GetAppOptions) (*GetAp
 func (p *JSONRPCProvider) GetAccount(address string) (*GetAccountResponse, error) {
 	rawResponse, err := p.doPostRequest("", map[string]string{
 		"address": address,
-	}, QueryAccount)
+	}, QueryAccountRoute)
 	if err != nil {
 		return nil, err
 	}
@@ -491,7 +491,7 @@ func (p *JSONRPCProvider) Dispatch(appPublicKey, chain string, sessionHeight int
 		"app_public_key": appPublicKey,
 		"chain":          chain,
 		"session_height": sessionHeight,
-	}, ClientDispatch)
+	}, ClientDispatchRoute)
 	if err != nil {
 		return nil, err
 	}
@@ -519,7 +519,7 @@ func (p *JSONRPCProvider) Dispatch(appPublicKey, chain string, sessionHeight int
 
 // Relay does request to be relayed to a target blockchain
 func (p *JSONRPCProvider) Relay(rpcURL string, input *RelayInput, options *RelayRequestOptions) (*RelayResponse, error) {
-	rawResponse, err := p.doPostRequest(rpcURL, input, ClientRelay)
+	rawResponse, err := p.doPostRequest(rpcURL, input, ClientRelayRoute)
 	if err != nil {
 		return nil, err
 	}
