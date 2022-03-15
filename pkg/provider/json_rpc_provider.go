@@ -35,6 +35,15 @@ type JSONRPCProvider struct {
 	client      *client.Client
 }
 
+// NewJSONRPCProvider returns JSONRPCProvider instance from input
+func NewJSONRPCProvider(rpcURL string, dispatchers []string, providerClient *client.Client) *JSONRPCProvider {
+	return &JSONRPCProvider{
+		rpcURL:      rpcURL,
+		dispatchers: dispatchers,
+		client:      providerClient,
+	}
+}
+
 func (p *JSONRPCProvider) getFinalRPCURL(rpcURL string, route V1RPCRoute) string {
 	if rpcURL != "" {
 		return rpcURL

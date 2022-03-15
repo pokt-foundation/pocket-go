@@ -29,13 +29,7 @@ func TestJSONRPCProvider_GetBalance(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	providerClient := client.NewDefaultClient()
-
-	provider := &JSONRPCProvider{
-		rpcURL:      "https://dummy.com",
-		dispatchers: []string{"https://dummy.com"},
-		client:      providerClient,
-	}
+	provider := NewJSONRPCProvider("https://dummy.com", []string{"https://dummy.com"}, client.NewDefaultClient())
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryBalanceRoute), http.StatusOK, "samples/query_balance.json")
 
@@ -56,13 +50,7 @@ func TestJSONRPCProvider_GetTransactionCount(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	providerClient := client.NewDefaultClient()
-
-	provider := &JSONRPCProvider{
-		rpcURL:      "https://dummy.com",
-		dispatchers: []string{"https://dummy.com"},
-		client:      providerClient,
-	}
+	provider := NewJSONRPCProvider("https://dummy.com", []string{"https://dummy.com"}, client.NewDefaultClient())
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountTXsRoute), http.StatusOK, "samples/query_account_txs.json")
 
@@ -83,13 +71,7 @@ func TestJSONRPCProvider_GetType(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	providerClient := client.NewDefaultClient()
-
-	provider := &JSONRPCProvider{
-		rpcURL:      "https://dummy.com",
-		dispatchers: []string{"https://dummy.com"},
-		client:      providerClient,
-	}
+	provider := NewJSONRPCProvider("https://dummy.com", []string{"https://dummy.com"}, client.NewDefaultClient())
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAppRoute), http.StatusOK, "samples/query_app.json")
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryNodeRoute), http.StatusOK, "samples/query_node.json")
@@ -137,13 +119,7 @@ func TestJSONRPCProvider_SendTransaction(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	providerClient := client.NewDefaultClient()
-
-	provider := &JSONRPCProvider{
-		rpcURL:      "https://dummy.com",
-		dispatchers: []string{"https://dummy.com"},
-		client:      providerClient,
-	}
+	provider := NewJSONRPCProvider("https://dummy.com", []string{"https://dummy.com"}, client.NewDefaultClient())
 
 	transaction, err := provider.SendTransaction("pjog", "abcd")
 	c.Contains(err.Error(), "Post \"https://dummy.com/v1/client/rawtx\": no responder found")
@@ -168,13 +144,7 @@ func TestJSONRPCProvider_GetBlock(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	providerClient := client.NewDefaultClient()
-
-	provider := &JSONRPCProvider{
-		rpcURL:      "https://dummy.com",
-		dispatchers: []string{"https://dummy.com"},
-		client:      providerClient,
-	}
+	provider := NewJSONRPCProvider("https://dummy.com", []string{"https://dummy.com"}, client.NewDefaultClient())
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryBlockRoute), http.StatusOK, "samples/query_block.json")
 
@@ -201,13 +171,7 @@ func TestJSONRPCProvider_GetTransaction(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	providerClient := client.NewDefaultClient()
-
-	provider := &JSONRPCProvider{
-		rpcURL:      "https://dummy.com",
-		dispatchers: []string{"https://dummy.com"},
-		client:      providerClient,
-	}
+	provider := NewJSONRPCProvider("https://dummy.com", []string{"https://dummy.com"}, client.NewDefaultClient())
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryTXRoute), http.StatusOK, "samples/query_tx.json")
 
@@ -234,13 +198,7 @@ func TestJSONRPCProvider_GetBlockNumber(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	providerClient := client.NewDefaultClient()
-
-	provider := &JSONRPCProvider{
-		rpcURL:      "https://dummy.com",
-		dispatchers: []string{"https://dummy.com"},
-		client:      providerClient,
-	}
+	provider := NewJSONRPCProvider("https://dummy.com", []string{"https://dummy.com"}, client.NewDefaultClient())
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryHeightRoute), http.StatusOK, "samples/query_height.json")
 
@@ -267,13 +225,7 @@ func TestJSONRPCProvider_GetNodes(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	providerClient := client.NewDefaultClient()
-
-	provider := &JSONRPCProvider{
-		rpcURL:      "https://dummy.com",
-		dispatchers: []string{"https://dummy.com"},
-		client:      providerClient,
-	}
+	provider := NewJSONRPCProvider("https://dummy.com", []string{"https://dummy.com"}, client.NewDefaultClient())
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryNodesRoute), http.StatusOK, "samples/query_nodes.json")
 
@@ -294,13 +246,7 @@ func TestJSONRPCProvider_GetApps(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	providerClient := client.NewDefaultClient()
-
-	provider := &JSONRPCProvider{
-		rpcURL:      "https://dummy.com",
-		dispatchers: []string{"https://dummy.com"},
-		client:      providerClient,
-	}
+	provider := NewJSONRPCProvider("https://dummy.com", []string{"https://dummy.com"}, client.NewDefaultClient())
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAppsRoute), http.StatusOK, "samples/query_apps.json")
 
@@ -321,13 +267,7 @@ func TestJSONRPCProvider_GetNode(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	providerClient := client.NewDefaultClient()
-
-	provider := &JSONRPCProvider{
-		rpcURL:      "https://dummy.com",
-		dispatchers: []string{"https://dummy.com"},
-		client:      providerClient,
-	}
+	provider := NewJSONRPCProvider("https://dummy.com", []string{"https://dummy.com"}, client.NewDefaultClient())
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryNodeRoute), http.StatusOK, "samples/query_node.json")
 
@@ -354,13 +294,7 @@ func TestJSONRPCProvider_GetApp(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	providerClient := client.NewDefaultClient()
-
-	provider := &JSONRPCProvider{
-		rpcURL:      "https://dummy.com",
-		dispatchers: []string{"https://dummy.com"},
-		client:      providerClient,
-	}
+	provider := NewJSONRPCProvider("https://dummy.com", []string{"https://dummy.com"}, client.NewDefaultClient())
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAppRoute), http.StatusOK, "samples/query_app.json")
 
@@ -387,13 +321,7 @@ func TestJSONRPCProvider_GetAccount(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	providerClient := client.NewDefaultClient()
-
-	provider := &JSONRPCProvider{
-		rpcURL:      "https://dummy.com",
-		dispatchers: []string{"https://dummy.com"},
-		client:      providerClient,
-	}
+	provider := NewJSONRPCProvider("https://dummy.com", []string{"https://dummy.com"}, client.NewDefaultClient())
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountRoute), http.StatusOK, "samples/query_account.json")
 
@@ -420,13 +348,7 @@ func TestJSONRPCProvider_GetAccountWithTransactions(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	providerClient := client.NewDefaultClient()
-
-	provider := &JSONRPCProvider{
-		rpcURL:      "https://dummy.com",
-		dispatchers: []string{"https://dummy.com"},
-		client:      providerClient,
-	}
+	provider := NewJSONRPCProvider("https://dummy.com", []string{"https://dummy.com"}, client.NewDefaultClient())
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountRoute), http.StatusOK, "samples/query_account.json")
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountTXsRoute), http.StatusOK, "samples/query_account_txs.json")
@@ -492,13 +414,7 @@ func TestJSONRPCProvider_Relay(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	providerClient := client.NewDefaultClient()
-
-	provider := &JSONRPCProvider{
-		rpcURL:      "https://dummy.com",
-		dispatchers: []string{"https://dummy.com"},
-		client:      providerClient,
-	}
+	provider := NewJSONRPCProvider("https://dummy.com", []string{"https://dummy.com"}, client.NewDefaultClient())
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientRelayRoute), http.StatusOK, "samples/client_relay.json")
 
