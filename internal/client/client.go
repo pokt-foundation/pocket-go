@@ -66,7 +66,6 @@ func (client *Client) PostWithURLJSONParams(url string, params interface{}, head
 		body = bytes.NewBufferString(string(rawBody))
 	}
 
-	// Needed header for JSON request
 	headers.Set("Content-Type", "application/json")
 
 	return client.Post(url, body, headers)

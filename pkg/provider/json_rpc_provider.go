@@ -24,7 +24,7 @@ var (
 	ErrUnexpectedCodeOnConnection = errors.New("rpc responded with unexpected code")
 	// ErrUnexpectedResponse error when RPC responds with unexpected response
 	ErrUnexpectedResponse = errors.New("rpc responded with unexpected response")
-	// ErrNoDispatchers erros when dispatch call is requested with no dispatchers set
+	// ErrNoDispatchers error when dispatch call is requested with no dispatchers set
 	ErrNoDispatchers = errors.New("no dispatchers")
 )
 
@@ -299,7 +299,7 @@ func (p *JSONRPCProvider) GetNodes(height int, options *GetNodesOptions) (*GetNo
 
 	if options != nil {
 		params["opts"] = map[string]interface{}{
-			"staking_status": options.StatkingStatus,
+			"staking_status": options.StakingStatus,
 			"page":           options.Page,
 			"per_page":       options.PerPage,
 			"chain":          options.Chain,
@@ -375,7 +375,7 @@ func (p *JSONRPCProvider) GetApps(height int, options *GetAppsOptions) (*GetApps
 
 	if options != nil {
 		params["opts"] = map[string]interface{}{
-			"staking_status": options.StatkingStatus,
+			"staking_status": options.StakingStatus,
 			"page":           options.Page,
 			"per_page":       options.PerPage,
 			"chain":          options.Chain,

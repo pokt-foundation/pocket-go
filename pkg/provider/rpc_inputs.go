@@ -1,6 +1,6 @@
 package provider
 
-// RelayInput represents input needed for relay request
+// RelayInput represents the input needed for a relay request
 type RelayInput struct {
 	Payload struct {
 		Data   string `json:"data"`
@@ -16,7 +16,7 @@ type RelayInput struct {
 		SessionBlockHeight int    `json:"session_block_height"`
 		ServicerPubKey     string `json:"servicer_pub_key"`
 		Blockchain         string `json:"blockchain"`
-		Aat                struct {
+		AAT                struct {
 			Version      string `json:"version"`
 			AppPubKey    string `json:"app_pub_key"`
 			ClientPubKey string `json:"client_pub_key"`
