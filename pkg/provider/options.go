@@ -11,12 +11,12 @@ type GetNodeOptions struct {
 
 // GetNodesOptions represents optional arguments for GetNodes request
 type GetNodesOptions struct {
-	StatkingStatus models.StakingStatus
-	Page           int
-	PerPage        int
-	Chain          string
-	JailedStatus   models.JailedStatus
-	Blockchain     string
+	StakingStatus models.StakingStatus
+	Page          int
+	PerPage       int
+	Chain         string
+	JailedStatus  models.JailedStatus
+	Blockchain    string
 }
 
 // GetAppOptions represents optional arguments for GetApp request
@@ -26,12 +26,12 @@ type GetAppOptions struct {
 
 // GetAppsOptions represents optional arguments for GetApps request
 type GetAppsOptions struct {
-	StatkingStatus models.StakingStatus
-	Page           int
-	PerPage        int
-	Chain          string
-	JailedStatus   models.JailedStatus
-	Blockchain     string
+	StakingStatus models.StakingStatus
+	Page          int
+	PerPage       int
+	Chain         string
+	JailedStatus  models.JailedStatus
+	Blockchain    string
 }
 
 // DispatchRequestOptions represents optional arguments for Dispatch request

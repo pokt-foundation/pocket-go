@@ -300,7 +300,7 @@ type RelayResponse struct {
 		SessionBlockHeight int    `json:"session_block_height"`
 		ServicerPubKey     string `json:"servicer_pub_key"`
 		Blockchain         string `json:"blockchain"`
-		Aat                struct {
+		AAT                struct {
 			Version      string `json:"version"`
 			AppPubKey    string `json:"app_pub_key"`
 			ClientPubKey string `json:"client_pub_key"`

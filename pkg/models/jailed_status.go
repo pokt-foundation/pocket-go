@@ -4,8 +4,8 @@ package models
 type JailedStatus int
 
 const (
-	// Jailed represents jailed status
+	// Jailed status is when a node has been jailed due to x and thus cannot serve relays
 	Jailed JailedStatus = iota + 1
-	// UnJailed represents unJailed status
-	UnJailed
+	// Unjailed status is when a node is not jailed and thus can serve relays
+	Unjailed
 )
