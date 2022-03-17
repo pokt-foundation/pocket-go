@@ -146,14 +146,14 @@ func (p *JSONRPCProvider) GetTransactionCount(address string) (int, error) {
 
 func returnType(appResponse *GetAppResponse, nodeResponse *GetNodeResponse) AddressType {
 	if nodeResponse.ServiceURL == nil && appResponse.MaxRelays != nil {
-		return App
+		return AppType
 	}
 
 	if nodeResponse.ServiceURL != nil && appResponse.MaxRelays == nil {
-		return Node
+		return NodeType
 	}
 
-	return Account
+	return AccountType
 }
 
 // GetType returns type of given address
@@ -527,9 +527,9 @@ func (p *JSONRPCProvider) Dispatch(appPublicKey, chain string, sessionHeight int
 }
 
 // Relay does request to be relayed to a target blockchain
-func (p *JSONRPCProvider) Relay(rpcURL string, input *RelayInput, options *RelayRequestOptions) (*RelayResponse, error) {
+func (p *JSONRPCProvider) Relay(rpcURL string, input *Relay, options *RelayRequestOptions) (*RelayResponse, error) {
 	rawResponse, err := p.doPostRequest(rpcURL, input, ClientRelayRoute)
-	if err != nil {
+	if err != nil && rawResponse.StatusCode != http.StatusBadRequest {
 		return nil, err
 	}
 
@@ -540,12 +540,35 @@ func (p *JSONRPCProvider) Relay(rpcURL string, input *RelayInput, options *Relay
 		return nil, err
 	}
 
-	response := RelayResponse{}
+	if rawResponse.StatusCode == http.StatusBadRequest {
+		return parseRelayErrorResponse(bodyBytes)
+	}
 
-	err = json.Unmarshal(bodyBytes, &response)
+	return parseRelaySuccessfulResponse(bodyBytes)
+}
+
+func parseRelayErrorResponse(bodyBytes []byte) (*RelayResponse, error) {
+	response := RelayErrorResponse{}
+
+	err := json.Unmarshal(bodyBytes, &response)
 	if err != nil {
 		return nil, err
 	}
 
-	return &response, nil
+	return &RelayResponse{
+		ErrorResponse: &response,
+	}, nil
+}
+
+func parseRelaySuccessfulResponse(bodyBytes []byte) (*RelayResponse, error) {
+	response := Relay{}
+
+	err := json.Unmarshal(bodyBytes, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &RelayResponse{
+		SuccessfulResponse: &response,
+	}, nil
 }

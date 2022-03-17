@@ -263,49 +263,29 @@ type GetAccountWithTransactionsResponse struct {
 
 // DispatchResponse represents response for Dispatch request
 type DispatchResponse struct {
-	BlockHeight int `json:"block_height"`
-	Session     *struct {
-		Header struct {
-			AppPublicKey  string `json:"app_public_key"`
-			Chain         string `json:"chain"`
-			SessionHeight int    `json:"session_height"`
-		} `json:"header"`
-		Key   string `json:"key"`
-		Nodes []struct {
-			Address       string    `json:"address"`
-			Chains        []string  `json:"chains"`
-			Jailed        bool      `json:"jailed"`
-			PublicKey     string    `json:"public_key"`
-			ServiceURL    string    `json:"service_url"`
-			Status        int       `json:"status"`
-			Tokens        string    `json:"tokens"`
-			UnstakingTime time.Time `json:"unstaking_time"`
-		} `json:"nodes"`
-	} `json:"session"`
+	BlockHeight int      `json:"block_height"`
+	Session     *Session `json:"session"`
 }
 
-// RelayResponse represents response for Relay request
-type RelayResponse struct {
-	Payload struct {
-		Data   string `json:"data"`
-		Method string `json:"method"`
-		Path   string `json:"path"`
-	} `json:"payload"`
-	Meta struct {
-		BlockHeight int `json:"block_height"`
-	} `json:"meta"`
-	Proof struct {
-		RequestHash        string `json:"request_hash"`
-		Entropy            int64  `json:"entropy"`
-		SessionBlockHeight int    `json:"session_block_height"`
-		ServicerPubKey     string `json:"servicer_pub_key"`
-		Blockchain         string `json:"blockchain"`
-		AAT                struct {
-			Version      string `json:"version"`
-			AppPubKey    string `json:"app_pub_key"`
-			ClientPubKey string `json:"client_pub_key"`
-			Signature    string `json:"signature"`
-		} `json:"aat"`
-		Signature string `json:"signature"`
-	} `json:"proof"`
+// Session represents session response from RPC request
+type Session struct {
+	Header struct {
+		AppPublicKey  string `json:"app_public_key"`
+		Chain         string `json:"chain"`
+		SessionHeight int    `json:"session_height"`
+	} `json:"header"`
+	Key   string  `json:"key"`
+	Nodes []*Node `json:"nodes"`
+}
+
+// Node represents node response from RPC request
+type Node struct {
+	Address       string    `json:"address"`
+	Chains        []string  `json:"chains"`
+	Jailed        bool      `json:"jailed"`
+	PublicKey     string    `json:"public_key"`
+	ServiceURL    string    `json:"service_url"`
+	Status        int       `json:"status"`
+	Tokens        string    `json:"tokens"`
+	UnstakingTime time.Time `json:"unstaking_time"`
 }
