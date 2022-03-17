@@ -78,7 +78,7 @@ func TestJSONRPCProvider_GetType(t *testing.T) {
 
 	addressType, err := provider.GetType("pjog")
 	c.NoError(err)
-	c.Equal(Account, addressType)
+	c.Equal(AccountType, addressType)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryNodeRoute), http.StatusBadRequest, "samples/query_node.json")
 
@@ -103,14 +103,14 @@ func Test_returnType(t *testing.T) {
 
 	node := &GetNodeResponse{}
 
-	c.Equal(App, returnType(app, node))
+	c.Equal(AppType, returnType(app, node))
 
 	app.MaxRelays = nil
 
 	serviceURL := "https://dummy.com"
 	node.ServiceURL = &serviceURL
 
-	c.Equal(Node, returnType(app, node))
+	c.Equal(NodeType, returnType(app, node))
 }
 
 func TestJSONRPCProvider_SendTransaction(t *testing.T) {
@@ -418,13 +418,19 @@ func TestJSONRPCProvider_Relay(t *testing.T) {
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientRelayRoute), http.StatusOK, "samples/client_relay.json")
 
-	relay, err := provider.Relay("https://dummy.com", &RelayInput{}, nil)
+	relay, err := provider.Relay("https://dummy.com", &Relay{}, nil)
 	c.NoError(err)
-	c.NotEmpty(relay)
+	c.NotEmpty(relay.SuccessfulResponse)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientRelayRoute), http.StatusInternalServerError, "samples/client_relay.json")
 
-	relay, err = provider.Relay("https://dummy.com", &RelayInput{}, nil)
+	relay, err = provider.Relay("https://dummy.com", &Relay{}, nil)
 	c.Equal(Err5xxOnConnection, err)
 	c.Empty(relay)
+
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientRelayRoute), http.StatusBadRequest, "samples/client_relay_error.json")
+
+	relay, err = provider.Relay("https://dummy.com", &Relay{}, nil)
+	c.NoError(err)
+	c.NotEmpty(relay.ErrorResponse)
 }

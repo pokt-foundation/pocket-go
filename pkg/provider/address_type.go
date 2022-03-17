@@ -4,10 +4,10 @@ package provider
 type AddressType string
 
 const (
-	// Node represents node type
-	Node AddressType = "node"
-	// App represents app type
-	App AddressType = "app"
-	// Account represents account type
-	Account AddressType = "account"
+	// NodeType represents node type
+	NodeType AddressType = "node"
+	// AppType represents app type
+	AppType AddressType = "app"
+	// AccountType represents account type
+	AccountType AddressType = "account"
 )
