@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"math"
 	"math/big"
 	"math/rand"
 	"net/http"
@@ -50,7 +49,7 @@ func (p *JSONRPCProvider) getFinalRPCURL(rpcURL string, route V1RPCRoute) string
 	}
 
 	if route == ClientDispatchRoute {
-		return p.dispatchers[int(math.Floor(rand.Float64()*100))%len(p.dispatchers)]
+		return p.dispatchers[rand.Intn(len(p.dispatchers))]
 	}
 
 	return p.rpcURL
