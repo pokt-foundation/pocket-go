@@ -1,6 +1,10 @@
 package client
 
 import (
+	"bytes"
+	"encoding/json"
+	"io"
+	"net/http"
 	"time"
 
 	"github.com/gojektech/heimdall"
@@ -47,4 +51,22 @@ func NewCustomClient(retries int, timeout time.Duration) *Client {
 			httpclient.WithRetrier(retrier),
 		),
 	}
+}
+
+// PostWithURLJSONParams does post request with JSON param
+func (client *Client) PostWithURLJSONParams(url string, params interface{}, headers http.Header) (*http.Response, error) {
+	var body io.Reader
+
+	if params != nil {
+		rawBody, err := json.Marshal(params)
+		if err != nil {
+			return nil, err
+		}
+
+		body = bytes.NewBufferString(string(rawBody))
+	}
+
+	headers.Set("Content-Type", "application/json")
+
+	return client.Post(url, body, headers)
 }

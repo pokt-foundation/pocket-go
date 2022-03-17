@@ -1,0 +1,9 @@
+{
+    "coins": [
+      {
+        "amount": "string",
+        "denom": "string"
+      }
+    ],
+    "public_key": "string"
+}

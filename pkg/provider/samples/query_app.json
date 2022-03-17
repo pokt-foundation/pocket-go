@@ -1,0 +1,12 @@
+{
+    "address": "string",
+    "public_key": "string",
+    "jailed": false,
+    "status": 0,
+    "chains": [
+      "string"
+    ],
+    "tokens": "string",
+    "max_relays": 0,
+    "unstaking_time": "0001-01-01T00:00:00Z"
+}

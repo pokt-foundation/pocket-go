@@ -1,0 +1,12 @@
+{
+    "address": "05d98fbedf63cd4b4e337ef488ec2ad7e5072cb2",
+    "chains": [
+      "36f028580bb02cc8272a9a020f4200e346e276ae664e45ee80745574e2f5ab80"
+    ],
+    "jailed": false,
+    "public_key": "bac2790f5786d4e016ed1f03a54205ba99b949e6a3c4b4641317977dfedfce79",
+    "service_url": "0.0.0.0:8081",
+    "status": 2,
+    "tokens": "1000000000000000",
+    "unstaking_time": "0001-01-01T00:00:00Z"
+}
