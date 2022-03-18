@@ -58,18 +58,13 @@ func NewKeyManagerFromPrivateKey(privateKey string) (*KeyManager, error) {
 }
 
 // Sign returns a signed request
-func (km *KeyManager) Sign(payload string) (string, error) {
+func (km *KeyManager) Sign(payload []byte) (string, error) {
 	decodedKey, err := hex.DecodeString(km.privateKey)
 	if err != nil {
 		return "", err
 	}
 
-	decodedPayload, err := hex.DecodeString(payload)
-	if err != nil {
-		return "", err
-	}
-
-	signature, exit := cryptosign.CryptoSignDetached(decodedPayload, decodedKey)
+	signature, exit := cryptosign.CryptoSignDetached(payload, decodedKey)
 	if exit != 0 {
 		return "", ErrCryptoSignDetached
 	}
