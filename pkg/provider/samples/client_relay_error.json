@@ -1,5 +1,9 @@
 {
-    "error": "{code: 400, message: \"encoding/hex: odd length hex string\" }",
+    "error": {
+      "code": 25,
+      "codespace": "pocketcore",
+      "message": "the payload data of the relay request is empty"
+    },
     "dispatch": {
       "block_height": 3,
       "session": {

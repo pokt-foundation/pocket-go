@@ -23,6 +23,17 @@ func TestJSONRPCProvider_ProviderInterface(t *testing.T) {
 	c.True(ok)
 }
 
+func TestRelayError_ErrorInterface(t *testing.T) {
+	c := require.New(t)
+
+	err := &RelayError{}
+
+	var i interface{} = err
+
+	_, ok := i.(error)
+	c.True(ok)
+}
+
 func TestJSONRPCProvider_GetBalance(t *testing.T) {
 	c := require.New(t)
 
@@ -433,4 +444,5 @@ func TestJSONRPCProvider_Relay(t *testing.T) {
 	relay, err = provider.Relay("https://dummy.com", &Relay{}, nil)
 	c.NoError(err)
 	c.NotEmpty(relay.ErrorResponse)
+	c.Equal("Request failed with code: 25, codespace: pocketcore and message: the payload data of the relay request is empty", relay.ErrorResponse.Error.Error())
 }

@@ -1,6 +1,8 @@
 package provider
 
 import (
+	"fmt"
+
 	"github.com/pokt-foundation/pocket-go/pkg/models"
 )
 
@@ -51,6 +53,19 @@ type PocketAAT struct {
 
 // RelayErrorResponse represents error response of relay request
 type RelayErrorResponse struct {
-	Error    string            `json:"error"`
+	Error    *RelayError       `json:"error"`
 	Dispatch *DispatchResponse `json:"dispatch"`
+}
+
+// RelayError represents the thrown error of a relay request
+type RelayError struct {
+	Code      int    `json:"code"`
+	Codespace string `json:"codespace"`
+	Message   string `json:"message"`
+}
+
+// Error returns string representation of error
+// needed to implement error interface
+func (e *RelayError) Error() string {
+	return fmt.Sprintf("Request failed with code: %v, codespace: %s and message: %s", e.Code, e.Codespace, e.Message)
 }
