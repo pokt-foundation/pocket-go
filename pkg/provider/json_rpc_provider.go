@@ -556,7 +556,7 @@ func parseRelayErrorResponse(bodyBytes []byte) (*RelayResponse, error) {
 
 	return &RelayResponse{
 		ErrorResponse: &response,
-	}, nil
+	}, response.Error
 }
 
 func parseRelaySuccessfulResponse(bodyBytes []byte) (*RelayResponse, error) {

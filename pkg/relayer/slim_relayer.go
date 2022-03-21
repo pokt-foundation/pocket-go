@@ -168,11 +168,6 @@ func (r *SlimRelayer) Relay(input *RelayInput, options *provider.RelayRequestOpt
 		return nil, err
 	}
 
-	err = ValidateRelayResponse(relayOutput)
-	if err != nil {
-		return nil, err
-	}
-
 	return relayOutput.SuccessfulResponse, nil
 }
 
@@ -263,17 +258,4 @@ func HashRequest(reqHash *RequestHash) (string, error) {
 	}
 
 	return hex.EncodeToString(hasher.Sum(nil)), nil
-}
-
-// ValidateRelayResponse validates if relay response is error or successful
-func ValidateRelayResponse(response *provider.RelayResponse) error {
-	if response.SuccessfulResponse != nil {
-		return nil
-	}
-
-	if response.ErrorResponse == nil {
-		return ErrUnexpectedErrorResponse
-	}
-
-	return response.ErrorResponse.Error
 }

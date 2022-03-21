@@ -442,7 +442,6 @@ func TestJSONRPCProvider_Relay(t *testing.T) {
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientRelayRoute), http.StatusBadRequest, "samples/client_relay_error.json")
 
 	relay, err = provider.Relay("https://dummy.com", &Relay{}, nil)
-	c.NoError(err)
+	c.Equal("Request failed with code: 25, codespace: pocketcore and message: the payload data of the relay request is empty", err.Error())
 	c.NotEmpty(relay.ErrorResponse)
-	c.Equal("Request failed with code: 25, codespace: pocketcore and message: the payload data of the relay request is empty", relay.ErrorResponse.Error.Error())
 }
