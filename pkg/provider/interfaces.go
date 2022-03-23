@@ -9,7 +9,7 @@ type Provider interface {
 	// Account
 	GetBalance(address string) (*big.Int, error)
 	GetTransactionCount(address string) (int, error)
-	GetType(address string) (AddressType, error)
+	GetType(address string, options *GetTypeOptions) (AddressType, error)
 	// TXs
 	SendTransaction(signerAddress string, signedTransaction string) (*SendTransactionResponse, error)
 	// Network

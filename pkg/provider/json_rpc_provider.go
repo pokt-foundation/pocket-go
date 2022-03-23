@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"math/big"
 	"math/rand"
 	"net/http"
-	"strconv"
 
 	"github.com/pokt-foundation/pocket-go/internal/client"
 	internalUtils "github.com/pokt-foundation/pocket-go/internal/utils"
@@ -21,8 +21,6 @@ var (
 	Err5xxOnConnection = errors.New("rpc responded with 5xx")
 	// ErrUnexpectedCodeOnConnection error when RPC responds with unexpected code
 	ErrUnexpectedCodeOnConnection = errors.New("rpc responded with unexpected code")
-	// ErrUnexpectedResponse error when RPC responds with unexpected response
-	ErrUnexpectedResponse = errors.New("rpc responded with unexpected response")
 	// ErrNoDispatchers error when dispatch call is requested with no dispatchers set
 	ErrNoDispatchers = errors.New("no dispatchers")
 )
@@ -63,6 +61,10 @@ func (p *JSONRPCProvider) doPostRequest(rpcURL string, params interface{}, route
 		return nil, err
 	}
 
+	if response.StatusCode == http.StatusBadRequest && route != ClientRelayRoute {
+		return nil, returnRPCError(response.Body)
+	}
+
 	if string(response.Status[0]) == "4" {
 		return response, Err4xxOnConnection
 	}
@@ -76,6 +78,24 @@ func (p *JSONRPCProvider) doPostRequest(rpcURL string, params interface{}, route
 	}
 
 	return nil, ErrUnexpectedCodeOnConnection
+}
+
+func returnRPCError(body io.ReadCloser) error {
+	defer internalUtils.CloseOrLog(body)
+
+	bodyBytes, err := ioutil.ReadAll(body)
+	if err != nil {
+		return err
+	}
+
+	response := RPCError{}
+
+	err = json.Unmarshal(bodyBytes, &response)
+	if err != nil {
+		return err
+	}
+
+	return &response
 }
 
 // GetBalance requests the balance of the specified address
@@ -126,10 +146,6 @@ func (p *JSONRPCProvider) queryAccountTXs(address string) (*queryAccountsTXsResp
 		return nil, err
 	}
 
-	if response.TotalCount == nil {
-		return nil, ErrUnexpectedResponse
-	}
-
 	return &response, nil
 }
 
@@ -140,15 +156,15 @@ func (p *JSONRPCProvider) GetTransactionCount(address string) (int, error) {
 		return 0, err
 	}
 
-	return strconv.Atoi(*response.TotalCount)
+	return response.TotalCount, nil
 }
 
-func returnType(appResponse *GetAppResponse, nodeResponse *GetNodeResponse) AddressType {
-	if nodeResponse.ServiceURL == nil && appResponse.MaxRelays != nil {
+func returnType(appErr, nodeErr error) AddressType {
+	if nodeErr != nil && appErr == nil {
 		return AppType
 	}
 
-	if nodeResponse.ServiceURL != nil && appResponse.MaxRelays == nil {
+	if nodeErr == nil && appErr != nil {
 		return NodeType
 	}
 
@@ -156,18 +172,25 @@ func returnType(appResponse *GetAppResponse, nodeResponse *GetNodeResponse) Addr
 }
 
 // GetType returns type of given address
-func (p *JSONRPCProvider) GetType(address string) (AddressType, error) {
-	appResponse, err := p.GetApp(address, nil)
-	if err != nil {
-		return "", err
+func (p *JSONRPCProvider) GetType(address string, options *GetTypeOptions) (AddressType, error) {
+	var height int
+	var errResponse *RPCError
+
+	if options != nil {
+		height = options.Height
 	}
 
-	nodeResponse, err := p.GetNode(address, nil)
-	if err != nil {
-		return "", err
+	_, appErr := p.GetApp(address, &GetAppOptions{Height: height})
+	if appErr != nil && !errors.As(appErr, &errResponse) {
+		return "", appErr
 	}
 
-	return returnType(appResponse, nodeResponse), nil
+	_, nodeErr := p.GetNode(address, &GetNodeOptions{Height: height})
+	if nodeErr != nil && !errors.As(nodeErr, &errResponse) {
+		return "", nodeErr
+	}
+
+	return returnType(appErr, nodeErr), nil
 }
 
 // SendTransaction sends raw transaction to be relayed to a target address
@@ -192,10 +215,6 @@ func (p *JSONRPCProvider) SendTransaction(signerAddress, signedTransaction strin
 	err = json.Unmarshal(bodyBytes, &response)
 	if err != nil {
 		return nil, err
-	}
-
-	if response.Txhash == "" {
-		return nil, ErrUnexpectedResponse
 	}
 
 	return &response, nil
@@ -224,10 +243,6 @@ func (p *JSONRPCProvider) GetBlock(blockNumber int) (*GetBlockResponse, error) {
 		return nil, err
 	}
 
-	if response.Block == nil {
-		return nil, ErrUnexpectedResponse
-	}
-
 	return &response, nil
 }
 
@@ -254,10 +269,6 @@ func (p *JSONRPCProvider) GetTransaction(transactionHash string) (*GetTransactio
 		return nil, err
 	}
 
-	if response.Transaction.Hash == "" {
-		return nil, ErrUnexpectedResponse
-	}
-
 	return &response, nil
 }
 
@@ -282,11 +293,7 @@ func (p *JSONRPCProvider) GetBlockNumber() (int, error) {
 		return 0, err
 	}
 
-	if response.Height == nil {
-		return 0, ErrUnexpectedResponse
-	}
-
-	return *response.Height, nil
+	return response.Height, nil
 }
 
 // GetNodes returns a page of nodes known at the specified height and with options
@@ -356,10 +363,6 @@ func (p *JSONRPCProvider) GetNode(address string, options *GetNodeOptions) (*Get
 	err = json.Unmarshal(bodyBytes, &response)
 	if err != nil {
 		return nil, err
-	}
-
-	if response.Chains == nil {
-		return nil, ErrUnexpectedResponse
 	}
 
 	return &response, nil
@@ -434,10 +437,6 @@ func (p *JSONRPCProvider) GetApp(address string, options *GetAppOptions) (*GetAp
 		return nil, err
 	}
 
-	if response.Chains == nil {
-		return nil, ErrUnexpectedResponse
-	}
-
 	return &response, nil
 }
 
@@ -462,10 +461,6 @@ func (p *JSONRPCProvider) GetAccount(address string) (*GetAccountResponse, error
 	err = json.Unmarshal(bodyBytes, &response)
 	if err != nil {
 		return nil, err
-	}
-
-	if response.Address == "" {
-		return nil, ErrUnexpectedResponse
 	}
 
 	return &response, nil
@@ -516,10 +511,6 @@ func (p *JSONRPCProvider) Dispatch(appPublicKey, chain string, sessionHeight int
 	err = json.Unmarshal(bodyBytes, &response)
 	if err != nil {
 		return nil, err
-	}
-
-	if response.Session == nil {
-		return nil, ErrUnexpectedResponse
 	}
 
 	return &response, nil

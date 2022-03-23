@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"fmt"
 	"math/big"
 	"time"
 )
@@ -51,7 +52,7 @@ type queryAccountsTXsResponse struct {
 			} `json:"signature"`
 		} `json:"stdTx"`
 	} `json:"txs"`
-	TotalCount *string `json:"total_count"`
+	TotalCount int `json:"total_count"`
 }
 
 // GetAppResponse represents response for GetApp request
@@ -76,7 +77,7 @@ type GetAppsResponse struct {
 // GetNodeResponse represents response for GetNode request
 type GetNodeResponse struct {
 	Address       string    `json:"address"`
-	Chains        *[]string `json:"chains"`
+	Chains        []string  `json:"chains"`
 	Jailed        bool      `json:"jailed"`
 	PublicKey     string    `json:"public_key"`
 	ServiceURL    *string   `json:"service_url"`
@@ -113,7 +114,7 @@ type SendTransactionResponse struct {
 
 // GetBlockResponse represents response for GetBlock request
 type GetBlockResponse struct {
-	Block *struct {
+	Block struct {
 		Data struct {
 			Txs string `json:"txs"`
 		} `json:"data"`
@@ -242,7 +243,7 @@ type GetTransactionResponse struct {
 }
 
 type queryHeightResponse struct {
-	Height *int `json:"height"`
+	Height int `json:"height"`
 }
 
 // GetAccountResponse represents response for GetAccount request
@@ -288,4 +289,16 @@ type Node struct {
 	Status        int       `json:"status"`
 	Tokens        string    `json:"tokens"`
 	UnstakingTime time.Time `json:"unstaking_time"`
+}
+
+// RPCError reprensents error response from RPC request
+type RPCError struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+}
+
+// Error returns string representation of error
+// needed to implement error interface
+func (e *RPCError) Error() string {
+	return fmt.Sprintf("Request failed with code: %v and message: %s", e.Code, e.Message)
 }
