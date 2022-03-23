@@ -3,6 +3,7 @@ package signer
 import (
 	"encoding/hex"
 	"errors"
+	"fmt"
 
 	"github.com/GoKillers/libsodium-go/cryptosign"
 	"github.com/pokt-foundation/pocket-go/pkg/utils"
@@ -26,7 +27,7 @@ type KeyManager struct {
 func NewRandomKeyManager() (*KeyManager, error) {
 	privateKey, publicKey, exit := cryptosign.CryptoSignKeyPair()
 	if exit != 0 {
-		return nil, ErrCryptoSignKeyPair
+		return nil, fmt.Errorf(fmt.Sprintf("Exit code: %v", exit), ErrCryptoSignKeyPair)
 	}
 
 	address, err := utils.GetAddressFromDecodedPublickey(publicKey)
@@ -58,6 +59,7 @@ func NewKeyManagerFromPrivateKey(privateKey string) (*KeyManager, error) {
 }
 
 // Sign returns a signed request
+// Note that libsodium uses detached signatures
 func (km *KeyManager) Sign(payload []byte) (string, error) {
 	decodedKey, err := hex.DecodeString(km.privateKey)
 	if err != nil {
@@ -66,7 +68,7 @@ func (km *KeyManager) Sign(payload []byte) (string, error) {
 
 	signature, exit := cryptosign.CryptoSignDetached(payload, decodedKey)
 	if exit != 0 {
-		return "", ErrCryptoSignDetached
+		return "", fmt.Errorf(fmt.Sprintf("Exit code: %v", exit), ErrCryptoSignDetached)
 	}
 
 	return hex.EncodeToString(signature), nil

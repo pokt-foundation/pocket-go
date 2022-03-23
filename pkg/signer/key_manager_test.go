@@ -1,6 +1,7 @@
 package signer
 
 import (
+	"encoding/hex"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -10,13 +11,16 @@ func TestKeyManager_Sign(t *testing.T) {
 	c := require.New(t)
 
 	privateKey := "1f8cbde30ef5a9db0a5a9d5eb40536fc9defc318b8581d543808b7504e0902bcb243b27bc9fbe5580457a46370ae5f03a6f6753633e51efdaf2cf534fdc26cc3"
-	payload := "\"jsonrpc\":\"2.0\",\"method\":\"web3_sha3\",\"params\":[\"0x68656c6c6f20776f726c64\"],\"id\":64"
-	expectedSignature := "3da5bdeaad60376b1b0f8d77bc33744bfee8c69f324057c84e83c79c1984bff7875d8a3c16e90d72eacb34da6e50d195852dcac0b74771799526e01e719b8502"
+	payload := "deadbeef"
+	expectedSignature := "5d04dfc0d0e579d815f761b452c7d01e5f20a71b9fb66dbbeb1959cffed9da0a621ee06dfd11171757f9c9541768eaf59cce75ac4acc1ad122556ec26e166108"
 
 	keyManager, err := NewKeyManagerFromPrivateKey(privateKey)
 	c.NoError(err)
 
-	signature, err := keyManager.Sign([]byte(payload))
+	decodedPayload, err := hex.DecodeString(payload)
+	c.NoError(err)
+
+	signature, err := keyManager.Sign(decodedPayload)
 	c.NoError(err)
 	c.Equal(expectedSignature, signature)
 }
