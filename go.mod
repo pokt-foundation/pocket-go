@@ -3,6 +3,7 @@ module github.com/pokt-foundation/pocket-go
 go 1.17
 
 require (
+	github.com/GoKillers/libsodium-go v0.0.0-20171022220152-dd733721c3cb
 	github.com/gojektech/heimdall v5.0.2+incompatible
 	github.com/jarcoal/httpmock v1.1.0
 	github.com/stretchr/testify v1.7.0

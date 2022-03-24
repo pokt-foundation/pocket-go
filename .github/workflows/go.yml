@@ -44,5 +44,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
 
-      - name: Run Unit tests.
+      - name: Install libsodium
+        run: sudo apt install libsodium-dev
+
+      - name: Run Unit tests
         run: go test ./...
