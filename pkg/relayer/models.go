@@ -23,6 +23,7 @@ type RequestHash struct {
 	Meta    *provider.RelayMeta    `json:"meta"`
 }
 
+// RelayResponse struct for data needed as response for relay request
 type RelayResponse struct {
 	Response string
 	Proof    *provider.RelayProof
