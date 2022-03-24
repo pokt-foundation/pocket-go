@@ -35,7 +35,7 @@ func TestSlimRelayer_GetNewSession(t *testing.T) {
 
 	relayer := NewSlimRelayer(wallet, nil)
 
-	session, err := relayer.GetNewSession("PJOG", 21, nil)
+	session, err := relayer.GetNewSession("PJOG", "PJOG", 21, nil)
 	c.Equal(ErrNoProvider, err)
 	c.Empty(session)
 
@@ -44,14 +44,14 @@ func TestSlimRelayer_GetNewSession(t *testing.T) {
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", provider.ClientDispatchRoute),
 		http.StatusOK, "../provider/samples/client_dispatch.json")
 
-	session, err = relayer.GetNewSession("PJOG", 21, nil)
+	session, err = relayer.GetNewSession("PJOG", "PJOG", 21, nil)
 	c.NoError(err)
 	c.NotEmpty(session)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", provider.ClientDispatchRoute),
 		http.StatusInternalServerError, "../provider/samples/client_dispatch.json")
 
-	session, err = relayer.GetNewSession("PJOG", 21, nil)
+	session, err = relayer.GetNewSession("PJOG", "PJOG", 21, nil)
 	c.Equal(provider.Err5xxOnConnection, err)
 	c.Empty(session)
 }
@@ -123,6 +123,12 @@ func TestSlimRelayer_Relay(t *testing.T) {
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", provider.ClientRelayRoute),
 		http.StatusOK, "../provider/samples/client_relay.json")
+
+	relay, err = relayer.Relay(relayInput, nil)
+	c.NoError(err)
+	c.NotEmpty(relay)
+
+	relayInput.Node = &provider.Node{PublicKey: "AOG"}
 
 	relay, err = relayer.Relay(relayInput, nil)
 	c.NoError(err)

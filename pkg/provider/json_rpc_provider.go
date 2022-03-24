@@ -23,6 +23,8 @@ var (
 	ErrUnexpectedCodeOnConnection = errors.New("rpc responded with unexpected code")
 	// ErrNoDispatchers error when dispatch call is requested with no dispatchers set
 	ErrNoDispatchers = errors.New("no dispatchers")
+	// ErrInvalidJSON error when provider responds with invalid JSON
+	ErrInvalidJSON = errors.New("invalid JSON")
 )
 
 // JSONRPCProvider struct handler por JSON RPC provider
@@ -531,13 +533,19 @@ func (p *JSONRPCProvider) Relay(rpcURL string, input *Relay, options *RelayReque
 	}
 
 	if rawResponse.StatusCode == http.StatusBadRequest {
-		return parseRelayErrorResponse(bodyBytes)
+		return parseRelayErrorResponse(bodyBytes, input.Proof.ServicerPubKey)
 	}
 
-	return parseRelaySuccessfulResponse(bodyBytes)
+	if !json.Valid(bodyBytes) {
+		return nil, ErrInvalidJSON
+	}
+
+	return &RelayResponse{
+		SuccessfulResponse: string(bodyBytes),
+	}, nil
 }
 
-func parseRelayErrorResponse(bodyBytes []byte) (*RelayResponse, error) {
+func parseRelayErrorResponse(bodyBytes []byte, servicerPubKey string) (*RelayResponse, error) {
 	response := RelayErrorResponse{}
 
 	err := json.Unmarshal(bodyBytes, &response)
@@ -546,19 +554,11 @@ func parseRelayErrorResponse(bodyBytes []byte) (*RelayResponse, error) {
 	}
 
 	return &RelayResponse{
-		ErrorResponse: &response,
-	}, response.Error
-}
-
-func parseRelaySuccessfulResponse(bodyBytes []byte) (*RelayResponse, error) {
-	response := Relay{}
-
-	err := json.Unmarshal(bodyBytes, &response)
-	if err != nil {
-		return nil, err
-	}
-
-	return &RelayResponse{
-		SuccessfulResponse: &response,
-	}, nil
+			ErrorResponse: &response,
+		}, &RelayError{
+			Code:           response.Error.Code,
+			Codespace:      response.Error.Message,
+			Message:        response.Error.Message,
+			ServicerPubKey: servicerPubKey,
+		}
 }

@@ -31,6 +31,19 @@ func NewRandomWallet() (*Wallet, error) {
 	}, nil
 }
 
+// NewWalletFromPrivatekey returns Wallet from random values
+func NewWalletFromPrivatekey(privateKey string) (*Wallet, error) {
+	keyManager, err := NewKeyManagerFromPrivateKey(privateKey)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Wallet{
+		isSigner:   true,
+		keyManager: keyManager,
+	}, nil
+}
+
 // Connect assigns provider and changes isSigner accordingly
 func (w *Wallet) Connect(requestProvider provider.Provider) {
 	w.requestProvider = requestProvider

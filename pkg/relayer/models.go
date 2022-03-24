@@ -22,3 +22,20 @@ type RequestHash struct {
 	Payload *provider.RelayPayload `json:"payload"`
 	Meta    *provider.RelayMeta    `json:"meta"`
 }
+
+type RelayResponse struct {
+	Response string
+	Proof    *provider.RelayProof
+	Node     *provider.Node
+}
+
+// Order of fields matters for signature
+type relayProofForSignature struct {
+	Entropy            int    `json:"entropy"`
+	SessionBlockHeight int    `json:"session_block_height"`
+	ServicerPubKey     string `json:"servicer_pub_key"`
+	Blockchain         string `json:"blockchain"`
+	Signature          string `json:"signature"`
+	Token              string `json:"token"`
+	RequestHash        string `json:"request_hash"`
+}

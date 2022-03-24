@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"math"
 	"math/rand"
 
 	"github.com/pokt-foundation/pocket-go/pkg/provider"
@@ -43,12 +44,12 @@ func NewSlimRelayer(signer signer.Signer, provider provider.Provider) *SlimRelay
 }
 
 // GetNewSession gets a session using dispatch request
-func (r *SlimRelayer) GetNewSession(chain string, sessionHeight int, options *provider.DispatchRequestOptions) (*provider.Session, error) {
+func (r *SlimRelayer) GetNewSession(chain, appPubKey string, sessionHeight int, options *provider.DispatchRequestOptions) (*provider.Session, error) {
 	if r.provider == nil {
 		return nil, ErrNoProvider
 	}
 
-	dispatchResponse, err := r.provider.Dispatch(r.signer.GetKeyManager().GetPublicKey(), chain, sessionHeight, options)
+	dispatchResponse, err := r.provider.Dispatch(appPubKey, chain, sessionHeight, options)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +104,7 @@ func (r *SlimRelayer) getSignedProofBytes(proof *provider.RelayProof) (string, e
 }
 
 // Relay does relay request with given input
-func (r *SlimRelayer) Relay(input *RelayInput, options *provider.RelayRequestOptions) (*provider.Relay, error) {
+func (r *SlimRelayer) Relay(input *RelayInput, options *provider.RelayRequestOptions) (*RelayResponse, error) {
 	err := r.validateRelayRequest(input)
 	if err != nil {
 		return nil, err
@@ -133,7 +134,7 @@ func (r *SlimRelayer) Relay(input *RelayInput, options *provider.RelayRequestOpt
 		return nil, err
 	}
 
-	entropy := int64(rand.Intn(99999999999999))
+	entropy := rand.Intn(math.MaxInt)
 
 	signedProofBytes, err := r.getSignedProofBytes(&provider.RelayProof{
 		RequestHash:        hashedReq,
@@ -168,7 +169,11 @@ func (r *SlimRelayer) Relay(input *RelayInput, options *provider.RelayRequestOpt
 		return nil, err
 	}
 
-	return relayOutput.SuccessfulResponse, nil
+	return &RelayResponse{
+		Response: relayOutput.SuccessfulResponse,
+		Proof:    relayProof,
+		Node:     node,
+	}, nil
 }
 
 // GetRandomSessionNode returns a random node from given session
@@ -194,14 +199,14 @@ func GenerateProofBytes(proof *provider.RelayProof) ([]byte, error) {
 		return nil, err
 	}
 
-	proofMap := map[string]interface{}{
-		"entropy":              proof.Entropy,
-		"session_block_height": proof.SessionBlockHeight,
-		"servicer_pub_key":     proof.ServicerPubKey,
-		"blockchain":           proof.Blockchain,
-		"signature":            "",
-		"token":                token,
-		"request_hash":         proof.RequestHash,
+	proofMap := &relayProofForSignature{
+		RequestHash:        proof.RequestHash,
+		Entropy:            proof.Entropy,
+		SessionBlockHeight: proof.SessionBlockHeight,
+		ServicerPubKey:     proof.ServicerPubKey,
+		Blockchain:         proof.Blockchain,
+		Token:              token,
+		Signature:          "",
 	}
 
 	marshaledProof, err := json.Marshal(proofMap)
@@ -221,14 +226,10 @@ func GenerateProofBytes(proof *provider.RelayProof) ([]byte, error) {
 
 // HashAAT returns Pocket AAT as hashed string
 func HashAAT(aat *provider.PocketAAT) (string, error) {
-	tokenMap := map[string]string{
-		"version":        aat.Version,
-		"app_pub_key":    aat.AppPubKey,
-		"client_pub_key": aat.ClientPubKey,
-		"signature":      "",
-	}
+	tokenToSend := *aat
+	tokenToSend.Signature = ""
 
-	marshaledAAT, err := json.Marshal(tokenMap)
+	marshaledAAT, err := json.Marshal(aat)
 	if err != nil {
 		return "", err
 	}
