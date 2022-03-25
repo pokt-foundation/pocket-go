@@ -29,22 +29,22 @@ var (
 	ErrUnexpectedErrorResponse = errors.New("unexpected error response")
 )
 
-// SlimRelayer implementation of relayer interface
-type SlimRelayer struct {
+// PocketRelayer implementation of relayer interface
+type PocketRelayer struct {
 	signer   signer.Signer
 	provider provider.Provider
 }
 
-// NewSlimRelayer returns instance of SlimRelayer with given input
-func NewSlimRelayer(signer signer.Signer, provider provider.Provider) *SlimRelayer {
-	return &SlimRelayer{
+// NewPocketRelayer returns instance of PocketRelayer with given input
+func NewPocketRelayer(signer signer.Signer, provider provider.Provider) *PocketRelayer {
+	return &PocketRelayer{
 		signer:   signer,
 		provider: provider,
 	}
 }
 
 // GetNewSession gets a session using dispatch request
-func (r *SlimRelayer) GetNewSession(chain, appPubKey string, sessionHeight int, options *provider.DispatchRequestOptions) (*provider.Session, error) {
+func (r *PocketRelayer) GetNewSession(chain, appPubKey string, sessionHeight int, options *provider.DispatchRequestOptions) (*provider.Session, error) {
 	if r.provider == nil {
 		return nil, ErrNoProvider
 	}
@@ -57,7 +57,7 @@ func (r *SlimRelayer) GetNewSession(chain, appPubKey string, sessionHeight int, 
 	return dispatchResponse.Session, nil
 }
 
-func (r *SlimRelayer) validateRelayRequest(input *RelayInput) error {
+func (r *PocketRelayer) validateRelayRequest(input *RelayInput) error {
 	if r.signer == nil {
 		return ErrNoSigner
 	}
@@ -94,7 +94,7 @@ func getNode(input *RelayInput) (*provider.Node, error) {
 	return node, nil
 }
 
-func (r *SlimRelayer) getSignedProofBytes(proof *provider.RelayProof) (string, error) {
+func (r *PocketRelayer) getSignedProofBytes(proof *provider.RelayProof) (string, error) {
 	proofBytes, err := GenerateProofBytes(proof)
 	if err != nil {
 		return "", err
@@ -104,7 +104,7 @@ func (r *SlimRelayer) getSignedProofBytes(proof *provider.RelayProof) (string, e
 }
 
 // Relay does relay request with given input
-func (r *SlimRelayer) Relay(input *RelayInput, options *provider.RelayRequestOptions) (*RelayResponse, error) {
+func (r *PocketRelayer) Relay(input *RelayInput, options *provider.RelayRequestOptions) (*RelayResponse, error) {
 	err := r.validateRelayRequest(input)
 	if err != nil {
 		return nil, err

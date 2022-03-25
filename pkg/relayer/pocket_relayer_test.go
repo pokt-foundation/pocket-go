@@ -13,10 +13,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestSlimRelayer_RelayerInterface(t *testing.T) {
+func TestPocketRelayer_RelayerInterface(t *testing.T) {
 	c := require.New(t)
 
-	relayer := &SlimRelayer{}
+	relayer := &PocketRelayer{}
 
 	var i interface{} = relayer
 
@@ -24,7 +24,7 @@ func TestSlimRelayer_RelayerInterface(t *testing.T) {
 	c.True(ok)
 }
 
-func TestSlimRelayer_GetNewSession(t *testing.T) {
+func TestPocketRelayer_GetNewSession(t *testing.T) {
 	c := require.New(t)
 
 	httpmock.Activate()
@@ -33,7 +33,7 @@ func TestSlimRelayer_GetNewSession(t *testing.T) {
 	wallet, err := signer.NewRandomWallet()
 	c.NoError(err)
 
-	relayer := NewSlimRelayer(wallet, nil)
+	relayer := NewPocketRelayer(wallet, nil)
 
 	session, err := relayer.GetNewSession("PJOG", "PJOG", 21, nil)
 	c.Equal(ErrNoProvider, err)
@@ -56,13 +56,13 @@ func TestSlimRelayer_GetNewSession(t *testing.T) {
 	c.Empty(session)
 }
 
-func TestSlimRelayer_Relay(t *testing.T) {
+func TestPocketRelayer_Relay(t *testing.T) {
 	c := require.New(t)
 
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	relayer := NewSlimRelayer(nil, nil)
+	relayer := NewPocketRelayer(nil, nil)
 	relayInput := &RelayInput{}
 
 	relay, err := relayer.Relay(relayInput, nil)
