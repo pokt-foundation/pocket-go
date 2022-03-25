@@ -229,7 +229,7 @@ func HashAAT(aat *provider.PocketAAT) (string, error) {
 	tokenToSend := *aat
 	tokenToSend.Signature = ""
 
-	marshaledAAT, err := json.Marshal(aat)
+	marshaledAAT, err := json.Marshal(tokenToSend)
 	if err != nil {
 		return "", err
 	}
