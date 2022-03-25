@@ -3,16 +3,8 @@ package signer
 import (
 	"crypto/ed25519"
 	"encoding/hex"
-	"errors"
 
 	"github.com/pokt-foundation/pocket-go/pkg/utils"
-)
-
-var (
-	// ErrCryptoSignDetached is error when ErrCryptoSignDetached function exits value other than 0
-	ErrCryptoSignDetached = errors.New("error in CryptoSignDetached")
-	// ErrCryptoSignKeyPair is error when ErrCryptoSignKeyPair function exits value other than 0
-	ErrCryptoSignKeyPair = errors.New("error in CryptoSignKeyPair")
 )
 
 // KeyManager struct handler
