@@ -170,7 +170,7 @@ func (r *SlimRelayer) Relay(input *RelayInput, options *provider.RelayRequestOpt
 	}
 
 	return &RelayResponse{
-		Response: relayOutput.SuccessfulResponse,
+		Response: relayOutput,
 		Proof:    relayProof,
 		Node:     node,
 	}, nil

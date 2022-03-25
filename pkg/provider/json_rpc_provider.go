@@ -23,8 +23,8 @@ var (
 	ErrUnexpectedCodeOnConnection = errors.New("rpc responded with unexpected code")
 	// ErrNoDispatchers error when dispatch call is requested with no dispatchers set
 	ErrNoDispatchers = errors.New("no dispatchers")
-	// ErrInvalidJSON error when provider responds with invalid JSON
-	ErrInvalidJSON = errors.New("invalid JSON")
+	// ErrNonJSONResponse error when provider does not respond with a JSON
+	ErrNonJSONResponse = errors.New("non JSON response")
 )
 
 // JSONRPCProvider struct handler por JSON RPC provider
@@ -519,46 +519,42 @@ func (p *JSONRPCProvider) Dispatch(appPublicKey, chain string, sessionHeight int
 }
 
 // Relay does request to be relayed to a target blockchain
-func (p *JSONRPCProvider) Relay(rpcURL string, input *Relay, options *RelayRequestOptions) (*RelayResponse, error) {
+func (p *JSONRPCProvider) Relay(rpcURL string, input *Relay, options *RelayRequestOptions) (string, error) {
 	rawResponse, err := p.doPostRequest(rpcURL, input, ClientRelayRoute)
 	if err != nil && rawResponse.StatusCode != http.StatusBadRequest {
-		return nil, err
+		return "", err
 	}
 
 	defer internalUtils.CloseOrLog(rawResponse.Body)
 
 	bodyBytes, err := ioutil.ReadAll(rawResponse.Body)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	if rawResponse.StatusCode == http.StatusBadRequest {
-		return parseRelayErrorResponse(bodyBytes, input.Proof.ServicerPubKey)
+		return "", parseRelayErrorResponse(bodyBytes, input.Proof.ServicerPubKey)
 	}
 
 	if !json.Valid(bodyBytes) {
-		return nil, ErrInvalidJSON
+		return "", ErrNonJSONResponse
 	}
 
-	return &RelayResponse{
-		SuccessfulResponse: string(bodyBytes),
-	}, nil
+	return string(bodyBytes), nil
 }
 
-func parseRelayErrorResponse(bodyBytes []byte, servicerPubKey string) (*RelayResponse, error) {
+func parseRelayErrorResponse(bodyBytes []byte, servicerPubKey string) error {
 	response := RelayErrorResponse{}
 
 	err := json.Unmarshal(bodyBytes, &response)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return &RelayResponse{
-			ErrorResponse: &response,
-		}, &RelayError{
-			Code:           response.Error.Code,
-			Codespace:      response.Error.Message,
-			Message:        response.Error.Message,
-			ServicerPubKey: servicerPubKey,
-		}
+	return &RelayError{
+		Code:           response.Error.Code,
+		Codespace:      response.Error.Message,
+		Message:        response.Error.Message,
+		ServicerPubKey: servicerPubKey,
+	}
 }

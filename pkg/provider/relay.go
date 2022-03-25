@@ -6,12 +6,6 @@ import (
 	"github.com/pokt-foundation/pocket-go/pkg/models"
 )
 
-// RelayResponse struct wrapper for both possible responses of a relay request
-type RelayResponse struct {
-	SuccessfulResponse string
-	ErrorResponse      *RelayErrorResponse
-}
-
 // Relay represents a Relay to Pocket
 type Relay struct {
 	Payload *RelayPayload `json:"payload"`
@@ -53,12 +47,11 @@ type PocketAAT struct {
 
 // RelayErrorResponse represents error response of relay request
 type RelayErrorResponse struct {
-	Error *struct {
+	Error struct {
 		Code      int    `json:"code"`
 		Codespace string `json:"codespace"`
 		Message   string `json:"message"`
 	} `json:"error"`
-	Dispatch *DispatchResponse `json:"dispatch"`
 }
 
 // RelayError represents the thrown error of a relay request

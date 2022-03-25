@@ -23,6 +23,6 @@ type Provider interface {
 	GetAccount(address string) (*GetAccountResponse, error)
 	GetAccountWithTransactions(address string) (*GetAccountWithTransactionsResponse, error)
 	Dispatch(appPublicKey, chain string, sessionHeight int, options *DispatchRequestOptions) (*DispatchResponse, error)
-	Relay(rpcURL string, input *Relay, options *RelayRequestOptions) (*RelayResponse, error)
+	Relay(rpcURL string, input *Relay, options *RelayRequestOptions) (string, error)
 	// TODO: Add methods for params/requestChallenge
 }
