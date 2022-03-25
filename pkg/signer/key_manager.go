@@ -1,11 +1,10 @@
 package signer
 
 import (
+	"crypto/ed25519"
 	"encoding/hex"
 	"errors"
-	"fmt"
 
-	"github.com/GoKillers/libsodium-go/cryptosign"
 	"github.com/pokt-foundation/pocket-go/pkg/utils"
 )
 
@@ -25,9 +24,9 @@ type KeyManager struct {
 
 // NewRandomKeyManager returns a KeyManager with random keys
 func NewRandomKeyManager() (*KeyManager, error) {
-	privateKey, publicKey, exit := cryptosign.CryptoSignKeyPair()
-	if exit != 0 {
-		return nil, fmt.Errorf(fmt.Sprintf("Exit code: %v", exit), ErrCryptoSignKeyPair)
+	publicKey, privateKey, err := ed25519.GenerateKey(nil)
+	if err != nil {
+		return nil, err
 	}
 
 	address, err := utils.GetAddressFromDecodedPublickey(publicKey)
@@ -66,12 +65,7 @@ func (km *KeyManager) Sign(payload []byte) (string, error) {
 		return "", err
 	}
 
-	signature, exit := cryptosign.CryptoSignDetached(payload, decodedKey)
-	if exit != 0 {
-		return "", fmt.Errorf(fmt.Sprintf("Exit code: %v", exit), ErrCryptoSignDetached)
-	}
-
-	return hex.EncodeToString(signature), nil
+	return hex.EncodeToString(ed25519.Sign(decodedKey, payload)), nil
 }
 
 // GetAddress returns address value

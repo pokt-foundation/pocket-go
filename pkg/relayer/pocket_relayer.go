@@ -82,16 +82,15 @@ func (r *PocketRelayer) validateRelayRequest(input *RelayInput) error {
 }
 
 func getNode(input *RelayInput) (*provider.Node, error) {
-	node := input.Node
-	if node == nil {
-		node = GetRandomSessionNode(input.Session)
-	} else {
-		if !IsNodeInSession(input.Session, node) {
-			return nil, ErrNodeNotInSession
-		}
+	if input.Node == nil {
+		return GetRandomSessionNode(input.Session), nil
 	}
 
-	return node, nil
+	if !IsNodeInSession(input.Session, input.Node) {
+		return nil, ErrNodeNotInSession
+	}
+
+	return input.Node, nil
 }
 
 func (r *PocketRelayer) getSignedProofBytes(proof *provider.RelayProof) (string, error) {

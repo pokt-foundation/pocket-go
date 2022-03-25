@@ -63,7 +63,7 @@ type GetAppResponse struct {
 	Status        int       `json:"status"`
 	Chains        []string  `json:"chains"`
 	Tokens        string    `json:"tokens"`
-	MaxRelays     *int      `json:"max_relays"`
+	MaxRelays     int       `json:"max_relays"`
 	UnstakingTime time.Time `json:"unstaking_time"`
 }
 
@@ -80,7 +80,7 @@ type GetNodeResponse struct {
 	Chains        []string  `json:"chains"`
 	Jailed        bool      `json:"jailed"`
 	PublicKey     string    `json:"public_key"`
-	ServiceURL    *string   `json:"service_url"`
+	ServiceURL    string    `json:"service_url"`
 	Status        int       `json:"status"`
 	Tokens        string    `json:"tokens"`
 	UnstakingTime time.Time `json:"unstaking_time"`
