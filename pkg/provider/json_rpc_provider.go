@@ -10,8 +10,8 @@ import (
 	"math/rand"
 	"net/http"
 
-	"github.com/pokt-foundation/pocket-go/internal/client"
-	internalUtils "github.com/pokt-foundation/pocket-go/internal/utils"
+	"github.com/pokt-foundation/pocket-go/pkg/client"
+	"github.com/pokt-foundation/pocket-go/pkg/utils"
 )
 
 var (
@@ -83,7 +83,7 @@ func (p *JSONRPCProvider) doPostRequest(rpcURL string, params interface{}, route
 }
 
 func returnRPCError(body io.ReadCloser) error {
-	defer internalUtils.CloseOrLog(body)
+	defer utils.CloseOrLog(body)
 
 	bodyBytes, err := ioutil.ReadAll(body)
 	if err != nil {
@@ -109,7 +109,7 @@ func (p *JSONRPCProvider) GetBalance(address string) (*big.Int, error) {
 		return nil, err
 	}
 
-	defer internalUtils.CloseOrLog(rawResponse.Body)
+	defer utils.CloseOrLog(rawResponse.Body)
 
 	bodyBytes, err := ioutil.ReadAll(rawResponse.Body)
 	if err != nil {
@@ -134,7 +134,7 @@ func (p *JSONRPCProvider) queryAccountTXs(address string) (*queryAccountsTXsResp
 		return nil, err
 	}
 
-	defer internalUtils.CloseOrLog(rawResponse.Body)
+	defer utils.CloseOrLog(rawResponse.Body)
 
 	bodyBytes, err := ioutil.ReadAll(rawResponse.Body)
 	if err != nil {
@@ -205,7 +205,7 @@ func (p *JSONRPCProvider) SendTransaction(signerAddress, signedTransaction strin
 		return nil, err
 	}
 
-	defer internalUtils.CloseOrLog(rawResponse.Body)
+	defer utils.CloseOrLog(rawResponse.Body)
 
 	bodyBytes, err := ioutil.ReadAll(rawResponse.Body)
 	if err != nil {
@@ -231,7 +231,7 @@ func (p *JSONRPCProvider) GetBlock(blockNumber int) (*GetBlockResponse, error) {
 		return nil, err
 	}
 
-	defer internalUtils.CloseOrLog(rawResponse.Body)
+	defer utils.CloseOrLog(rawResponse.Body)
 
 	bodyBytes, err := ioutil.ReadAll(rawResponse.Body)
 	if err != nil {
@@ -257,7 +257,7 @@ func (p *JSONRPCProvider) GetTransaction(transactionHash string) (*GetTransactio
 		return nil, err
 	}
 
-	defer internalUtils.CloseOrLog(rawResponse.Body)
+	defer utils.CloseOrLog(rawResponse.Body)
 
 	bodyBytes, err := ioutil.ReadAll(rawResponse.Body)
 	if err != nil {
@@ -281,7 +281,7 @@ func (p *JSONRPCProvider) GetBlockNumber() (int, error) {
 		return 0, err
 	}
 
-	defer internalUtils.CloseOrLog(rawResponse.Body)
+	defer utils.CloseOrLog(rawResponse.Body)
 
 	bodyBytes, err := ioutil.ReadAll(rawResponse.Body)
 	if err != nil {
@@ -321,7 +321,7 @@ func (p *JSONRPCProvider) GetNodes(height int, options *GetNodesOptions) (*GetNo
 		return nil, err
 	}
 
-	defer internalUtils.CloseOrLog(rawResponse.Body)
+	defer utils.CloseOrLog(rawResponse.Body)
 
 	bodyBytes, err := ioutil.ReadAll(rawResponse.Body)
 	if err != nil {
@@ -353,7 +353,7 @@ func (p *JSONRPCProvider) GetNode(address string, options *GetNodeOptions) (*Get
 		return nil, err
 	}
 
-	defer internalUtils.CloseOrLog(rawResponse.Body)
+	defer utils.CloseOrLog(rawResponse.Body)
 
 	bodyBytes, err := ioutil.ReadAll(rawResponse.Body)
 	if err != nil {
@@ -393,7 +393,7 @@ func (p *JSONRPCProvider) GetApps(height int, options *GetAppsOptions) (*GetApps
 		return nil, err
 	}
 
-	defer internalUtils.CloseOrLog(rawResponse.Body)
+	defer utils.CloseOrLog(rawResponse.Body)
 
 	bodyBytes, err := ioutil.ReadAll(rawResponse.Body)
 	if err != nil {
@@ -425,7 +425,7 @@ func (p *JSONRPCProvider) GetApp(address string, options *GetAppOptions) (*GetAp
 		return nil, err
 	}
 
-	defer internalUtils.CloseOrLog(rawResponse.Body)
+	defer utils.CloseOrLog(rawResponse.Body)
 
 	bodyBytes, err := ioutil.ReadAll(rawResponse.Body)
 	if err != nil {
@@ -451,7 +451,7 @@ func (p *JSONRPCProvider) GetAccount(address string) (*GetAccountResponse, error
 		return nil, err
 	}
 
-	defer internalUtils.CloseOrLog(rawResponse.Body)
+	defer utils.CloseOrLog(rawResponse.Body)
 
 	bodyBytes, err := ioutil.ReadAll(rawResponse.Body)
 	if err != nil {
@@ -501,7 +501,7 @@ func (p *JSONRPCProvider) Dispatch(appPublicKey, chain string, sessionHeight int
 		return nil, err
 	}
 
-	defer internalUtils.CloseOrLog(rawResponse.Body)
+	defer utils.CloseOrLog(rawResponse.Body)
 
 	bodyBytes, err := ioutil.ReadAll(rawResponse.Body)
 	if err != nil {
@@ -525,7 +525,7 @@ func (p *JSONRPCProvider) Relay(rpcURL string, input *Relay, options *RelayReque
 		return "", err
 	}
 
-	defer internalUtils.CloseOrLog(rawResponse.Body)
+	defer utils.CloseOrLog(rawResponse.Body)
 
 	bodyBytes, err := ioutil.ReadAll(rawResponse.Body)
 	if err != nil {

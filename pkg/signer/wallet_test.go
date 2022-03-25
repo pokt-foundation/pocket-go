@@ -3,7 +3,7 @@ package signer
 import (
 	"testing"
 
-	"github.com/pokt-foundation/pocket-go/internal/client"
+	"github.com/pokt-foundation/pocket-go/pkg/client"
 	"github.com/pokt-foundation/pocket-go/pkg/provider"
 	"github.com/pokt-foundation/pocket-go/pkg/utils"
 	"github.com/stretchr/testify/require"
