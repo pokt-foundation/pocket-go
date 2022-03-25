@@ -9,7 +9,7 @@ type Provider interface {
 	// Account
 	GetBalance(address string) (*big.Int, error)
 	GetTransactionCount(address string) (int, error)
-	GetType(address string) (AddressType, error)
+	GetType(address string, options *GetTypeOptions) (AddressType, error)
 	// TXs
 	SendTransaction(signerAddress string, signedTransaction string) (*SendTransactionResponse, error)
 	// Network
@@ -23,6 +23,6 @@ type Provider interface {
 	GetAccount(address string) (*GetAccountResponse, error)
 	GetAccountWithTransactions(address string) (*GetAccountWithTransactionsResponse, error)
 	Dispatch(appPublicKey, chain string, sessionHeight int, options *DispatchRequestOptions) (*DispatchResponse, error)
-	Relay(rpcURL string, input *Relay, options *RelayRequestOptions) (*RelayResponse, error)
+	Relay(rpcURL string, input *Relay, options *RelayRequestOptions) (string, error)
 	// TODO: Add methods for params/requestChallenge
 }

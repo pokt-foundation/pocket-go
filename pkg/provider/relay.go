@@ -1,14 +1,10 @@
 package provider
 
 import (
+	"fmt"
+
 	"github.com/pokt-foundation/pocket-go/pkg/models"
 )
-
-// RelayResponse struct wrapper for both possible responses of a relay request
-type RelayResponse struct {
-	SuccessfulResponse *Relay
-	ErrorResponse      *RelayErrorResponse
-}
 
 // Relay represents a Relay to Pocket
 type Relay struct {
@@ -33,7 +29,7 @@ type RelayPayload struct {
 // RelayProof represents proof of a relay
 type RelayProof struct {
 	RequestHash        string     `json:"request_hash"`
-	Entropy            int64      `json:"entropy"`
+	Entropy            int        `json:"entropy"`
 	SessionBlockHeight int        `json:"session_block_height"`
 	ServicerPubKey     string     `json:"servicer_pub_key"`
 	Blockchain         string     `json:"blockchain"`
@@ -51,6 +47,24 @@ type PocketAAT struct {
 
 // RelayErrorResponse represents error response of relay request
 type RelayErrorResponse struct {
-	Error    string            `json:"error"`
-	Dispatch *DispatchResponse `json:"dispatch"`
+	Error struct {
+		Code      int    `json:"code"`
+		Codespace string `json:"codespace"`
+		Message   string `json:"message"`
+	} `json:"error"`
+}
+
+// RelayError represents the thrown error of a relay request
+type RelayError struct {
+	Code           int
+	Codespace      string
+	Message        string
+	ServicerPubKey string
+}
+
+// Error returns string representation of error
+// needed to implement error interface
+func (e *RelayError) Error() string {
+	return fmt.Sprintf("Request failed with code: %v, codespace: %s and message: %s\nWith ServicerPubKey: %s",
+		e.Code, e.Codespace, e.Message, e.ServicerPubKey)
 }

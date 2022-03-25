@@ -24,6 +24,11 @@ type GetAppOptions struct {
 	Height int
 }
 
+// GetTypeOptions represents optional arguments for GetType request
+type GetTypeOptions struct {
+	Height int
+}
+
 // GetAppsOptions represents optional arguments for GetApps request
 type GetAppsOptions struct {
 	StakingStatus models.StakingStatus

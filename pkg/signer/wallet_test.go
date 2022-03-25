@@ -34,6 +34,22 @@ func TestNewRandomWallet(t *testing.T) {
 	c.Equal(expectedAddres, wallet.GetKeyManager().GetAddress())
 }
 
+func TestNewWalletFromPrivatekey(t *testing.T) {
+	c := require.New(t)
+
+	privateKey := "1f8cbde30ef5a9db0a5a9d5eb40536fc9defc318b8581d543808b7504e0902bcb243b27bc9fbe5580457a46370ae5f03a6f6753633e51efdaf2cf534fdc26cc3"
+
+	wallet, err := NewWalletFromPrivatekey(privateKey)
+	c.NoError(err)
+
+	c.True(wallet.IsSigner())
+	c.Equal(utils.PublicKeyFromPrivate(wallet.GetKeyManager().GetPrivateKey()), wallet.GetKeyManager().GetPublicKey())
+
+	expectedAddres, err := utils.GetAddressFromPublickey(wallet.GetKeyManager().GetPublicKey())
+	c.NoError(err)
+	c.Equal(expectedAddres, wallet.GetKeyManager().GetAddress())
+}
+
 func TestWallet_Connect(t *testing.T) {
 	c := require.New(t)
 
