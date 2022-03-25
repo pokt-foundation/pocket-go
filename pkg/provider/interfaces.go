@@ -15,7 +15,7 @@ type Provider interface {
 	// Network
 	GetBlock(blockNumber int) (*GetBlockResponse, error)
 	GetTransaction(transactionHash string) (*GetTransactionResponse, error)
-	GetBlockNumber() (int, error)
+	GetBlockHeight() (int, error)
 	GetNodes(height int, options *GetNodesOptions) (*GetNodesResponse, error)
 	GetNode(address string, options *GetNodeOptions) (*GetNodeResponse, error)
 	GetApps(height int, options *GetAppsOptions) (*GetAppsResponse, error)

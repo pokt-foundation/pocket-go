@@ -179,7 +179,7 @@ func TestJSONRPCProvider_GetTransaction(t *testing.T) {
 	c.Empty(transaction)
 }
 
-func TestJSONRPCProvider_GetBlockNumber(t *testing.T) {
+func TestJSONRPCProvider_GetBlockHeight(t *testing.T) {
 	c := require.New(t)
 
 	httpmock.Activate()
@@ -189,13 +189,13 @@ func TestJSONRPCProvider_GetBlockNumber(t *testing.T) {
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryHeightRoute), http.StatusOK, "samples/query_height.json")
 
-	blockNumber, err := provider.GetBlockNumber()
+	blockNumber, err := provider.GetBlockHeight()
 	c.NoError(err)
 	c.Equal(21, blockNumber)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryHeightRoute), http.StatusInternalServerError, "samples/query_height.json")
 
-	blockNumber, err = provider.GetBlockNumber()
+	blockNumber, err = provider.GetBlockHeight()
 	c.Equal(Err5xxOnConnection, err)
 	c.Empty(blockNumber)
 }
