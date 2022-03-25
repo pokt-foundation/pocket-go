@@ -274,8 +274,8 @@ func (p *JSONRPCProvider) GetTransaction(transactionHash string) (*GetTransactio
 	return &response, nil
 }
 
-// GetBlockNumber returns the current height
-func (p *JSONRPCProvider) GetBlockNumber() (int, error) {
+// GetBlockHeight returns the current height
+func (p *JSONRPCProvider) GetBlockHeight() (int, error) {
 	rawResponse, err := p.doPostRequest("", nil, QueryHeightRoute)
 	if err != nil {
 		return 0, err

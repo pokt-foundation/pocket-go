@@ -270,7 +270,8 @@ type DispatchResponse struct {
 
 // Session represents session response from RPC request
 type Session struct {
-	Header struct {
+	BlockHeight int `json:"block_height"`
+	Header      struct {
 		AppPublicKey  string `json:"app_public_key"`
 		Chain         string `json:"chain"`
 		SessionHeight int    `json:"session_height"`
