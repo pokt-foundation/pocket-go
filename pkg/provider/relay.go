@@ -56,7 +56,7 @@ type RelayErrorResponse struct {
 
 // RelayError represents the thrown error of a relay request
 type RelayError struct {
-	Code           int
+	Code           RelayErrorCode
 	Codespace      string
 	Message        string
 	ServicerPubKey string
@@ -68,3 +68,31 @@ func (e *RelayError) Error() string {
 	return fmt.Sprintf("Request failed with code: %v, codespace: %s and message: %s\nWith ServicerPubKey: %s",
 		e.Code, e.Codespace, e.Message, e.ServicerPubKey)
 }
+
+// RelayErrorCode is enum of possible relay error codes
+type RelayErrorCode int
+
+const (
+	// AppNotFoundError error when app is not found
+	AppNotFoundError RelayErrorCode = 45
+	// DuplicateProofError error when proof is used multiple times
+	DuplicateProofError RelayErrorCode = 37
+	// EmptyPayloadDataError error when sent payload is empty
+	EmptyPayloadDataError RelayErrorCode = 25
+	// EvidencedSealedError error when evidence is sealed, either max relays reached or claim already submitted
+	EvidencedSealedError RelayErrorCode = 90
+	// HTTPExecutionError error when http request failed
+	HTTPExecutionError RelayErrorCode = 28
+	// InvalidBlockHeightError error when sent block height is invalid
+	InvalidBlockHeightError RelayErrorCode = 60
+	// InvalidSessionError error when session is invalid
+	InvalidSessionError RelayErrorCode = 14
+	// OutOfSyncRequestError error when request is not on sync
+	OutOfSyncRequestError RelayErrorCode = 75
+	// OverServiceError error when request exceeds service capacity
+	OverServiceError RelayErrorCode = 71
+	// RequestHashError error when hash is not correct
+	RequestHashError RelayErrorCode = 74
+	// UnsupportedBlockchainError error when sent blockchain is not supported yet
+	UnsupportedBlockchainError RelayErrorCode = 76
+)
