@@ -48,9 +48,9 @@ type PocketAAT struct {
 // RelayErrorResponse represents error response of relay request
 type RelayErrorResponse struct {
 	Error struct {
-		Code      int    `json:"code"`
-		Codespace string `json:"codespace"`
-		Message   string `json:"message"`
+		Code      RelayErrorCode `json:"code"`
+		Codespace string         `json:"codespace"`
+		Message   string         `json:"message"`
 	} `json:"error"`
 }
 
