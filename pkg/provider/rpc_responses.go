@@ -270,14 +270,17 @@ type DispatchResponse struct {
 
 // Session represents session response from RPC request
 type Session struct {
-	BlockHeight int `json:"block_height"`
-	Header      struct {
-		AppPublicKey  string `json:"app_public_key"`
-		Chain         string `json:"chain"`
-		SessionHeight int    `json:"session_height"`
-	} `json:"header"`
-	Key   string  `json:"key"`
-	Nodes []*Node `json:"nodes"`
+	BlockHeight int            `json:"block_height"`
+	Header      *SessionHeader `json:"header"`
+	Key         string         `json:"key"`
+	Nodes       []*Node        `json:"nodes"`
+}
+
+// SessionHeader represents the headers of a session response
+type SessionHeader struct {
+	AppPublicKey  string `json:"app_public_key"`
+	Chain         string `json:"chain"`
+	SessionHeight int    `json:"session_height"`
 }
 
 // Node represents node response from RPC request
