@@ -96,3 +96,13 @@ const (
 	// UnsupportedBlockchainError error when sent blockchain is not supported yet
 	UnsupportedBlockchainError RelayErrorCode = 76
 )
+
+// IsErrorCode returns if error has the same relay error code as input
+func IsErrorCode(code RelayErrorCode, err error) bool {
+	castedErr, ok := err.(*RelayError)
+	if !ok {
+		return false
+	}
+
+	return castedErr.Code == code
+}
