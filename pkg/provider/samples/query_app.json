@@ -7,6 +7,6 @@
       "string"
     ],
     "tokens": "string",
-    "max_relays": 0,
+    "max_relays": "0",
     "unstaking_time": "0001-01-01T00:00:00Z"
 }
