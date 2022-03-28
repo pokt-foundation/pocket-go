@@ -552,7 +552,7 @@ func parseRelayErrorResponse(bodyBytes []byte, servicerPubKey string) error {
 	}
 
 	return &RelayError{
-		Code:           response.Error.Code,
+		Code:           RelayErrorCode(response.Error.Code),
 		Codespace:      response.Error.Message,
 		Message:        response.Error.Message,
 		ServicerPubKey: servicerPubKey,
