@@ -377,12 +377,14 @@ func TestJSONRPCProvider_Relay(t *testing.T) {
 
 	relay, err = provider.Relay("https://dummy.com", &Relay{}, nil)
 	c.Equal(Err5xxOnConnection, err)
+	c.False(IsErrorCode(EmptyPayloadDataError, err))
 	c.Empty(relay)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientRelayRoute), http.StatusBadRequest, "samples/client_relay_error.json")
 
 	relay, err = provider.Relay("https://dummy.com", &Relay{Proof: &RelayProof{ServicerPubKey: "PJOG"}}, nil)
 	c.Equal("Request failed with code: 25, codespace: the payload data of the relay request is empty and message: the payload data of the relay request is empty\nWith ServicerPubKey: PJOG", err.Error())
+	c.True(IsErrorCode(EmptyPayloadDataError, err))
 	c.Empty(relay)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientRelayRoute), http.StatusOK, "samples/no_json.txt")
