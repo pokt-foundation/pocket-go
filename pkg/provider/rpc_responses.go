@@ -63,7 +63,7 @@ type GetAppResponse struct {
 	Status        int       `json:"status"`
 	Chains        []string  `json:"chains"`
 	Tokens        string    `json:"tokens"`
-	MaxRelays     int       `json:"max_relays"`
+	MaxRelays     string    `json:"max_relays"`
 	UnstakingTime time.Time `json:"unstaking_time"`
 }
 
