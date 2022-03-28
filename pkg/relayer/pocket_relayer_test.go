@@ -96,8 +96,14 @@ func TestPocketRelayer_Relay(t *testing.T) {
 	c.Equal(ErrSessionHasNoNodes, err)
 	c.Empty(relay)
 
-	relayInput.Node = &provider.Node{PublicKey: "PJOG"}
 	relayInput.Session.Nodes = []*provider.Node{{PublicKey: "AOG"}}
+
+	relay, err = relayer.Relay(relayInput, nil)
+	c.Equal(ErrNoSessionHeader, err)
+	c.Empty(relay)
+
+	relayInput.Session.Header = &provider.SessionHeader{}
+	relayInput.Node = &provider.Node{PublicKey: "PJOG"}
 
 	relay, err = relayer.Relay(relayInput, nil)
 	c.Equal(ErrNodeNotInSession, err)

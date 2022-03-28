@@ -17,6 +17,8 @@ var (
 	ErrNoSigner = errors.New("no signer provided")
 	// ErrNoSession error when no session is provided
 	ErrNoSession = errors.New("no session provided")
+	// ErrNoSessionHeader error when no session header is provided
+	ErrNoSessionHeader = errors.New("no session header provided")
 	// ErrNoProvider error when no provider is provided
 	ErrNoProvider = errors.New("no provider provided")
 	// ErrNoPocketAAT error when no Pocket AAT is provided
@@ -76,6 +78,10 @@ func (r *PocketRelayer) validateRelayRequest(input *RelayInput) error {
 
 	if len(input.Session.Nodes) == 0 {
 		return ErrSessionHasNoNodes
+	}
+
+	if input.Session.Header == nil {
+		return ErrNoSessionHeader
 	}
 
 	return nil
