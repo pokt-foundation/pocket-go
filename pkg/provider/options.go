@@ -48,6 +48,7 @@ type GetAppsOptions struct {
 
 // DispatchRequestOptions represents optional arguments for Dispatch request
 type DispatchRequestOptions struct {
+	Height                       int
 	RejectSelfSignedCertificates bool
 }
 

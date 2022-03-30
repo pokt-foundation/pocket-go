@@ -1,13 +1,13 @@
 package provider
 
 import (
+	"crypto/rand"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"math/big"
-	"math/rand"
 	"net/http"
 
 	"github.com/pokt-foundation/pocket-go/pkg/client"
@@ -25,6 +25,8 @@ var (
 	ErrNoDispatchers = errors.New("no dispatchers")
 	// ErrNonJSONResponse error when provider does not respond with a JSON
 	ErrNonJSONResponse = errors.New("non JSON response")
+
+	errOnRelayRequest = errors.New("error on relay request")
 )
 
 // JSONRPCProvider struct handler por JSON RPC provider
@@ -43,28 +45,36 @@ func NewJSONRPCProvider(rpcURL string, dispatchers []string, providerClient *cli
 	}
 }
 
-func (p *JSONRPCProvider) getFinalRPCURL(rpcURL string, route V1RPCRoute) string {
+func (p *JSONRPCProvider) getFinalRPCURL(rpcURL string, route V1RPCRoute) (string, error) {
 	if rpcURL != "" {
-		return rpcURL
+		return rpcURL, nil
 	}
 
 	if route == ClientDispatchRoute {
-		return p.dispatchers[rand.Intn(len(p.dispatchers))]
+		index, err := rand.Int(rand.Reader, big.NewInt(int64(len(p.dispatchers))))
+		if err != nil {
+			return "", err
+		}
+
+		return p.dispatchers[index.Int64()], nil
 	}
 
-	return p.rpcURL
+	return p.rpcURL, nil
 }
 
 func (p *JSONRPCProvider) doPostRequest(rpcURL string, params interface{}, route V1RPCRoute) (*http.Response, error) {
-	finalRPCURL := p.getFinalRPCURL(rpcURL, route)
+	finalRPCURL, err := p.getFinalRPCURL(rpcURL, route)
+	if err != nil {
+		return nil, err
+	}
 
 	response, err := p.client.PostWithURLJSONParams(fmt.Sprintf("%s%s", finalRPCURL, route), params, http.Header{})
 	if err != nil {
 		return nil, err
 	}
 
-	if response.StatusCode == http.StatusBadRequest && route != ClientRelayRoute {
-		return nil, returnRPCError(response.Body)
+	if response.StatusCode == http.StatusBadRequest {
+		return response, returnRPCError(route, response.Body)
 	}
 
 	if string(response.Status[0]) == "4" {
@@ -82,7 +92,11 @@ func (p *JSONRPCProvider) doPostRequest(rpcURL string, params interface{}, route
 	return nil, ErrUnexpectedCodeOnConnection
 }
 
-func returnRPCError(body io.ReadCloser) error {
+func returnRPCError(route V1RPCRoute, body io.ReadCloser) error {
+	if route == ClientRelayRoute {
+		return errOnRelayRequest
+	}
+
 	defer utils.CloseOrLog(body)
 
 	bodyBytes, err := ioutil.ReadAll(body)
@@ -502,16 +516,21 @@ func (p *JSONRPCProvider) GetAccountWithTransactions(address string) (*GetAccoun
 }
 
 // Dispatch sends a dispatch request to the network and gets the nodes that will be servicing the requests for the session.
-func (p *JSONRPCProvider) Dispatch(appPublicKey, chain string, sessionHeight int, options *DispatchRequestOptions) (*DispatchResponse, error) {
+func (p *JSONRPCProvider) Dispatch(appPublicKey, chain string, options *DispatchRequestOptions) (*DispatchResponse, error) {
 	if len(p.dispatchers) == 0 {
 		return nil, ErrNoDispatchers
 	}
 
-	rawResponse, err := p.doPostRequest("", map[string]interface{}{
+	params := map[string]interface{}{
 		"app_public_key": appPublicKey,
 		"chain":          chain,
-		"session_height": sessionHeight,
-	}, ClientDispatchRoute)
+	}
+
+	if options != nil {
+		params["session_height"] = options.Height
+	}
+
+	rawResponse, err := p.doPostRequest("", params, ClientDispatchRoute)
 	if err != nil {
 		return nil, err
 	}
@@ -535,9 +554,9 @@ func (p *JSONRPCProvider) Dispatch(appPublicKey, chain string, sessionHeight int
 
 // Relay does request to be relayed to a target blockchain
 func (p *JSONRPCProvider) Relay(rpcURL string, input *Relay, options *RelayRequestOptions) (*RelayResponse, error) {
-	rawResponse, err := p.doPostRequest(rpcURL, input, ClientRelayRoute)
-	if err != nil && rawResponse.StatusCode != http.StatusBadRequest {
-		return nil, err
+	rawResponse, reqErr := p.doPostRequest(rpcURL, input, ClientRelayRoute)
+	if reqErr != nil && !errors.Is(reqErr, errOnRelayRequest) {
+		return nil, reqErr
 	}
 
 	defer utils.CloseOrLog(rawResponse.Body)
@@ -547,7 +566,7 @@ func (p *JSONRPCProvider) Relay(rpcURL string, input *Relay, options *RelayReque
 		return nil, err
 	}
 
-	if rawResponse.StatusCode == http.StatusBadRequest {
+	if errors.Is(reqErr, errOnRelayRequest) {
 		return nil, parseRelayErrorResponse(bodyBytes, input.Proof.ServicerPubKey)
 	}
 

@@ -35,7 +35,7 @@ type RelayPayload struct {
 // RelayProof represents proof of a relay
 type RelayProof struct {
 	RequestHash        string     `json:"request_hash"`
-	Entropy            int        `json:"entropy"`
+	Entropy            int64      `json:"entropy"`
 	SessionBlockHeight int        `json:"session_block_height"`
 	ServicerPubKey     string     `json:"servicer_pub_key"`
 	Blockchain         string     `json:"blockchain"`

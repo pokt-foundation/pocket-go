@@ -1,11 +1,12 @@
 package relayer
 
 import (
+	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"math"
-	"math/rand"
+	"math/big"
 
 	"github.com/pokt-foundation/pocket-go/pkg/provider"
 	"github.com/pokt-foundation/pocket-go/pkg/signer"
@@ -75,7 +76,7 @@ func (r *PocketRelayer) validateRelayRequest(input *RelayInput) error {
 
 func getNode(input *RelayInput) (*provider.Node, error) {
 	if input.Node == nil {
-		return GetRandomSessionNode(input.Session), nil
+		return GetRandomSessionNode(input.Session)
 	}
 
 	if !IsNodeInSession(input.Session, input.Node) {
@@ -125,11 +126,14 @@ func (r *PocketRelayer) Relay(input *RelayInput, options *provider.RelayRequestO
 		return nil, err
 	}
 
-	entropy := rand.Intn(math.MaxInt)
+	entropy, err := rand.Int(rand.Reader, big.NewInt(math.MaxInt64))
+	if err != nil {
+		return nil, err
+	}
 
 	signedProofBytes, err := r.getSignedProofBytes(&provider.RelayProof{
 		RequestHash:        hashedReq,
-		Entropy:            entropy,
+		Entropy:            entropy.Int64(),
 		SessionBlockHeight: input.Session.Header.SessionHeight,
 		ServicerPubKey:     node.PublicKey,
 		Blockchain:         input.Blockchain,
@@ -141,7 +145,7 @@ func (r *PocketRelayer) Relay(input *RelayInput, options *provider.RelayRequestO
 
 	relayProof := &provider.RelayProof{
 		RequestHash:        hashedReq,
-		Entropy:            entropy,
+		Entropy:            entropy.Int64(),
 		SessionBlockHeight: input.Session.Header.SessionHeight,
 		ServicerPubKey:     node.PublicKey,
 		Blockchain:         input.Blockchain,
@@ -168,8 +172,13 @@ func (r *PocketRelayer) Relay(input *RelayInput, options *provider.RelayRequestO
 }
 
 // GetRandomSessionNode returns a random node from given session
-func GetRandomSessionNode(session *provider.Session) *provider.Node {
-	return session.Nodes[rand.Intn(len(session.Nodes))]
+func GetRandomSessionNode(session *provider.Session) (*provider.Node, error) {
+	index, err := rand.Int(rand.Reader, big.NewInt(int64(len(session.Nodes))))
+	if err != nil {
+		return nil, err
+	}
+
+	return session.Nodes[index.Int64()], nil
 }
 
 // IsNodeInSession verifies if given node is in given session

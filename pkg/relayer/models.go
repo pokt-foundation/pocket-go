@@ -32,7 +32,7 @@ type Response struct {
 
 // Order of fields matters for signature
 type relayProofForSignature struct {
-	Entropy            int    `json:"entropy"`
+	Entropy            int64  `json:"entropy"`
 	SessionBlockHeight int    `json:"session_block_height"`
 	ServicerPubKey     string `json:"servicer_pub_key"`
 	Blockchain         string `json:"blockchain"`

@@ -346,7 +346,7 @@ func TestJSONRPCProvider_Dispatch(t *testing.T) {
 		client: providerClient,
 	}
 
-	dispatch, err := provider.Dispatch("pjog", "abcd", 21, nil)
+	dispatch, err := provider.Dispatch("pjog", "abcd", &DispatchRequestOptions{Height: 21})
 	c.Equal(ErrNoDispatchers, err)
 	c.Empty(dispatch)
 
@@ -354,13 +354,13 @@ func TestJSONRPCProvider_Dispatch(t *testing.T) {
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientDispatchRoute), http.StatusOK, "samples/client_dispatch.json")
 
-	dispatch, err = provider.Dispatch("pjog", "abcd", 21, nil)
+	dispatch, err = provider.Dispatch("pjog", "abcd", &DispatchRequestOptions{Height: 21})
 	c.NoError(err)
 	c.NotEmpty(dispatch)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientDispatchRoute), http.StatusInternalServerError, "samples/client_dispatch.json")
 
-	dispatch, err = provider.Dispatch("pjog", "abcd", 21, nil)
+	dispatch, err = provider.Dispatch("pjog", "abcd", &DispatchRequestOptions{Height: 21})
 	c.Equal(Err5xxOnConnection, err)
 	c.Empty(dispatch)
 }
