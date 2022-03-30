@@ -22,11 +22,11 @@ type RequestHash struct {
 	Meta    *provider.RelayMeta    `json:"meta"`
 }
 
-// Response struct for data needed as response for relay request
-type Response struct {
-	Response *provider.RelayResponse
-	Proof    *provider.RelayProof
-	Node     *provider.Node
+// Output struct for data needed as output for relay request
+type Output struct {
+	RelayOutput *provider.RelayOutput
+	Proof       *provider.RelayProof
+	Node        *provider.Node
 }
 
 // Order of fields matters for signature

@@ -11,8 +11,8 @@ type Relay struct {
 	Proof   *RelayProof   `json:"proof"`
 }
 
-// RelayResponse reprensents the Relay RPC response
-type RelayResponse struct {
+// RelayOutput represents the Relay RPC output
+type RelayOutput struct {
 	Response  string `json:"response"`
 	Signature string `json:"signature"`
 }
@@ -52,8 +52,8 @@ type PocketAAT struct {
 	Signature    string `json:"signature"`
 }
 
-// RelayErrorResponse represents error response of relay request
-type RelayErrorResponse struct {
+// RelayErrorOutput represents error response of relay request
+type RelayErrorOutput struct {
 	Error struct {
 		Code      RelayErrorCode `json:"code"`
 		Codespace string         `json:"codespace"`
