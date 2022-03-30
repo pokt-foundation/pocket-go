@@ -101,10 +101,16 @@ func returnRPCError(body io.ReadCloser) error {
 }
 
 // GetBalance requests the balance of the specified address
-func (p *JSONRPCProvider) GetBalance(address string) (*big.Int, error) {
-	rawResponse, err := p.doPostRequest("", map[string]string{
+func (p *JSONRPCProvider) GetBalance(address string, options *GetBalanceOptions) (*big.Int, error) {
+	params := map[string]interface{}{
 		"address": address,
-	}, QueryBalanceRoute)
+	}
+
+	if options != nil {
+		params["height"] = options.Height
+	}
+
+	rawResponse, err := p.doPostRequest("", params, QueryBalanceRoute)
 	if err != nil {
 		return nil, err
 	}
@@ -249,10 +255,16 @@ func (p *JSONRPCProvider) GetBlock(blockNumber int) (*GetBlockResponse, error) {
 }
 
 // GetTransaction returns the transaction by the given transaction hash
-func (p *JSONRPCProvider) GetTransaction(transactionHash string) (*GetTransactionResponse, error) {
-	rawResponse, err := p.doPostRequest("", map[string]string{
+func (p *JSONRPCProvider) GetTransaction(transactionHash string, options *GetTransactionOptions) (*GetTransactionResponse, error) {
+	params := map[string]interface{}{
 		"hash": transactionHash,
-	}, QueryTXRoute)
+	}
+
+	if options != nil {
+		params["prove"] = options.Prove
+	}
+
+	rawResponse, err := p.doPostRequest("", params, QueryTXRoute)
 	if err != nil {
 		return nil, err
 	}
@@ -310,9 +322,8 @@ func (p *JSONRPCProvider) GetNodes(height int, options *GetNodesOptions) (*GetNo
 			"staking_status": options.StakingStatus,
 			"page":           options.Page,
 			"per_page":       options.PerPage,
-			"chain":          options.Chain,
+			"blockchain":     options.BlockChain,
 			"jailed_status":  options.JailedStatus,
-			"blockchain":     options.Blockchain,
 		}
 	}
 
@@ -382,9 +393,7 @@ func (p *JSONRPCProvider) GetApps(height int, options *GetAppsOptions) (*GetApps
 			"staking_status": options.StakingStatus,
 			"page":           options.Page,
 			"per_page":       options.PerPage,
-			"chain":          options.Chain,
-			"jailed_status":  options.JailedStatus,
-			"blockchain":     options.Blockchain,
+			"blockchain":     options.BlockChain,
 		}
 	}
 
@@ -443,10 +452,16 @@ func (p *JSONRPCProvider) GetApp(address string, options *GetAppOptions) (*GetAp
 }
 
 // GetAccount returns account at the specified address
-func (p *JSONRPCProvider) GetAccount(address string) (*GetAccountResponse, error) {
-	rawResponse, err := p.doPostRequest("", map[string]string{
+func (p *JSONRPCProvider) GetAccount(address string, options *GetAccountOptions) (*GetAccountResponse, error) {
+	params := map[string]interface{}{
 		"address": address,
-	}, QueryAccountRoute)
+	}
+
+	if options != nil {
+		params["height"] = options.Height
+	}
+
+	rawResponse, err := p.doPostRequest("", params, QueryAccountRoute)
 	if err != nil {
 		return nil, err
 	}
@@ -470,7 +485,7 @@ func (p *JSONRPCProvider) GetAccount(address string) (*GetAccountResponse, error
 
 // GetAccountWithTransactions returns account at the specified address with its performed transactions
 func (p *JSONRPCProvider) GetAccountWithTransactions(address string) (*GetAccountWithTransactionsResponse, error) {
-	accountResponse, err := p.GetAccount(address)
+	accountResponse, err := p.GetAccount(address, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -519,28 +534,39 @@ func (p *JSONRPCProvider) Dispatch(appPublicKey, chain string, sessionHeight int
 }
 
 // Relay does request to be relayed to a target blockchain
-func (p *JSONRPCProvider) Relay(rpcURL string, input *Relay, options *RelayRequestOptions) (string, error) {
+func (p *JSONRPCProvider) Relay(rpcURL string, input *Relay, options *RelayRequestOptions) (*RelayResponse, error) {
 	rawResponse, err := p.doPostRequest(rpcURL, input, ClientRelayRoute)
 	if err != nil && rawResponse.StatusCode != http.StatusBadRequest {
-		return "", err
+		return nil, err
 	}
 
 	defer utils.CloseOrLog(rawResponse.Body)
 
 	bodyBytes, err := ioutil.ReadAll(rawResponse.Body)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	if rawResponse.StatusCode == http.StatusBadRequest {
-		return "", parseRelayErrorResponse(bodyBytes, input.Proof.ServicerPubKey)
+		return nil, parseRelayErrorResponse(bodyBytes, input.Proof.ServicerPubKey)
 	}
 
-	if !json.Valid(bodyBytes) {
-		return "", ErrNonJSONResponse
+	return parseRelaySuccesfulResponse(bodyBytes)
+}
+
+func parseRelaySuccesfulResponse(bodyBytes []byte) (*RelayResponse, error) {
+	response := RelayResponse{}
+
+	err := json.Unmarshal(bodyBytes, &response)
+	if err != nil {
+		return nil, err
 	}
 
-	return string(bodyBytes), nil
+	if !json.Valid([]byte(response.Response)) {
+		return nil, ErrNonJSONResponse
+	}
+
+	return &response, nil
 }
 
 func parseRelayErrorResponse(bodyBytes []byte, servicerPubKey string) error {

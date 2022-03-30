@@ -44,13 +44,13 @@ func TestJSONRPCProvider_GetBalance(t *testing.T) {
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryBalanceRoute), http.StatusOK, "samples/query_balance.json")
 
-	balance, err := provider.GetBalance("pjog")
+	balance, err := provider.GetBalance("pjog", &GetBalanceOptions{Height: 21})
 	c.NoError(err)
 	c.Equal(big.NewInt(1000000000), balance)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryBalanceRoute), http.StatusBadRequest, "samples/error_response.json")
 
-	balance, err = provider.GetBalance("pjog")
+	balance, err = provider.GetBalance("pjog", &GetBalanceOptions{Height: 21})
 	c.Equal("Request failed with code: 400 and message: dummy error", err.Error())
 	c.Empty(balance)
 }
@@ -168,13 +168,13 @@ func TestJSONRPCProvider_GetTransaction(t *testing.T) {
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryTXRoute), http.StatusOK, "samples/query_tx.json")
 
-	transaction, err := provider.GetTransaction("abcd")
+	transaction, err := provider.GetTransaction("abcd", &GetTransactionOptions{Prove: true})
 	c.NoError(err)
 	c.NotEmpty(transaction)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryTXRoute), http.StatusInternalServerError, "samples/query_tx.json")
 
-	transaction, err = provider.GetTransaction("abcd")
+	transaction, err = provider.GetTransaction("abcd", &GetTransactionOptions{Prove: true})
 	c.Equal(Err5xxOnConnection, err)
 	c.Empty(transaction)
 }
@@ -294,13 +294,13 @@ func TestJSONRPCProvider_GetAccount(t *testing.T) {
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountRoute), http.StatusOK, "samples/query_account.json")
 
-	account, err := provider.GetAccount("pjog")
+	account, err := provider.GetAccount("pjog", &GetAccountOptions{Height: 21})
 	c.NoError(err)
 	c.NotEmpty(account)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountRoute), http.StatusInternalServerError, "samples/query_account.json")
 
-	account, err = provider.GetAccount("pjog")
+	account, err = provider.GetAccount("pjog", &GetAccountOptions{Height: 21})
 	c.Equal(Err5xxOnConnection, err)
 	c.Empty(account)
 }
@@ -319,6 +319,12 @@ func TestJSONRPCProvider_GetAccountWithTransactions(t *testing.T) {
 	account, err := provider.GetAccountWithTransactions("pjog")
 	c.NoError(err)
 	c.NotEmpty(account)
+
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountTXsRoute), http.StatusNotFound, "samples/query_account_txs.json")
+
+	account, err = provider.GetAccountWithTransactions("pjog")
+	c.Equal(Err4xxOnConnection, err)
+	c.Empty(account)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountRoute), http.StatusInternalServerError, "samples/query_account.json")
 
@@ -387,7 +393,7 @@ func TestJSONRPCProvider_Relay(t *testing.T) {
 	c.True(IsErrorCode(EmptyPayloadDataError, err))
 	c.Empty(relay)
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientRelayRoute), http.StatusOK, "samples/no_json.txt")
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientRelayRoute), http.StatusOK, "samples/client_relay_non_json.json")
 
 	relay, err = provider.Relay("https://dummy.com", &Relay{}, nil)
 	c.Equal(ErrNonJSONResponse, err)

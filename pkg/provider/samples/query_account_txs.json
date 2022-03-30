@@ -32,10 +32,12 @@
         },
         "stdTx": {
           "entropy": 0,
-          "fee": {
-            "amount": "string",
-            "denom": "string"
-          },
+          "fee": [
+            {
+              "amount": "string",
+              "denom": "string"
+            }
+          ],
           "memo": "string",
           "msg": {},
           "signature": {
