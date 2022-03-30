@@ -2,8 +2,6 @@ package provider
 
 import (
 	"fmt"
-
-	"github.com/pokt-foundation/pocket-go/pkg/models"
 )
 
 // Relay represents a Relay to Pocket
@@ -24,12 +22,15 @@ type RelayMeta struct {
 	BlockHeight int `json:"block_height"`
 }
 
+// RelayHeaders map of relay headers
+type RelayHeaders map[string]string
+
 // RelayPayload represents payload of a relay
 type RelayPayload struct {
-	Data    string              `json:"data"`
-	Method  string              `json:"method"`
-	Path    string              `json:"path"`
-	Headers models.RelayHeaders `json:"headers"`
+	Data    string       `json:"data"`
+	Method  string       `json:"method"`
+	Path    string       `json:"path"`
+	Headers RelayHeaders `json:"headers"`
 }
 
 // RelayProof represents proof of a relay

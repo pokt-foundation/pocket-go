@@ -1,7 +1,6 @@
 package relayer
 
 import (
-	"github.com/pokt-foundation/pocket-go/pkg/models"
 	"github.com/pokt-foundation/pocket-go/pkg/provider"
 )
 
@@ -9,7 +8,7 @@ import (
 type RelayInput struct {
 	Blockchain string
 	Data       string
-	Headers    models.RelayHeaders
+	Headers    provider.RelayHeaders
 	Method     string
 	Node       *provider.Node
 	Path       string
