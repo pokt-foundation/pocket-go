@@ -95,7 +95,7 @@ func (r *PocketRelayer) getSignedProofBytes(proof *provider.RelayProof) (string,
 }
 
 // Relay does relay request with given input
-func (r *PocketRelayer) Relay(input *RelayInput, options *provider.RelayRequestOptions) (*RelayerResponse, error) {
+func (r *PocketRelayer) Relay(input *RelayInput, options *provider.RelayRequestOptions) (*Response, error) {
 	err := r.validateRelayRequest(input)
 	if err != nil {
 		return nil, err
@@ -160,7 +160,7 @@ func (r *PocketRelayer) Relay(input *RelayInput, options *provider.RelayRequestO
 		return nil, err
 	}
 
-	return &RelayerResponse{
+	return &Response{
 		Response: relayOutput,
 		Proof:    relayProof,
 		Node:     node,
