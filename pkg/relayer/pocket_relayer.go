@@ -45,20 +45,6 @@ func NewPocketRelayer(signer signer.Signer, provider provider.Provider) *PocketR
 	}
 }
 
-// GetNewSession gets a session using dispatch request
-func (r *PocketRelayer) GetNewSession(chain, appPubKey string, sessionHeight int, options *provider.DispatchRequestOptions) (*provider.Session, error) {
-	if r.provider == nil {
-		return nil, ErrNoProvider
-	}
-
-	dispatchResponse, err := r.provider.Dispatch(appPubKey, chain, sessionHeight, options)
-	if err != nil {
-		return nil, err
-	}
-
-	return dispatchResponse.Session, nil
-}
-
 func (r *PocketRelayer) validateRelayRequest(input *RelayInput) error {
 	if r.signer == nil {
 		return ErrNoSigner
@@ -109,7 +95,7 @@ func (r *PocketRelayer) getSignedProofBytes(proof *provider.RelayProof) (string,
 }
 
 // Relay does relay request with given input
-func (r *PocketRelayer) Relay(input *RelayInput, options *provider.RelayRequestOptions) (*RelayResponse, error) {
+func (r *PocketRelayer) Relay(input *RelayInput, options *provider.RelayRequestOptions) (*RelayerResponse, error) {
 	err := r.validateRelayRequest(input)
 	if err != nil {
 		return nil, err
@@ -174,7 +160,7 @@ func (r *PocketRelayer) Relay(input *RelayInput, options *provider.RelayRequestO
 		return nil, err
 	}
 
-	return &RelayResponse{
+	return &RelayerResponse{
 		Response: relayOutput,
 		Proof:    relayProof,
 		Node:     node,

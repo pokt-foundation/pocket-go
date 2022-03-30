@@ -13,6 +13,12 @@ type Relay struct {
 	Proof   *RelayProof   `json:"proof"`
 }
 
+// RelayResponse reprensents Relay RPC response
+type RelayResponse struct {
+	Response  string `json:"response"`
+	Signature string `json:"signature"`
+}
+
 // RelayMeta represents metadata of a relay
 type RelayMeta struct {
 	BlockHeight int `json:"block_height"`

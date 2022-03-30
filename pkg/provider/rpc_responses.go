@@ -39,7 +39,7 @@ type queryAccountsTXsResponse struct {
 		} `json:"proof"`
 		StdTx struct {
 			Entropy int `json:"entropy"`
-			Fee     struct {
+			Fee     []struct {
 				Amount string `json:"amount"`
 				Denom  string `json:"denom"`
 			} `json:"fee"`
@@ -116,10 +116,10 @@ type SendTransactionResponse struct {
 type GetBlockResponse struct {
 	Block struct {
 		Data struct {
-			Txs string `json:"txs"`
+			Txs []string `json:"txs"`
 		} `json:"data"`
 		Evidence struct {
-			Evidence string `json:"evidence"`
+			Evidence interface{} `json:"evidence"`
 		} `json:"evidence"`
 		Header struct {
 			AppHash       string `json:"app_hash"`
@@ -156,90 +156,59 @@ type GetBlockResponse struct {
 					Total string `json:"total"`
 				} `json:"parts"`
 			} `json:"block_id"`
-			Precommits interface{} `json:"precommits"`
+			Precommits []interface{} `json:"precommits"`
 		} `json:"last_commit"`
 	} `json:"block"`
-	BlockMeta struct {
-		BlockID struct {
+	BlockID struct {
+		Hash  string `json:"hash"`
+		Parts struct {
 			Hash  string `json:"hash"`
-			Parts struct {
-				Hash  string `json:"hash"`
-				Total string `json:"total"`
-			} `json:"parts"`
-		} `json:"block_id"`
-		Header struct {
-			AppHash       string `json:"app_hash"`
-			ChainID       string `json:"chain_id"`
-			ConsensusHash string `json:"consensus_hash"`
-			DataHash      string `json:"data_hash"`
-			EvidenceHash  string `json:"evidence_hash"`
-			Height        string `json:"height"`
-			LastBlockID   struct {
-				Hash  string `json:"hash"`
-				Parts struct {
-					Hash  string `json:"hash"`
-					Total string `json:"total"`
-				} `json:"parts"`
-			} `json:"last_block_id"`
-			LastCommitHash     string    `json:"last_commit_hash"`
-			LastResultsHash    string    `json:"last_results_hash"`
-			NextValidatorsHash string    `json:"next_validators_hash"`
-			NumTxs             string    `json:"num_txs"`
-			ProposerAddress    string    `json:"proposer_address"`
-			Time               time.Time `json:"time"`
-			TotalTxs           string    `json:"total_txs"`
-			ValidatorsHash     string    `json:"validators_hash"`
-			Version            struct {
-				App   string `json:"app"`
-				Block string `json:"block"`
-			} `json:"version"`
-		} `json:"header"`
-	} `json:"block_meta"`
+			Total string `json:"total"`
+		} `json:"parts"`
+	} `json:"block_id"`
 }
 
 // GetTransactionResponse represents response for GetTransaction request
 type GetTransactionResponse struct {
-	Transaction struct {
-		Hash     string `json:"hash"`
-		Height   int    `json:"height"`
-		Index    int    `json:"index"`
-		TxResult struct {
-			Code        int      `json:"code"`
-			Data        string   `json:"data"`
-			Log         string   `json:"log"`
-			Info        string   `json:"info"`
-			Events      []string `json:"events"`
-			Codespace   string   `json:"codespace"`
-			Signer      string   `json:"signer"`
-			Recipient   string   `json:"recipient"`
-			MessageType string   `json:"message_type"`
-		} `json:"tx_result"`
-		Tx    string `json:"tx"`
-		Proof struct {
-			RootHash string `json:"root_hash"`
-			Data     string `json:"data"`
-			Proof    struct {
-				Total    int      `json:"total"`
-				Index    int      `json:"index"`
-				LeafHash string   `json:"leaf_hash"`
-				Aunts    []string `json:"aunts"`
-			} `json:"proof"`
+	Hash     string `json:"hash"`
+	Height   int    `json:"height"`
+	Index    int    `json:"index"`
+	TxResult struct {
+		Code        int      `json:"code"`
+		Data        string   `json:"data"`
+		Log         string   `json:"log"`
+		Info        string   `json:"info"`
+		Events      []string `json:"events"`
+		Codespace   string   `json:"codespace"`
+		Signer      string   `json:"signer"`
+		Recipient   string   `json:"recipient"`
+		MessageType string   `json:"message_type"`
+	} `json:"tx_result"`
+	Tx    string `json:"tx"`
+	Proof struct {
+		RootHash string `json:"root_hash"`
+		Data     string `json:"data"`
+		Proof    struct {
+			Total    int      `json:"total"`
+			Index    int      `json:"index"`
+			LeafHash string   `json:"leaf_hash"`
+			Aunts    []string `json:"aunts"`
 		} `json:"proof"`
-		StdTx struct {
-			Entropy int `json:"entropy"`
-			Fee     struct {
-				Amount string `json:"amount"`
-				Denom  string `json:"denom"`
-			} `json:"fee"`
-			Memo string `json:"memo"`
-			Msg  struct {
-			} `json:"msg"`
-			Signature struct {
-				PubKey    string `json:"pub_key"`
-				Signature string `json:"signature"`
-			} `json:"signature"`
-		} `json:"stdTx"`
-	} `json:"transaction"`
+	} `json:"proof"`
+	StdTx struct {
+		Entropy int `json:"entropy"`
+		Fee     []struct {
+			Amount string `json:"amount"`
+			Denom  string `json:"denom"`
+		} `json:"fee"`
+		Memo string `json:"memo"`
+		Msg  struct {
+		} `json:"msg"`
+		Signature struct {
+			PubKey    string `json:"pub_key"`
+			Signature string `json:"signature"`
+		} `json:"signature"`
+	} `json:"stdTx"`
 }
 
 type queryHeightResponse struct {
@@ -270,10 +239,9 @@ type DispatchResponse struct {
 
 // Session represents session response from RPC request
 type Session struct {
-	BlockHeight int            `json:"block_height"`
-	Header      *SessionHeader `json:"header"`
-	Key         string         `json:"key"`
-	Nodes       []*Node        `json:"nodes"`
+	Header *SessionHeader `json:"header"`
+	Key    string         `json:"key"`
+	Nodes  []*Node        `json:"nodes"`
 }
 
 // SessionHeader represents the headers of a session response

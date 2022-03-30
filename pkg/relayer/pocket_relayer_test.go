@@ -24,38 +24,6 @@ func TestPocketRelayer_RelayerInterface(t *testing.T) {
 	c.True(ok)
 }
 
-func TestPocketRelayer_GetNewSession(t *testing.T) {
-	c := require.New(t)
-
-	httpmock.Activate()
-	defer httpmock.DeactivateAndReset()
-
-	wallet, err := signer.NewRandomWallet()
-	c.NoError(err)
-
-	relayer := NewPocketRelayer(wallet, nil)
-
-	session, err := relayer.GetNewSession("PJOG", "PJOG", 21, nil)
-	c.Equal(ErrNoProvider, err)
-	c.Empty(session)
-
-	relayer.provider = provider.NewJSONRPCProvider("https://dummy.com", []string{"https://dummy.com"}, client.NewDefaultClient())
-
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", provider.ClientDispatchRoute),
-		http.StatusOK, "../provider/samples/client_dispatch.json")
-
-	session, err = relayer.GetNewSession("PJOG", "PJOG", 21, nil)
-	c.NoError(err)
-	c.NotEmpty(session)
-
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", provider.ClientDispatchRoute),
-		http.StatusInternalServerError, "../provider/samples/client_dispatch.json")
-
-	session, err = relayer.GetNewSession("PJOG", "PJOG", 21, nil)
-	c.Equal(provider.Err5xxOnConnection, err)
-	c.Empty(session)
-}
-
 func TestPocketRelayer_Relay(t *testing.T) {
 	c := require.New(t)
 
