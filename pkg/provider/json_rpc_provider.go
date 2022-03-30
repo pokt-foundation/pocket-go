@@ -146,10 +146,22 @@ func (p *JSONRPCProvider) GetBalance(address string, options *GetBalanceOptions)
 	return output.Balance, nil
 }
 
-func (p *JSONRPCProvider) queryAccountTXs(address string) (*queryAccountsTXsOutput, error) {
-	rawOutput, err := p.doPostRequest("", map[string]string{
+// GetAccountTransactions returns transactions of given address' account
+func (p *JSONRPCProvider) GetAccountTransactions(address string, options *GetAccountTransactionsOptions) (*GetAccountTransactionsOutput, error) {
+	params := map[string]interface{}{
 		"address": address,
-	}, QueryAccountTXsRoute)
+	}
+
+	if options != nil {
+		params["height"] = options.Height
+		params["page"] = options.Page
+		params["per_page"] = options.PerPage
+		params["prove"] = options.Prove
+		params["received"] = options.Received
+		params["order"] = options.Order
+	}
+
+	rawOutput, err := p.doPostRequest("", params, QueryAccountTXsRoute)
 	if err != nil {
 		return nil, err
 	}
@@ -161,7 +173,7 @@ func (p *JSONRPCProvider) queryAccountTXs(address string) (*queryAccountsTXsOutp
 		return nil, err
 	}
 
-	output := queryAccountsTXsOutput{}
+	output := GetAccountTransactionsOutput{}
 
 	err = json.Unmarshal(bodyBytes, &output)
 	if err != nil {
@@ -172,13 +184,33 @@ func (p *JSONRPCProvider) queryAccountTXs(address string) (*queryAccountsTXsOutp
 }
 
 // GetTransactionCount returns number of transactions sent by the given address
-func (p *JSONRPCProvider) GetTransactionCount(address string) (int, error) {
-	output, err := p.queryAccountTXs(address)
-	if err != nil {
-		return 0, err
+func (p *JSONRPCProvider) GetTransactionCount(address string, options *GetTransactionCountOptions) (int, error) {
+	optionsToSend := &GetAccountTransactionsOptions{}
+	currentPage := 1
+	totalCount := 0
+
+	if options != nil {
+		optionsToSend.Height = options.Height
+		optionsToSend.Received = options.Received
 	}
 
-	return output.TotalCount, nil
+	for {
+		optionsToSend.Page = currentPage
+
+		output, err := p.GetAccountTransactions(address, optionsToSend)
+		if err != nil {
+			return 0, err
+		}
+
+		if output.TotalCount == 0 {
+			break
+		}
+
+		totalCount += output.TotalCount
+		currentPage++
+	}
+
+	return totalCount, nil
 }
 
 func returnType(appErr, nodeErr error) AddressType {
@@ -495,24 +527,6 @@ func (p *JSONRPCProvider) GetAccount(address string, options *GetAccountOptions)
 	}
 
 	return &output, nil
-}
-
-// GetAccountWithTransactions returns account at the specified address with its performed transactions
-func (p *JSONRPCProvider) GetAccountWithTransactions(address string) (*GetAccountWithTransactionsOutput, error) {
-	accountOutput, err := p.GetAccount(address, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	transactionsOutput, err := p.queryAccountTXs(address)
-	if err != nil {
-		return nil, err
-	}
-
-	return &GetAccountWithTransactionsOutput{
-		Account:      accountOutput,
-		Transactions: transactionsOutput,
-	}, nil
 }
 
 // Dispatch sends a dispatch request to the network and gets the nodes that will be servicing the requests for the session.

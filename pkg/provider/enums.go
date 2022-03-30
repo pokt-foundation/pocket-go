@@ -21,3 +21,13 @@ const (
 	// Staked represents staked status
 	Staked
 )
+
+// Order enum that represents the order which RPC requests should return their outputs
+type Order string
+
+const (
+	// DescendantOrder represents greater to lower order
+	DescendantOrder Order = "desc"
+	// AscendantOrder represents lower to greater order
+	AscendantOrder Order = "asc"
+)

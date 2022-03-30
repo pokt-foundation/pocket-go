@@ -10,7 +10,8 @@ type queryBalanceOutput struct {
 	Balance *big.Int `json:"balance"`
 }
 
-type queryAccountsTXsOutput struct {
+// GetAccountTransactionsOutput represents output for GetAccountTransactions request
+type GetAccountTransactionsOutput struct {
 	Txs []struct {
 		Hash     string `json:"hash"`
 		Height   int    `json:"height"`
@@ -223,12 +224,6 @@ type GetAccountOutput struct {
 		Denom  string `json:"denom"`
 	} `json:"coins"`
 	PublicKey string `json:"public_key"`
-}
-
-// GetAccountWithTransactionsOutput represents output for GetAccountWithTransactions request
-type GetAccountWithTransactionsOutput struct {
-	Account      *GetAccountOutput
-	Transactions *queryAccountsTXsOutput
 }
 
 // DispatchOutput represents output for Dispatch request

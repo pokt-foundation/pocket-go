@@ -8,7 +8,7 @@ import (
 type Provider interface {
 	// Account
 	GetBalance(address string, options *GetBalanceOptions) (*big.Int, error)
-	GetTransactionCount(address string) (int, error)
+	GetTransactionCount(address string, options *GetTransactionCountOptions) (int, error)
 	GetType(address string, options *GetTypeOptions) (AddressType, error)
 	// TXs
 	SendTransaction(signerAddress string, signedTransaction string) (*SendTransactionOutput, error)
@@ -21,7 +21,7 @@ type Provider interface {
 	GetApps(height int, options *GetAppsOptions) (*GetAppsOutput, error)
 	GetApp(address string, options *GetAppOptions) (*GetAppOutput, error)
 	GetAccount(address string, options *GetAccountOptions) (*GetAccountOutput, error)
-	GetAccountWithTransactions(address string) (*GetAccountWithTransactionsOutput, error)
+	GetAccountTransactions(address string, options *GetAccountTransactionsOptions) (*GetAccountTransactionsOutput, error)
 	Dispatch(appPublicKey, chain string, options *DispatchRequestOptions) (*DispatchOutput, error)
 	Relay(rpcURL string, input *Relay, options *RelayRequestOptions) (*RelayOutput, error)
 	// TODO: Add methods for params/requestChallenge
