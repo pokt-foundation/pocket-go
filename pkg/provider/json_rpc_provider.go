@@ -68,25 +68,25 @@ func (p *JSONRPCProvider) doPostRequest(rpcURL string, params interface{}, route
 		return nil, err
 	}
 
-	response, err := p.client.PostWithURLJSONParams(fmt.Sprintf("%s%s", finalRPCURL, route), params, http.Header{})
+	output, err := p.client.PostWithURLJSONParams(fmt.Sprintf("%s%s", finalRPCURL, route), params, http.Header{})
 	if err != nil {
 		return nil, err
 	}
 
-	if response.StatusCode == http.StatusBadRequest {
-		return response, returnRPCError(route, response.Body)
+	if output.StatusCode == http.StatusBadRequest {
+		return output, returnRPCError(route, output.Body)
 	}
 
-	if string(response.Status[0]) == "4" {
-		return response, Err4xxOnConnection
+	if string(output.Status[0]) == "4" {
+		return output, Err4xxOnConnection
 	}
 
-	if string(response.Status[0]) == "5" {
-		return response, Err5xxOnConnection
+	if string(output.Status[0]) == "5" {
+		return output, Err5xxOnConnection
 	}
 
-	if string(response.Status[0]) == "2" {
-		return response, nil
+	if string(output.Status[0]) == "2" {
+		return output, nil
 	}
 
 	return nil, ErrUnexpectedCodeOnConnection
@@ -104,14 +104,14 @@ func returnRPCError(route V1RPCRoute, body io.ReadCloser) error {
 		return err
 	}
 
-	response := RPCError{}
+	output := RPCError{}
 
-	err = json.Unmarshal(bodyBytes, &response)
+	err = json.Unmarshal(bodyBytes, &output)
 	if err != nil {
 		return err
 	}
 
-	return &response
+	return &output
 }
 
 // GetBalance requests the balance of the specified address
@@ -124,61 +124,61 @@ func (p *JSONRPCProvider) GetBalance(address string, options *GetBalanceOptions)
 		params["height"] = options.Height
 	}
 
-	rawResponse, err := p.doPostRequest("", params, QueryBalanceRoute)
+	rawOutput, err := p.doPostRequest("", params, QueryBalanceRoute)
 	if err != nil {
 		return nil, err
 	}
 
-	defer utils.CloseOrLog(rawResponse.Body)
+	defer utils.CloseOrLog(rawOutput.Body)
 
-	bodyBytes, err := ioutil.ReadAll(rawResponse.Body)
+	bodyBytes, err := ioutil.ReadAll(rawOutput.Body)
 	if err != nil {
 		return nil, err
 	}
 
-	response := queryBalanceResponse{}
+	output := queryBalanceOutput{}
 
-	err = json.Unmarshal(bodyBytes, &response)
+	err = json.Unmarshal(bodyBytes, &output)
 	if err != nil {
 		return nil, err
 	}
 
-	return response.Balance, nil
+	return output.Balance, nil
 }
 
-func (p *JSONRPCProvider) queryAccountTXs(address string) (*queryAccountsTXsResponse, error) {
-	rawResponse, err := p.doPostRequest("", map[string]string{
+func (p *JSONRPCProvider) queryAccountTXs(address string) (*queryAccountsTXsOutput, error) {
+	rawOutput, err := p.doPostRequest("", map[string]string{
 		"address": address,
 	}, QueryAccountTXsRoute)
 	if err != nil {
 		return nil, err
 	}
 
-	defer utils.CloseOrLog(rawResponse.Body)
+	defer utils.CloseOrLog(rawOutput.Body)
 
-	bodyBytes, err := ioutil.ReadAll(rawResponse.Body)
+	bodyBytes, err := ioutil.ReadAll(rawOutput.Body)
 	if err != nil {
 		return nil, err
 	}
 
-	response := queryAccountsTXsResponse{}
+	output := queryAccountsTXsOutput{}
 
-	err = json.Unmarshal(bodyBytes, &response)
+	err = json.Unmarshal(bodyBytes, &output)
 	if err != nil {
 		return nil, err
 	}
 
-	return &response, nil
+	return &output, nil
 }
 
 // GetTransactionCount returns number of transactions sent by the given address
 func (p *JSONRPCProvider) GetTransactionCount(address string) (int, error) {
-	response, err := p.queryAccountTXs(address)
+	output, err := p.queryAccountTXs(address)
 	if err != nil {
 		return 0, err
 	}
 
-	return response.TotalCount, nil
+	return output.TotalCount, nil
 }
 
 func returnType(appErr, nodeErr error) AddressType {
@@ -196,19 +196,19 @@ func returnType(appErr, nodeErr error) AddressType {
 // GetType returns type of given address
 func (p *JSONRPCProvider) GetType(address string, options *GetTypeOptions) (AddressType, error) {
 	var height int
-	var errResponse *RPCError
+	var errOutput *RPCError
 
 	if options != nil {
 		height = options.Height
 	}
 
 	_, appErr := p.GetApp(address, &GetAppOptions{Height: height})
-	if appErr != nil && !errors.As(appErr, &errResponse) {
+	if appErr != nil && !errors.As(appErr, &errOutput) {
 		return "", appErr
 	}
 
 	_, nodeErr := p.GetNode(address, &GetNodeOptions{Height: height})
-	if nodeErr != nil && !errors.As(nodeErr, &errResponse) {
+	if nodeErr != nil && !errors.As(nodeErr, &errOutput) {
 		return "", nodeErr
 	}
 
@@ -216,8 +216,8 @@ func (p *JSONRPCProvider) GetType(address string, options *GetTypeOptions) (Addr
 }
 
 // SendTransaction sends raw transaction to be relayed to a target address
-func (p *JSONRPCProvider) SendTransaction(signerAddress, signedTransaction string) (*SendTransactionResponse, error) {
-	rawResponse, err := p.doPostRequest("", map[string]string{
+func (p *JSONRPCProvider) SendTransaction(signerAddress, signedTransaction string) (*SendTransactionOutput, error) {
+	rawOutput, err := p.doPostRequest("", map[string]string{
 		"address":       signerAddress,
 		"raw_hex_bytes": signedTransaction,
 	}, ClientRawTXRoute)
@@ -225,51 +225,51 @@ func (p *JSONRPCProvider) SendTransaction(signerAddress, signedTransaction strin
 		return nil, err
 	}
 
-	defer utils.CloseOrLog(rawResponse.Body)
+	defer utils.CloseOrLog(rawOutput.Body)
 
-	bodyBytes, err := ioutil.ReadAll(rawResponse.Body)
+	bodyBytes, err := ioutil.ReadAll(rawOutput.Body)
 	if err != nil {
 		return nil, err
 	}
 
-	response := SendTransactionResponse{}
+	output := SendTransactionOutput{}
 
-	err = json.Unmarshal(bodyBytes, &response)
+	err = json.Unmarshal(bodyBytes, &output)
 	if err != nil {
 		return nil, err
 	}
 
-	return &response, nil
+	return &output, nil
 }
 
 // GetBlock returns the block structure at the specified height, height = 0 is used as latest
-func (p *JSONRPCProvider) GetBlock(blockNumber int) (*GetBlockResponse, error) {
-	rawResponse, err := p.doPostRequest("", map[string]int{
+func (p *JSONRPCProvider) GetBlock(blockNumber int) (*GetBlockOutput, error) {
+	rawOutput, err := p.doPostRequest("", map[string]int{
 		"height": blockNumber,
 	}, QueryBlockRoute)
 	if err != nil {
 		return nil, err
 	}
 
-	defer utils.CloseOrLog(rawResponse.Body)
+	defer utils.CloseOrLog(rawOutput.Body)
 
-	bodyBytes, err := ioutil.ReadAll(rawResponse.Body)
+	bodyBytes, err := ioutil.ReadAll(rawOutput.Body)
 	if err != nil {
 		return nil, err
 	}
 
-	response := GetBlockResponse{}
+	output := GetBlockOutput{}
 
-	err = json.Unmarshal(bodyBytes, &response)
+	err = json.Unmarshal(bodyBytes, &output)
 	if err != nil {
 		return nil, err
 	}
 
-	return &response, nil
+	return &output, nil
 }
 
 // GetTransaction returns the transaction by the given transaction hash
-func (p *JSONRPCProvider) GetTransaction(transactionHash string, options *GetTransactionOptions) (*GetTransactionResponse, error) {
+func (p *JSONRPCProvider) GetTransaction(transactionHash string, options *GetTransactionOptions) (*GetTransactionOutput, error) {
 	params := map[string]interface{}{
 		"hash": transactionHash,
 	}
@@ -278,55 +278,55 @@ func (p *JSONRPCProvider) GetTransaction(transactionHash string, options *GetTra
 		params["prove"] = options.Prove
 	}
 
-	rawResponse, err := p.doPostRequest("", params, QueryTXRoute)
+	rawOutput, err := p.doPostRequest("", params, QueryTXRoute)
 	if err != nil {
 		return nil, err
 	}
 
-	defer utils.CloseOrLog(rawResponse.Body)
+	defer utils.CloseOrLog(rawOutput.Body)
 
-	bodyBytes, err := ioutil.ReadAll(rawResponse.Body)
+	bodyBytes, err := ioutil.ReadAll(rawOutput.Body)
 	if err != nil {
 		return nil, err
 	}
 
-	response := GetTransactionResponse{}
+	output := GetTransactionOutput{}
 
-	err = json.Unmarshal(bodyBytes, &response)
+	err = json.Unmarshal(bodyBytes, &output)
 	if err != nil {
 		return nil, err
 	}
 
-	return &response, nil
+	return &output, nil
 }
 
 // GetBlockHeight returns the current height
 func (p *JSONRPCProvider) GetBlockHeight() (int, error) {
-	rawResponse, err := p.doPostRequest("", nil, QueryHeightRoute)
+	rawOutput, err := p.doPostRequest("", nil, QueryHeightRoute)
 	if err != nil {
 		return 0, err
 	}
 
-	defer utils.CloseOrLog(rawResponse.Body)
+	defer utils.CloseOrLog(rawOutput.Body)
 
-	bodyBytes, err := ioutil.ReadAll(rawResponse.Body)
+	bodyBytes, err := ioutil.ReadAll(rawOutput.Body)
 	if err != nil {
 		return 0, err
 	}
 
-	response := queryHeightResponse{}
+	output := queryHeightOutput{}
 
-	err = json.Unmarshal(bodyBytes, &response)
+	err = json.Unmarshal(bodyBytes, &output)
 	if err != nil {
 		return 0, err
 	}
 
-	return response.Height, nil
+	return output.Height, nil
 }
 
 // GetNodes returns a page of nodes known at the specified height and with options
 // empty options returns all validators, page < 1 returns the first page, per_page < 1 returns 10000 elements per page
-func (p *JSONRPCProvider) GetNodes(height int, options *GetNodesOptions) (*GetNodesResponse, error) {
+func (p *JSONRPCProvider) GetNodes(height int, options *GetNodesOptions) (*GetNodesOutput, error) {
 	params := map[string]interface{}{
 		"height": height,
 	}
@@ -341,30 +341,30 @@ func (p *JSONRPCProvider) GetNodes(height int, options *GetNodesOptions) (*GetNo
 		}
 	}
 
-	rawResponse, err := p.doPostRequest("", params, QueryNodesRoute)
+	rawOutput, err := p.doPostRequest("", params, QueryNodesRoute)
 	if err != nil {
 		return nil, err
 	}
 
-	defer utils.CloseOrLog(rawResponse.Body)
+	defer utils.CloseOrLog(rawOutput.Body)
 
-	bodyBytes, err := ioutil.ReadAll(rawResponse.Body)
+	bodyBytes, err := ioutil.ReadAll(rawOutput.Body)
 	if err != nil {
 		return nil, err
 	}
 
-	response := GetNodesResponse{}
+	output := GetNodesOutput{}
 
-	err = json.Unmarshal(bodyBytes, &response)
+	err = json.Unmarshal(bodyBytes, &output)
 	if err != nil {
 		return nil, err
 	}
 
-	return &response, nil
+	return &output, nil
 }
 
 // GetNode returns the node at the specified height, height = 0 is used as latest
-func (p *JSONRPCProvider) GetNode(address string, options *GetNodeOptions) (*GetNodeResponse, error) {
+func (p *JSONRPCProvider) GetNode(address string, options *GetNodeOptions) (*GetNodeOutput, error) {
 	params := map[string]interface{}{
 		"address": address,
 	}
@@ -373,31 +373,31 @@ func (p *JSONRPCProvider) GetNode(address string, options *GetNodeOptions) (*Get
 		params["height"] = options.Height
 	}
 
-	rawResponse, err := p.doPostRequest("", params, QueryNodeRoute)
+	rawOutput, err := p.doPostRequest("", params, QueryNodeRoute)
 	if err != nil {
 		return nil, err
 	}
 
-	defer utils.CloseOrLog(rawResponse.Body)
+	defer utils.CloseOrLog(rawOutput.Body)
 
-	bodyBytes, err := ioutil.ReadAll(rawResponse.Body)
+	bodyBytes, err := ioutil.ReadAll(rawOutput.Body)
 	if err != nil {
 		return nil, err
 	}
 
-	response := GetNodeResponse{}
+	output := GetNodeOutput{}
 
-	err = json.Unmarshal(bodyBytes, &response)
+	err = json.Unmarshal(bodyBytes, &output)
 	if err != nil {
 		return nil, err
 	}
 
-	return &response, nil
+	return &output, nil
 }
 
 // GetApps returns a page of applications known at the specified height and staking status
 // empty ("") staking_status returns all apps, page < 1 returns the first page, per_page < 1 returns 10000 elements per page
-func (p *JSONRPCProvider) GetApps(height int, options *GetAppsOptions) (*GetAppsResponse, error) {
+func (p *JSONRPCProvider) GetApps(height int, options *GetAppsOptions) (*GetAppsOutput, error) {
 	params := map[string]interface{}{
 		"height": height,
 	}
@@ -411,30 +411,30 @@ func (p *JSONRPCProvider) GetApps(height int, options *GetAppsOptions) (*GetApps
 		}
 	}
 
-	rawResponse, err := p.doPostRequest("", params, QueryAppsRoute)
+	rawOutput, err := p.doPostRequest("", params, QueryAppsRoute)
 	if err != nil {
 		return nil, err
 	}
 
-	defer utils.CloseOrLog(rawResponse.Body)
+	defer utils.CloseOrLog(rawOutput.Body)
 
-	bodyBytes, err := ioutil.ReadAll(rawResponse.Body)
+	bodyBytes, err := ioutil.ReadAll(rawOutput.Body)
 	if err != nil {
 		return nil, err
 	}
 
-	response := GetAppsResponse{}
+	output := GetAppsOutput{}
 
-	err = json.Unmarshal(bodyBytes, &response)
+	err = json.Unmarshal(bodyBytes, &output)
 	if err != nil {
 		return nil, err
 	}
 
-	return &response, nil
+	return &output, nil
 }
 
 // GetApp returns the app at the specified height, height = 0 is used as latest
-func (p *JSONRPCProvider) GetApp(address string, options *GetAppOptions) (*GetAppResponse, error) {
+func (p *JSONRPCProvider) GetApp(address string, options *GetAppOptions) (*GetAppOutput, error) {
 	params := map[string]interface{}{
 		"address": address,
 	}
@@ -443,30 +443,30 @@ func (p *JSONRPCProvider) GetApp(address string, options *GetAppOptions) (*GetAp
 		params["height"] = options.Height
 	}
 
-	rawResponse, err := p.doPostRequest("", params, QueryAppRoute)
+	rawOutput, err := p.doPostRequest("", params, QueryAppRoute)
 	if err != nil {
 		return nil, err
 	}
 
-	defer utils.CloseOrLog(rawResponse.Body)
+	defer utils.CloseOrLog(rawOutput.Body)
 
-	bodyBytes, err := ioutil.ReadAll(rawResponse.Body)
+	bodyBytes, err := ioutil.ReadAll(rawOutput.Body)
 	if err != nil {
 		return nil, err
 	}
 
-	response := GetAppResponse{}
+	output := GetAppOutput{}
 
-	err = json.Unmarshal(bodyBytes, &response)
+	err = json.Unmarshal(bodyBytes, &output)
 	if err != nil {
 		return nil, err
 	}
 
-	return &response, nil
+	return &output, nil
 }
 
 // GetAccount returns account at the specified address
-func (p *JSONRPCProvider) GetAccount(address string, options *GetAccountOptions) (*GetAccountResponse, error) {
+func (p *JSONRPCProvider) GetAccount(address string, options *GetAccountOptions) (*GetAccountOutput, error) {
 	params := map[string]interface{}{
 		"address": address,
 	}
@@ -475,48 +475,48 @@ func (p *JSONRPCProvider) GetAccount(address string, options *GetAccountOptions)
 		params["height"] = options.Height
 	}
 
-	rawResponse, err := p.doPostRequest("", params, QueryAccountRoute)
+	rawOutput, err := p.doPostRequest("", params, QueryAccountRoute)
 	if err != nil {
 		return nil, err
 	}
 
-	defer utils.CloseOrLog(rawResponse.Body)
+	defer utils.CloseOrLog(rawOutput.Body)
 
-	bodyBytes, err := ioutil.ReadAll(rawResponse.Body)
+	bodyBytes, err := ioutil.ReadAll(rawOutput.Body)
 	if err != nil {
 		return nil, err
 	}
 
-	response := GetAccountResponse{}
+	output := GetAccountOutput{}
 
-	err = json.Unmarshal(bodyBytes, &response)
+	err = json.Unmarshal(bodyBytes, &output)
 	if err != nil {
 		return nil, err
 	}
 
-	return &response, nil
+	return &output, nil
 }
 
 // GetAccountWithTransactions returns account at the specified address with its performed transactions
-func (p *JSONRPCProvider) GetAccountWithTransactions(address string) (*GetAccountWithTransactionsResponse, error) {
-	accountResponse, err := p.GetAccount(address, nil)
+func (p *JSONRPCProvider) GetAccountWithTransactions(address string) (*GetAccountWithTransactionsOutput, error) {
+	accountOutput, err := p.GetAccount(address, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	transactionsResponse, err := p.queryAccountTXs(address)
+	transactionsOutput, err := p.queryAccountTXs(address)
 	if err != nil {
 		return nil, err
 	}
 
-	return &GetAccountWithTransactionsResponse{
-		Account:      accountResponse,
-		Transactions: transactionsResponse,
+	return &GetAccountWithTransactionsOutput{
+		Account:      accountOutput,
+		Transactions: transactionsOutput,
 	}, nil
 }
 
 // Dispatch sends a dispatch request to the network and gets the nodes that will be servicing the requests for the session.
-func (p *JSONRPCProvider) Dispatch(appPublicKey, chain string, options *DispatchRequestOptions) (*DispatchResponse, error) {
+func (p *JSONRPCProvider) Dispatch(appPublicKey, chain string, options *DispatchRequestOptions) (*DispatchOutput, error) {
 	if len(p.dispatchers) == 0 {
 		return nil, ErrNoDispatchers
 	}
@@ -530,76 +530,76 @@ func (p *JSONRPCProvider) Dispatch(appPublicKey, chain string, options *Dispatch
 		params["session_height"] = options.Height
 	}
 
-	rawResponse, err := p.doPostRequest("", params, ClientDispatchRoute)
+	rawOutput, err := p.doPostRequest("", params, ClientDispatchRoute)
 	if err != nil {
 		return nil, err
 	}
 
-	defer utils.CloseOrLog(rawResponse.Body)
+	defer utils.CloseOrLog(rawOutput.Body)
 
-	bodyBytes, err := ioutil.ReadAll(rawResponse.Body)
+	bodyBytes, err := ioutil.ReadAll(rawOutput.Body)
 	if err != nil {
 		return nil, err
 	}
 
-	response := DispatchResponse{}
+	output := DispatchOutput{}
 
-	err = json.Unmarshal(bodyBytes, &response)
+	err = json.Unmarshal(bodyBytes, &output)
 	if err != nil {
 		return nil, err
 	}
 
-	return &response, nil
+	return &output, nil
 }
 
 // Relay does request to be relayed to a target blockchain
-func (p *JSONRPCProvider) Relay(rpcURL string, input *Relay, options *RelayRequestOptions) (*RelayResponse, error) {
-	rawResponse, reqErr := p.doPostRequest(rpcURL, input, ClientRelayRoute)
+func (p *JSONRPCProvider) Relay(rpcURL string, input *Relay, options *RelayRequestOptions) (*RelayOutput, error) {
+	rawOutput, reqErr := p.doPostRequest(rpcURL, input, ClientRelayRoute)
 	if reqErr != nil && !errors.Is(reqErr, errOnRelayRequest) {
 		return nil, reqErr
 	}
 
-	defer utils.CloseOrLog(rawResponse.Body)
+	defer utils.CloseOrLog(rawOutput.Body)
 
-	bodyBytes, err := ioutil.ReadAll(rawResponse.Body)
+	bodyBytes, err := ioutil.ReadAll(rawOutput.Body)
 	if err != nil {
 		return nil, err
 	}
 
 	if errors.Is(reqErr, errOnRelayRequest) {
-		return nil, parseRelayErrorResponse(bodyBytes, input.Proof.ServicerPubKey)
+		return nil, parseRelayErrorOutput(bodyBytes, input.Proof.ServicerPubKey)
 	}
 
-	return parseRelaySuccesfulResponse(bodyBytes)
+	return parseRelaySuccesfulOutput(bodyBytes)
 }
 
-func parseRelaySuccesfulResponse(bodyBytes []byte) (*RelayResponse, error) {
-	response := RelayResponse{}
+func parseRelaySuccesfulOutput(bodyBytes []byte) (*RelayOutput, error) {
+	output := RelayOutput{}
 
-	err := json.Unmarshal(bodyBytes, &response)
+	err := json.Unmarshal(bodyBytes, &output)
 	if err != nil {
 		return nil, err
 	}
 
-	if !json.Valid([]byte(response.Response)) {
+	if !json.Valid([]byte(output.Response)) {
 		return nil, ErrNonJSONResponse
 	}
 
-	return &response, nil
+	return &output, nil
 }
 
-func parseRelayErrorResponse(bodyBytes []byte, servicerPubKey string) error {
-	response := RelayErrorResponse{}
+func parseRelayErrorOutput(bodyBytes []byte, servicerPubKey string) error {
+	output := RelayErrorOutput{}
 
-	err := json.Unmarshal(bodyBytes, &response)
+	err := json.Unmarshal(bodyBytes, &output)
 	if err != nil {
 		return err
 	}
 
 	return &RelayError{
-		Code:           response.Error.Code,
-		Codespace:      response.Error.Message,
-		Message:        response.Error.Message,
+		Code:           output.Error.Code,
+		Codespace:      output.Error.Message,
+		Message:        output.Error.Message,
 		ServicerPubKey: servicerPubKey,
 	}
 }

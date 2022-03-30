@@ -1,7 +1,6 @@
 package relayer
 
 import (
-	"github.com/pokt-foundation/pocket-go/pkg/models"
 	"github.com/pokt-foundation/pocket-go/pkg/provider"
 )
 
@@ -9,7 +8,7 @@ import (
 type RelayInput struct {
 	Blockchain string
 	Data       string
-	Headers    models.RelayHeaders
+	Headers    provider.RelayHeaders
 	Method     string
 	Node       *provider.Node
 	Path       string
@@ -23,11 +22,11 @@ type RequestHash struct {
 	Meta    *provider.RelayMeta    `json:"meta"`
 }
 
-// Response struct for data needed as response for relay request
-type Response struct {
-	Response *provider.RelayResponse
-	Proof    *provider.RelayProof
-	Node     *provider.Node
+// Output struct for data needed as output for relay request
+type Output struct {
+	RelayOutput *provider.RelayOutput
+	Proof       *provider.RelayProof
+	Node        *provider.Node
 }
 
 // Order of fields matters for signature

@@ -6,11 +6,11 @@ import (
 	"time"
 )
 
-type queryBalanceResponse struct {
+type queryBalanceOutput struct {
 	Balance *big.Int `json:"balance"`
 }
 
-type queryAccountsTXsResponse struct {
+type queryAccountsTXsOutput struct {
 	Txs []struct {
 		Hash     string `json:"hash"`
 		Height   int    `json:"height"`
@@ -55,8 +55,8 @@ type queryAccountsTXsResponse struct {
 	TotalCount int `json:"total_count"`
 }
 
-// GetAppResponse represents response for GetApp request
-type GetAppResponse struct {
+// GetAppOutput represents output for GetApp request
+type GetAppOutput struct {
 	Address       string    `json:"address"`
 	PublicKey     string    `json:"public_key"`
 	Jailed        bool      `json:"jailed"`
@@ -67,15 +67,15 @@ type GetAppResponse struct {
 	UnstakingTime time.Time `json:"unstaking_time"`
 }
 
-// GetAppsResponse represents response for GetApps request
-type GetAppsResponse struct {
-	Result     []GetAppResponse `json:"result"`
-	Page       int              `json:"page"`
-	TotalPages int              `json:"total_pages"`
+// GetAppsOutput represents output for GetApps request
+type GetAppsOutput struct {
+	Result     []GetAppOutput `json:"result"`
+	Page       int            `json:"page"`
+	TotalPages int            `json:"total_pages"`
 }
 
-// GetNodeResponse represents response for GetNode request
-type GetNodeResponse struct {
+// GetNodeOutput represents output for GetNode request
+type GetNodeOutput struct {
 	Address       string    `json:"address"`
 	Chains        []string  `json:"chains"`
 	Jailed        bool      `json:"jailed"`
@@ -86,15 +86,15 @@ type GetNodeResponse struct {
 	UnstakingTime time.Time `json:"unstaking_time"`
 }
 
-// GetNodesResponse represents response for GetNodes request
-type GetNodesResponse struct {
-	Result     []GetNodeResponse `json:"result"`
-	Page       int               `json:"page"`
-	TotalPages int               `json:"total_pages"`
+// GetNodesOutput represents output for GetNodes request
+type GetNodesOutput struct {
+	Result     []GetNodeOutput `json:"result"`
+	Page       int             `json:"page"`
+	TotalPages int             `json:"total_pages"`
 }
 
-// SendTransactionResponse represents response for SendTransaction request
-type SendTransactionResponse struct {
+// SendTransactionOutput represents output for SendTransaction request
+type SendTransactionOutput struct {
 	Height string `json:"height"`
 	Txhash string `json:"txhash"`
 	RawLog string `json:"raw_log"`
@@ -112,8 +112,8 @@ type SendTransactionResponse struct {
 	} `json:"logs"`
 }
 
-// GetBlockResponse represents response for GetBlock request
-type GetBlockResponse struct {
+// GetBlockOutput represents output for GetBlock request
+type GetBlockOutput struct {
 	Block struct {
 		Data struct {
 			Txs []string `json:"txs"`
@@ -168,8 +168,8 @@ type GetBlockResponse struct {
 	} `json:"block_id"`
 }
 
-// GetTransactionResponse represents response for GetTransaction request
-type GetTransactionResponse struct {
+// GetTransactionOutput represents output for GetTransaction request
+type GetTransactionOutput struct {
 	Hash     string `json:"hash"`
 	Height   int    `json:"height"`
 	Index    int    `json:"index"`
@@ -211,12 +211,12 @@ type GetTransactionResponse struct {
 	} `json:"stdTx"`
 }
 
-type queryHeightResponse struct {
+type queryHeightOutput struct {
 	Height int `json:"height"`
 }
 
-// GetAccountResponse represents response for GetAccount request
-type GetAccountResponse struct {
+// GetAccountOutput represents output for GetAccount request
+type GetAccountOutput struct {
 	Address string `json:"address"`
 	Coins   []struct {
 		Amount string `json:"amount"`
@@ -225,33 +225,33 @@ type GetAccountResponse struct {
 	PublicKey string `json:"public_key"`
 }
 
-// GetAccountWithTransactionsResponse represents response for GetAccountWithTransactions request
-type GetAccountWithTransactionsResponse struct {
-	Account      *GetAccountResponse
-	Transactions *queryAccountsTXsResponse
+// GetAccountWithTransactionsOutput represents output for GetAccountWithTransactions request
+type GetAccountWithTransactionsOutput struct {
+	Account      *GetAccountOutput
+	Transactions *queryAccountsTXsOutput
 }
 
-// DispatchResponse represents response for Dispatch request
-type DispatchResponse struct {
+// DispatchOutput represents output for Dispatch request
+type DispatchOutput struct {
 	BlockHeight int      `json:"block_height"`
 	Session     *Session `json:"session"`
 }
 
-// Session represents session response from RPC request
+// Session represents session output from RPC request
 type Session struct {
 	Header *SessionHeader `json:"header"`
 	Key    string         `json:"key"`
 	Nodes  []*Node        `json:"nodes"`
 }
 
-// SessionHeader represents the headers of a session response
+// SessionHeader represents the headers of a session output
 type SessionHeader struct {
 	AppPublicKey  string `json:"app_public_key"`
 	Chain         string `json:"chain"`
 	SessionHeight int    `json:"session_height"`
 }
 
-// Node represents node response from RPC request
+// Node represents node output from RPC request
 type Node struct {
 	Address       string    `json:"address"`
 	Chains        []string  `json:"chains"`
@@ -263,7 +263,7 @@ type Node struct {
 	UnstakingTime time.Time `json:"unstaking_time"`
 }
 
-// RPCError reprensents error response from RPC request
+// RPCError reprensents error output from RPC request
 type RPCError struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`

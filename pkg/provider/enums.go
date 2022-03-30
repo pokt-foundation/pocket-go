@@ -1,4 +1,4 @@
-package models
+package provider
 
 // JailedStatus enum that represents jailed status
 type JailedStatus int
@@ -8,4 +8,16 @@ const (
 	Jailed JailedStatus = iota + 1
 	// Unjailed status is when a node is not jailed and thus can serve relays
 	Unjailed
+)
+
+// StakingStatus enum that represents staking status
+type StakingStatus int
+
+const (
+	// Unstaked represents unstaked status
+	Unstaked StakingStatus = iota
+	// Unstaking represents unstaking status
+	Unstaking
+	// Staked represents staked status
+	Staked
 )

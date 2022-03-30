@@ -28,8 +28,6 @@ var (
 	ErrSessionHasNoNodes = errors.New("session has no nodes")
 	// ErrNodeNotInSession error when given node is not in session
 	ErrNodeNotInSession = errors.New("node not in session")
-	// ErrUnexpectedErrorResponse error when relay error response is empty
-	ErrUnexpectedErrorResponse = errors.New("unexpected error response")
 )
 
 // PocketRelayer implementation of relayer interface
@@ -96,7 +94,7 @@ func (r *PocketRelayer) getSignedProofBytes(proof *provider.RelayProof) (string,
 }
 
 // Relay does relay request with given input
-func (r *PocketRelayer) Relay(input *RelayInput, options *provider.RelayRequestOptions) (*Response, error) {
+func (r *PocketRelayer) Relay(input *RelayInput, options *provider.RelayRequestOptions) (*Output, error) {
 	err := r.validateRelayRequest(input)
 	if err != nil {
 		return nil, err
@@ -164,10 +162,10 @@ func (r *PocketRelayer) Relay(input *RelayInput, options *provider.RelayRequestO
 		return nil, err
 	}
 
-	return &Response{
-		Response: relayOutput,
-		Proof:    relayProof,
-		Node:     node,
+	return &Output{
+		RelayOutput: relayOutput,
+		Proof:       relayProof,
+		Node:        node,
 	}, nil
 }
 

@@ -1,9 +1,5 @@
 package provider
 
-import (
-	"github.com/pokt-foundation/pocket-go/pkg/models"
-)
-
 // GetBalanceOptions represents optional arguments for GetBalance request
 type GetBalanceOptions struct {
 	Height int
@@ -16,11 +12,11 @@ type GetNodeOptions struct {
 
 // GetNodesOptions represents optional arguments for GetNodes request
 type GetNodesOptions struct {
-	StakingStatus models.StakingStatus
+	StakingStatus StakingStatus
 	Page          int
 	PerPage       int
 	BlockChain    string
-	JailedStatus  models.JailedStatus
+	JailedStatus  JailedStatus
 }
 
 // GetAppOptions represents optional arguments for GetApp request
@@ -40,7 +36,7 @@ type GetTypeOptions struct {
 
 // GetAppsOptions represents optional arguments for GetApps request
 type GetAppsOptions struct {
-	StakingStatus models.StakingStatus
+	StakingStatus StakingStatus
 	Page          int
 	PerPage       int
 	BlockChain    string
