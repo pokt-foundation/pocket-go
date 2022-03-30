@@ -19,6 +19,22 @@ type GetNodesOptions struct {
 	JailedStatus  JailedStatus
 }
 
+// GetAccountTransactionsOptions represents optional arguments for GetAccountTransactions request
+type GetAccountTransactionsOptions struct {
+	Height   int
+	Page     int
+	PerPage  int
+	Prove    bool
+	Received bool
+	Order    Order
+}
+
+// GetTransactionCountOptions represents optional arguments for GetTransactionCount request
+type GetTransactionCountOptions struct {
+	Height   int
+	Received bool
+}
+
 // GetAppOptions represents optional arguments for GetApp request
 type GetAppOptions struct {
 	Height int

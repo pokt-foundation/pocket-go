@@ -63,17 +63,41 @@ func TestJSONRPCProvider_GetTransactionCount(t *testing.T) {
 
 	provider := NewJSONRPCProvider("https://dummy.com", []string{"https://dummy.com"}, client.NewDefaultClient())
 
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountTXsRoute), http.StatusOK, "samples/query_account_txs.json")
+	mock.AddMultipleMockedResponses(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountTXsRoute), http.StatusOK, []string{
+		"samples/query_account_txs.json",
+		"samples/query_account_txs_empty.json",
+	})
 
-	count, err := provider.GetTransactionCount("pjog")
+	count, err := provider.GetTransactionCount("pjog", &GetTransactionCountOptions{Height: 21})
 	c.NoError(err)
 	c.Equal(21, count)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountTXsRoute), http.StatusInternalServerError, "samples/query_account_txs.json")
 
-	count, err = provider.GetTransactionCount("pjog")
+	count, err = provider.GetTransactionCount("pjog", &GetTransactionCountOptions{Height: 21})
 	c.Equal(Err5xxOnConnection, err)
 	c.Empty(count)
+}
+
+func TestJSONRPCProvider_GetAccountTransactions(t *testing.T) {
+	c := require.New(t)
+
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	provider := NewJSONRPCProvider("https://dummy.com", []string{"https://dummy.com"}, client.NewDefaultClient())
+
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountTXsRoute), http.StatusOK, "samples/query_account_txs.json")
+
+	transactions, err := provider.GetAccountTransactions("pjog", &GetAccountTransactionsOptions{Height: 21})
+	c.NoError(err)
+	c.NotEmpty(transactions)
+
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountTXsRoute), http.StatusInternalServerError, "samples/query_account_txs.json")
+
+	transactions, err = provider.GetAccountTransactions("pjog", &GetAccountTransactionsOptions{Height: 21})
+	c.Equal(Err5xxOnConnection, err)
+	c.Empty(transactions)
 }
 
 func TestJSONRPCProvider_GetType(t *testing.T) {
@@ -301,34 +325,6 @@ func TestJSONRPCProvider_GetAccount(t *testing.T) {
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountRoute), http.StatusInternalServerError, "samples/query_account.json")
 
 	account, err = provider.GetAccount("pjog", &GetAccountOptions{Height: 21})
-	c.Equal(Err5xxOnConnection, err)
-	c.Empty(account)
-}
-
-func TestJSONRPCProvider_GetAccountWithTransactions(t *testing.T) {
-	c := require.New(t)
-
-	httpmock.Activate()
-	defer httpmock.DeactivateAndReset()
-
-	provider := NewJSONRPCProvider("https://dummy.com", []string{"https://dummy.com"}, client.NewDefaultClient())
-
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountRoute), http.StatusOK, "samples/query_account.json")
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountTXsRoute), http.StatusOK, "samples/query_account_txs.json")
-
-	account, err := provider.GetAccountWithTransactions("pjog")
-	c.NoError(err)
-	c.NotEmpty(account)
-
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountTXsRoute), http.StatusNotFound, "samples/query_account_txs.json")
-
-	account, err = provider.GetAccountWithTransactions("pjog")
-	c.Equal(Err4xxOnConnection, err)
-	c.Empty(account)
-
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountRoute), http.StatusInternalServerError, "samples/query_account.json")
-
-	account, err = provider.GetAccountWithTransactions("pjog")
 	c.Equal(Err5xxOnConnection, err)
 	c.Empty(account)
 }
