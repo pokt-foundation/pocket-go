@@ -146,6 +146,7 @@ func (p *JSONRPCProvider) GetBalance(address string, options *GetBalanceOptions)
 	return output.Balance, nil
 }
 
+// GetAccountTransactions returns transactions of given address' account
 func (p *JSONRPCProvider) GetAccountTransactions(address string, options *GetAccountTransactionsOptions) (*GetAccountTransactionsOutput, error) {
 	params := map[string]interface{}{
 		"address": address,
@@ -206,7 +207,7 @@ func (p *JSONRPCProvider) GetTransactionCount(address string, options *GetTransa
 		}
 
 		totalCount += output.TotalCount
-		currentPage += 1
+		currentPage++
 	}
 
 	return totalCount, nil
