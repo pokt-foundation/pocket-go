@@ -56,7 +56,7 @@ type RelayRequestOptions struct {
 	RejectSelfSignedCertificates bool
 }
 
-// GetTransactionOptions represents optional arguments for GetTransaction request
+// GetTransactionOptions represents the optional arguments for a GetTransaction request
 type GetTransactionOptions struct {
 	Prove bool
 }

@@ -13,7 +13,7 @@ type Relay struct {
 	Proof   *RelayProof   `json:"proof"`
 }
 
-// RelayResponse reprensents Relay RPC response
+// RelayResponse reprensents the Relay RPC response
 type RelayResponse struct {
 	Response  string `json:"response"`
 	Signature string `json:"signature"`
