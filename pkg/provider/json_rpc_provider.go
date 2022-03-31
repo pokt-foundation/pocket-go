@@ -612,7 +612,7 @@ func parseRelayErrorOutput(bodyBytes []byte, servicerPubKey string) error {
 
 	return &RelayError{
 		Code:           output.Error.Code,
-		Codespace:      output.Error.Message,
+		Codespace:      output.Error.Codespace,
 		Message:        output.Error.Message,
 		ServicerPubKey: servicerPubKey,
 	}
