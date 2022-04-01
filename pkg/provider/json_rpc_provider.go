@@ -10,7 +10,7 @@ import (
 	"math/big"
 	"net/http"
 
-	"github.com/pokt-foundation/pocket-go/pkg/client"
+	"github.com/pokt-foundation/pocket-go/internal/client"
 	"github.com/pokt-foundation/pocket-go/pkg/utils"
 )
 
@@ -33,15 +33,13 @@ var (
 type JSONRPCProvider struct {
 	rpcURL      string
 	dispatchers []string
-	client      *client.Client
 }
 
 // NewJSONRPCProvider returns JSONRPCProvider instance from input
-func NewJSONRPCProvider(rpcURL string, dispatchers []string, providerClient *client.Client) *JSONRPCProvider {
+func NewJSONRPCProvider(rpcURL string, dispatchers []string) *JSONRPCProvider {
 	return &JSONRPCProvider{
 		rpcURL:      rpcURL,
 		dispatchers: dispatchers,
-		client:      providerClient,
 	}
 }
 
@@ -62,13 +60,21 @@ func (p *JSONRPCProvider) getFinalRPCURL(rpcURL string, route V1RPCRoute) (strin
 	return p.rpcURL, nil
 }
 
-func (p *JSONRPCProvider) doPostRequest(rpcURL string, params interface{}, route V1RPCRoute) (*http.Response, error) {
+func setClient(requester requester) *client.Client {
+	if requester == nil || requester.getRequestOptions() == nil {
+		return client.NewDefaultClient()
+	}
+
+	return client.NewCustomClient(requester.getRequestOptions().HTTPRetries, requester.getRequestOptions().HTTPTimeout)
+}
+
+func (p *JSONRPCProvider) doPostRequest(rpcURL string, params interface{}, route V1RPCRoute, requester requester) (*http.Response, error) {
 	finalRPCURL, err := p.getFinalRPCURL(rpcURL, route)
 	if err != nil {
 		return nil, err
 	}
 
-	output, err := p.client.PostWithURLJSONParams(fmt.Sprintf("%s%s", finalRPCURL, route), params, http.Header{})
+	output, err := setClient(requester).PostWithURLJSONParams(fmt.Sprintf("%s%s", finalRPCURL, route), params, http.Header{})
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +130,7 @@ func (p *JSONRPCProvider) GetBalance(address string, options *GetBalanceOptions)
 		params["height"] = options.Height
 	}
 
-	rawOutput, err := p.doPostRequest("", params, QueryBalanceRoute)
+	rawOutput, err := p.doPostRequest("", params, QueryBalanceRoute, options)
 	if err != nil {
 		return nil, err
 	}
@@ -161,7 +167,7 @@ func (p *JSONRPCProvider) GetAccountTransactions(address string, options *GetAcc
 		params["order"] = options.Order
 	}
 
-	rawOutput, err := p.doPostRequest("", params, QueryAccountTXsRoute)
+	rawOutput, err := p.doPostRequest("", params, QueryAccountTXsRoute, options)
 	if err != nil {
 		return nil, err
 	}
@@ -192,6 +198,7 @@ func (p *JSONRPCProvider) GetTransactionCount(address string, options *GetTransa
 	if options != nil {
 		optionsToSend.Height = options.Height
 		optionsToSend.Received = options.Received
+		optionsToSend.RequestOptions = options.RequestOptions
 	}
 
 	for {
@@ -228,18 +235,20 @@ func returnType(appErr, nodeErr error) AddressType {
 // GetType returns type of given address
 func (p *JSONRPCProvider) GetType(address string, options *GetTypeOptions) (AddressType, error) {
 	var height int
+	var requestOptions *RequestOptions
 	var errOutput *RPCError
 
 	if options != nil {
 		height = options.Height
+		requestOptions = options.RequestOptions
 	}
 
-	_, appErr := p.GetApp(address, &GetAppOptions{Height: height})
+	_, appErr := p.GetApp(address, &GetAppOptions{Height: height, RequestOptions: requestOptions})
 	if appErr != nil && !errors.As(appErr, &errOutput) {
 		return "", appErr
 	}
 
-	_, nodeErr := p.GetNode(address, &GetNodeOptions{Height: height})
+	_, nodeErr := p.GetNode(address, &GetNodeOptions{Height: height, RequestOptions: requestOptions})
 	if nodeErr != nil && !errors.As(nodeErr, &errOutput) {
 		return "", nodeErr
 	}
@@ -248,11 +257,11 @@ func (p *JSONRPCProvider) GetType(address string, options *GetTypeOptions) (Addr
 }
 
 // SendTransaction sends raw transaction to be relayed to a target address
-func (p *JSONRPCProvider) SendTransaction(signerAddress, signedTransaction string) (*SendTransactionOutput, error) {
+func (p *JSONRPCProvider) SendTransaction(signerAddress, signedTransaction string, options *SendTransactionOptions) (*SendTransactionOutput, error) {
 	rawOutput, err := p.doPostRequest("", map[string]string{
 		"address":       signerAddress,
 		"raw_hex_bytes": signedTransaction,
-	}, ClientRawTXRoute)
+	}, ClientRawTXRoute, options)
 	if err != nil {
 		return nil, err
 	}
@@ -275,10 +284,10 @@ func (p *JSONRPCProvider) SendTransaction(signerAddress, signedTransaction strin
 }
 
 // GetBlock returns the block structure at the specified height, height = 0 is used as latest
-func (p *JSONRPCProvider) GetBlock(blockNumber int) (*GetBlockOutput, error) {
+func (p *JSONRPCProvider) GetBlock(blockNumber int, options *GetBlockOptions) (*GetBlockOutput, error) {
 	rawOutput, err := p.doPostRequest("", map[string]int{
 		"height": blockNumber,
-	}, QueryBlockRoute)
+	}, QueryBlockRoute, options)
 	if err != nil {
 		return nil, err
 	}
@@ -310,7 +319,7 @@ func (p *JSONRPCProvider) GetTransaction(transactionHash string, options *GetTra
 		params["prove"] = options.Prove
 	}
 
-	rawOutput, err := p.doPostRequest("", params, QueryTXRoute)
+	rawOutput, err := p.doPostRequest("", params, QueryTXRoute, options)
 	if err != nil {
 		return nil, err
 	}
@@ -333,8 +342,8 @@ func (p *JSONRPCProvider) GetTransaction(transactionHash string, options *GetTra
 }
 
 // GetBlockHeight returns the current height
-func (p *JSONRPCProvider) GetBlockHeight() (int, error) {
-	rawOutput, err := p.doPostRequest("", nil, QueryHeightRoute)
+func (p *JSONRPCProvider) GetBlockHeight(options *GetBlockHeightOptions) (int, error) {
+	rawOutput, err := p.doPostRequest("", nil, QueryHeightRoute, options)
 	if err != nil {
 		return 0, err
 	}
@@ -373,7 +382,7 @@ func (p *JSONRPCProvider) GetNodes(height int, options *GetNodesOptions) (*GetNo
 		}
 	}
 
-	rawOutput, err := p.doPostRequest("", params, QueryNodesRoute)
+	rawOutput, err := p.doPostRequest("", params, QueryNodesRoute, options)
 	if err != nil {
 		return nil, err
 	}
@@ -405,7 +414,7 @@ func (p *JSONRPCProvider) GetNode(address string, options *GetNodeOptions) (*Get
 		params["height"] = options.Height
 	}
 
-	rawOutput, err := p.doPostRequest("", params, QueryNodeRoute)
+	rawOutput, err := p.doPostRequest("", params, QueryNodeRoute, options)
 	if err != nil {
 		return nil, err
 	}
@@ -443,7 +452,7 @@ func (p *JSONRPCProvider) GetApps(height int, options *GetAppsOptions) (*GetApps
 		}
 	}
 
-	rawOutput, err := p.doPostRequest("", params, QueryAppsRoute)
+	rawOutput, err := p.doPostRequest("", params, QueryAppsRoute, options)
 	if err != nil {
 		return nil, err
 	}
@@ -475,7 +484,7 @@ func (p *JSONRPCProvider) GetApp(address string, options *GetAppOptions) (*GetAp
 		params["height"] = options.Height
 	}
 
-	rawOutput, err := p.doPostRequest("", params, QueryAppRoute)
+	rawOutput, err := p.doPostRequest("", params, QueryAppRoute, options)
 	if err != nil {
 		return nil, err
 	}
@@ -507,7 +516,7 @@ func (p *JSONRPCProvider) GetAccount(address string, options *GetAccountOptions)
 		params["height"] = options.Height
 	}
 
-	rawOutput, err := p.doPostRequest("", params, QueryAccountRoute)
+	rawOutput, err := p.doPostRequest("", params, QueryAccountRoute, options)
 	if err != nil {
 		return nil, err
 	}
@@ -544,7 +553,7 @@ func (p *JSONRPCProvider) Dispatch(appPublicKey, chain string, options *Dispatch
 		params["session_height"] = options.Height
 	}
 
-	rawOutput, err := p.doPostRequest("", params, ClientDispatchRoute)
+	rawOutput, err := p.doPostRequest("", params, ClientDispatchRoute, options)
 	if err != nil {
 		return nil, err
 	}
@@ -568,7 +577,7 @@ func (p *JSONRPCProvider) Dispatch(appPublicKey, chain string, options *Dispatch
 
 // Relay does request to be relayed to a target blockchain
 func (p *JSONRPCProvider) Relay(rpcURL string, input *Relay, options *RelayRequestOptions) (*RelayOutput, error) {
-	rawOutput, reqErr := p.doPostRequest(rpcURL, input, ClientRelayRoute)
+	rawOutput, reqErr := p.doPostRequest(rpcURL, input, ClientRelayRoute, options)
 	if reqErr != nil && !errors.Is(reqErr, errOnRelayRequest) {
 		return nil, reqErr
 	}

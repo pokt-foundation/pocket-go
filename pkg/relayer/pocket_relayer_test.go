@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/jarcoal/httpmock"
-	"github.com/pokt-foundation/pocket-go/pkg/client"
 	"github.com/pokt-foundation/pocket-go/pkg/mock-client"
 	"github.com/pokt-foundation/pocket-go/pkg/provider"
 	"github.com/pokt-foundation/pocket-go/pkg/signer"
@@ -46,7 +45,7 @@ func TestPocketRelayer_Relay(t *testing.T) {
 	c.Equal(ErrNoProvider, err)
 	c.Empty(relay)
 
-	relayer.provider = provider.NewJSONRPCProvider("https://dummy.com", []string{"https://dummy.com"}, client.NewDefaultClient())
+	relayer.provider = provider.NewJSONRPCProvider("https://dummy.com", []string{"https://dummy.com"})
 
 	relay, err = relayer.Relay(relayInput, nil)
 	c.Equal(ErrNoSession, err)
