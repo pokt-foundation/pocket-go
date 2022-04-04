@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/jarcoal/httpmock"
-	"github.com/pokt-foundation/pocket-go/pkg/client"
+	"github.com/pokt-foundation/pocket-go/internal/client"
 	"github.com/stretchr/testify/require"
 )
 

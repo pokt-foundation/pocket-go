@@ -3,7 +3,6 @@ package signer
 import (
 	"testing"
 
-	"github.com/pokt-foundation/pocket-go/pkg/client"
 	"github.com/pokt-foundation/pocket-go/pkg/provider"
 	"github.com/pokt-foundation/pocket-go/pkg/utils"
 	"github.com/stretchr/testify/require"
@@ -56,7 +55,7 @@ func TestWallet_Connect(t *testing.T) {
 	wallet, err := NewRandomWallet()
 	c.NoError(err)
 
-	wallet.Connect(provider.NewJSONRPCProvider("https://dummy.com", []string{"https://dummy.com"}, client.NewDefaultClient()))
+	wallet.Connect(provider.NewJSONRPCProvider("https://dummy.com", []string{"https://dummy.com"}))
 
 	c.True(wallet.IsSigner())
 	c.NotEmpty(wallet.GetProvider())

@@ -11,11 +11,11 @@ type Provider interface {
 	GetTransactionCount(address string, options *GetTransactionCountOptions) (int, error)
 	GetType(address string, options *GetTypeOptions) (AddressType, error)
 	// TXs
-	SendTransaction(signerAddress string, signedTransaction string) (*SendTransactionOutput, error)
+	SendTransaction(signerAddress string, signedTransaction string, options *SendTransactionOptions) (*SendTransactionOutput, error)
 	// Network
-	GetBlock(blockNumber int) (*GetBlockOutput, error)
+	GetBlock(blockNumber int, options *GetBlockOptions) (*GetBlockOutput, error)
 	GetTransaction(transactionHash string, options *GetTransactionOptions) (*GetTransactionOutput, error)
-	GetBlockHeight() (int, error)
+	GetBlockHeight(options *GetBlockHeightOptions) (int, error)
 	GetNodes(height int, options *GetNodesOptions) (*GetNodesOutput, error)
 	GetNode(address string, options *GetNodeOptions) (*GetNodeOutput, error)
 	GetApps(height int, options *GetAppsOptions) (*GetAppsOutput, error)

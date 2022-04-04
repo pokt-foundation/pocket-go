@@ -18,6 +18,9 @@ func TestNewDefaultClient(t *testing.T) {
 
 	client = NewCustomClient(5, 3*time.Second)
 	c.NotEmpty(client)
+
+	client = NewCustomClient(0, 0*time.Second)
+	c.NotEmpty(client)
 }
 
 func TestClient_PostWithURLJSONParams(t *testing.T) {
@@ -29,7 +32,7 @@ func TestClient_PostWithURLJSONParams(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	mock.AddMockedResponseFromFile(http.MethodPost, "https://dummy.com", http.StatusCreated, "../mock-client/samples/dummy.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, "https://dummy.com", http.StatusCreated, "../../pkg/mock-client/samples/dummy.json")
 
 	response, err := client.PostWithURLJSONParams("https://dummy.com", map[string]interface{}{
 		"ohana": "family",
