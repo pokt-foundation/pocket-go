@@ -642,6 +642,7 @@ func parseRelayErrorOutput(bodyBytes []byte, servicerPubKey string) error {
 
 func closeOrLog(response *http.Response) {
 	if response != nil {
+		io.Copy(ioutil.Discard, response.Body)
 		utils.CloseOrLog(response.Body)
 	}
 }
