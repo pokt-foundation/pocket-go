@@ -131,11 +131,12 @@ func (p *JSONRPCProvider) GetBalance(address string, options *GetBalanceOptions)
 	}
 
 	rawOutput, err := p.doPostRequest("", params, QueryBalanceRoute, options)
+
+	defer closeOrLog(rawOutput)
+
 	if err != nil {
 		return nil, err
 	}
-
-	defer utils.CloseOrLog(rawOutput.Body)
 
 	bodyBytes, err := ioutil.ReadAll(rawOutput.Body)
 	if err != nil {
@@ -168,11 +169,12 @@ func (p *JSONRPCProvider) GetAccountTransactions(address string, options *GetAcc
 	}
 
 	rawOutput, err := p.doPostRequest("", params, QueryAccountTXsRoute, options)
+
+	defer closeOrLog(rawOutput)
+
 	if err != nil {
 		return nil, err
 	}
-
-	defer utils.CloseOrLog(rawOutput.Body)
 
 	bodyBytes, err := ioutil.ReadAll(rawOutput.Body)
 	if err != nil {
@@ -262,11 +264,12 @@ func (p *JSONRPCProvider) SendTransaction(signerAddress, signedTransaction strin
 		"address":       signerAddress,
 		"raw_hex_bytes": signedTransaction,
 	}, ClientRawTXRoute, options)
+
+	defer closeOrLog(rawOutput)
+
 	if err != nil {
 		return nil, err
 	}
-
-	defer utils.CloseOrLog(rawOutput.Body)
 
 	bodyBytes, err := ioutil.ReadAll(rawOutput.Body)
 	if err != nil {
@@ -288,11 +291,12 @@ func (p *JSONRPCProvider) GetBlock(blockNumber int, options *GetBlockOptions) (*
 	rawOutput, err := p.doPostRequest("", map[string]int{
 		"height": blockNumber,
 	}, QueryBlockRoute, options)
+
+	defer closeOrLog(rawOutput)
+
 	if err != nil {
 		return nil, err
 	}
-
-	defer utils.CloseOrLog(rawOutput.Body)
 
 	bodyBytes, err := ioutil.ReadAll(rawOutput.Body)
 	if err != nil {
@@ -320,11 +324,12 @@ func (p *JSONRPCProvider) GetTransaction(transactionHash string, options *GetTra
 	}
 
 	rawOutput, err := p.doPostRequest("", params, QueryTXRoute, options)
+
+	defer closeOrLog(rawOutput)
+
 	if err != nil {
 		return nil, err
 	}
-
-	defer utils.CloseOrLog(rawOutput.Body)
 
 	bodyBytes, err := ioutil.ReadAll(rawOutput.Body)
 	if err != nil {
@@ -344,11 +349,12 @@ func (p *JSONRPCProvider) GetTransaction(transactionHash string, options *GetTra
 // GetBlockHeight returns the current height
 func (p *JSONRPCProvider) GetBlockHeight(options *GetBlockHeightOptions) (int, error) {
 	rawOutput, err := p.doPostRequest("", nil, QueryHeightRoute, options)
+
+	defer closeOrLog(rawOutput)
+
 	if err != nil {
 		return 0, err
 	}
-
-	defer utils.CloseOrLog(rawOutput.Body)
 
 	bodyBytes, err := ioutil.ReadAll(rawOutput.Body)
 	if err != nil {
@@ -383,11 +389,12 @@ func (p *JSONRPCProvider) GetNodes(height int, options *GetNodesOptions) (*GetNo
 	}
 
 	rawOutput, err := p.doPostRequest("", params, QueryNodesRoute, options)
+
+	defer closeOrLog(rawOutput)
+
 	if err != nil {
 		return nil, err
 	}
-
-	defer utils.CloseOrLog(rawOutput.Body)
 
 	bodyBytes, err := ioutil.ReadAll(rawOutput.Body)
 	if err != nil {
@@ -415,11 +422,12 @@ func (p *JSONRPCProvider) GetNode(address string, options *GetNodeOptions) (*Get
 	}
 
 	rawOutput, err := p.doPostRequest("", params, QueryNodeRoute, options)
+
+	defer closeOrLog(rawOutput)
+
 	if err != nil {
 		return nil, err
 	}
-
-	defer utils.CloseOrLog(rawOutput.Body)
 
 	bodyBytes, err := ioutil.ReadAll(rawOutput.Body)
 	if err != nil {
@@ -453,11 +461,12 @@ func (p *JSONRPCProvider) GetApps(height int, options *GetAppsOptions) (*GetApps
 	}
 
 	rawOutput, err := p.doPostRequest("", params, QueryAppsRoute, options)
+
+	defer closeOrLog(rawOutput)
+
 	if err != nil {
 		return nil, err
 	}
-
-	defer utils.CloseOrLog(rawOutput.Body)
 
 	bodyBytes, err := ioutil.ReadAll(rawOutput.Body)
 	if err != nil {
@@ -485,11 +494,12 @@ func (p *JSONRPCProvider) GetApp(address string, options *GetAppOptions) (*GetAp
 	}
 
 	rawOutput, err := p.doPostRequest("", params, QueryAppRoute, options)
+
+	defer closeOrLog(rawOutput)
+
 	if err != nil {
 		return nil, err
 	}
-
-	defer utils.CloseOrLog(rawOutput.Body)
 
 	bodyBytes, err := ioutil.ReadAll(rawOutput.Body)
 	if err != nil {
@@ -517,11 +527,12 @@ func (p *JSONRPCProvider) GetAccount(address string, options *GetAccountOptions)
 	}
 
 	rawOutput, err := p.doPostRequest("", params, QueryAccountRoute, options)
+
+	defer closeOrLog(rawOutput)
+
 	if err != nil {
 		return nil, err
 	}
-
-	defer utils.CloseOrLog(rawOutput.Body)
 
 	bodyBytes, err := ioutil.ReadAll(rawOutput.Body)
 	if err != nil {
@@ -554,11 +565,12 @@ func (p *JSONRPCProvider) Dispatch(appPublicKey, chain string, options *Dispatch
 	}
 
 	rawOutput, err := p.doPostRequest("", params, ClientDispatchRoute, options)
+
+	defer closeOrLog(rawOutput)
+
 	if err != nil {
 		return nil, err
 	}
-
-	defer utils.CloseOrLog(rawOutput.Body)
 
 	bodyBytes, err := ioutil.ReadAll(rawOutput.Body)
 	if err != nil {
@@ -578,11 +590,12 @@ func (p *JSONRPCProvider) Dispatch(appPublicKey, chain string, options *Dispatch
 // Relay does request to be relayed to a target blockchain
 func (p *JSONRPCProvider) Relay(rpcURL string, input *Relay, options *RelayRequestOptions) (*RelayOutput, error) {
 	rawOutput, reqErr := p.doPostRequest(rpcURL, input, ClientRelayRoute, options)
+
+	defer closeOrLog(rawOutput)
+
 	if reqErr != nil && !errors.Is(reqErr, errOnRelayRequest) {
 		return nil, reqErr
 	}
-
-	defer utils.CloseOrLog(rawOutput.Body)
 
 	bodyBytes, err := ioutil.ReadAll(rawOutput.Body)
 	if err != nil {
@@ -624,5 +637,11 @@ func parseRelayErrorOutput(bodyBytes []byte, servicerPubKey string) error {
 		Codespace:      output.Error.Codespace,
 		Message:        output.Error.Message,
 		ServicerPubKey: servicerPubKey,
+	}
+}
+
+func closeOrLog(response *http.Response) {
+	if response != nil {
+		utils.CloseOrLog(response.Body)
 	}
 }
