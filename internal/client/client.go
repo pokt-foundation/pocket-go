@@ -75,6 +75,7 @@ func (client *Client) PostWithURLJSONParams(url string, params interface{}, head
 	}
 
 	headers.Set("Content-Type", "application/json")
+	headers.Set("Connection", "close")
 
 	return client.Post(url, body, headers)
 }
