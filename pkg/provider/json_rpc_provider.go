@@ -10,7 +10,7 @@ import (
 	"math/big"
 	"net/http"
 
-	"github.com/pokt-foundation/pocket-go/internal/client"
+	"github.com/pokt-foundation/pocket-go/pkg/client"
 	"github.com/pokt-foundation/pocket-go/pkg/utils"
 )
 
@@ -33,6 +33,7 @@ var (
 type JSONRPCProvider struct {
 	rpcURL      string
 	dispatchers []string
+	Client      *client.Client
 }
 
 // NewJSONRPCProvider returns JSONRPCProvider instance from input
@@ -60,7 +61,11 @@ func (p *JSONRPCProvider) getFinalRPCURL(rpcURL string, route V1RPCRoute) (strin
 	return p.rpcURL, nil
 }
 
-func setClient(requester requester) *client.Client {
+func (p *JSONRPCProvider) setClient(requester requester) *client.Client {
+	if p.Client != nil {
+		return p.Client
+	}
+
 	if requester == nil || requester.getRequestOptions() == nil {
 		return client.NewDefaultClient()
 	}
@@ -74,7 +79,7 @@ func (p *JSONRPCProvider) doPostRequest(rpcURL string, params interface{}, route
 		return nil, err
 	}
 
-	output, err := setClient(requester).PostWithURLJSONParams(fmt.Sprintf("%s%s", finalRPCURL, route), params, http.Header{})
+	output, err := p.setClient(requester).PostWithURLJSONParams(fmt.Sprintf("%s%s", finalRPCURL, route), params, http.Header{})
 	if err != nil {
 		return nil, err
 	}
