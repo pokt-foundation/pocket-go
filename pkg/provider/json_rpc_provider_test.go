@@ -5,6 +5,7 @@ import (
 	"math/big"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/jarcoal/httpmock"
 	"github.com/pokt-foundation/pocket-go/pkg/mock-client"
@@ -43,7 +44,7 @@ func TestJSONRPCProvider_GetBalance(t *testing.T) {
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryBalanceRoute), http.StatusOK, "samples/query_balance.json")
 
-	balance, err := provider.GetBalance("pjog", &GetBalanceOptions{Height: 21, RequestOptions: &RequestOptions{HTTPRetries: 3}})
+	balance, err := provider.GetBalance("pjog", &GetBalanceOptions{Height: 21})
 	c.NoError(err)
 	c.Equal(big.NewInt(1000000000), balance)
 
@@ -67,7 +68,7 @@ func TestJSONRPCProvider_GetTransactionCount(t *testing.T) {
 		"samples/query_account_txs_empty.json",
 	})
 
-	count, err := provider.GetTransactionCount("pjog", &GetTransactionCountOptions{Height: 21, RequestOptions: &RequestOptions{HTTPRetries: 3}})
+	count, err := provider.GetTransactionCount("pjog", &GetTransactionCountOptions{Height: 21})
 	c.NoError(err)
 	c.Equal(21, count)
 
@@ -88,7 +89,7 @@ func TestJSONRPCProvider_GetAccountTransactions(t *testing.T) {
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountTXsRoute), http.StatusOK, "samples/query_account_txs.json")
 
-	transactions, err := provider.GetAccountTransactions("pjog", &GetAccountTransactionsOptions{Height: 21, RequestOptions: &RequestOptions{HTTPRetries: 3}})
+	transactions, err := provider.GetAccountTransactions("pjog", &GetAccountTransactionsOptions{Height: 21})
 	c.NoError(err)
 	c.NotEmpty(transactions)
 
@@ -110,7 +111,7 @@ func TestJSONRPCProvider_GetType(t *testing.T) {
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAppRoute), http.StatusOK, "samples/query_app.json")
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryNodeRoute), http.StatusOK, "samples/query_node.json")
 
-	addressType, err := provider.GetType("pjog", &GetTypeOptions{Height: 21, RequestOptions: &RequestOptions{HTTPRetries: 3}})
+	addressType, err := provider.GetType("pjog", &GetTypeOptions{Height: 21})
 	c.NoError(err)
 	c.Equal(AccountType, addressType)
 
@@ -136,7 +137,7 @@ func TestJSONRPCProvider_GetType(t *testing.T) {
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAppRoute), http.StatusBadRequest, "samples/error_response.json")
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryNodeRoute), http.StatusOK, "samples/query_node.json")
 
-	addressType, err = provider.GetType("pjog", &GetTypeOptions{RequestOptions: &RequestOptions{HTTPRetries: 2}})
+	addressType, err = provider.GetType("pjog", nil)
 	c.NoError(err)
 	c.Equal(NodeType, addressType)
 }
@@ -149,13 +150,13 @@ func TestJSONRPCProvider_SendTransaction(t *testing.T) {
 
 	provider := NewJSONRPCProvider("https://dummy.com", []string{"https://dummy.com"})
 
-	transaction, err := provider.SendTransaction("pjog", "abcd", &SendTransactionOptions{RequestOptions: &RequestOptions{HTTPRetries: 3}})
+	transaction, err := provider.SendTransaction("pjog", "abcd")
 	c.Contains(err.Error(), "Post \"https://dummy.com/v1/client/rawtx\": no responder found")
 	c.Empty(transaction)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientRawTXRoute), http.StatusOK, "samples/client_raw_tx.json")
 
-	transaction, err = provider.SendTransaction("pjog", "abcd", nil)
+	transaction, err = provider.SendTransaction("pjog", "abcd")
 	c.NoError(err)
 	c.NotEmpty(transaction)
 }
@@ -170,13 +171,13 @@ func TestJSONRPCProvider_GetBlock(t *testing.T) {
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryBlockRoute), http.StatusOK, "samples/query_block.json")
 
-	block, err := provider.GetBlock(21, &GetBlockOptions{RequestOptions: &RequestOptions{HTTPRetries: 3}})
+	block, err := provider.GetBlock(21)
 	c.NoError(err)
 	c.NotEmpty(block)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryBlockRoute), http.StatusInternalServerError, "samples/query_block.json")
 
-	block, err = provider.GetBlock(21, nil)
+	block, err = provider.GetBlock(21)
 	c.Equal(Err5xxOnConnection, err)
 	c.Empty(block)
 }
@@ -191,7 +192,7 @@ func TestJSONRPCProvider_GetTransaction(t *testing.T) {
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryTXRoute), http.StatusOK, "samples/query_tx.json")
 
-	transaction, err := provider.GetTransaction("abcd", &GetTransactionOptions{Prove: true, RequestOptions: &RequestOptions{HTTPRetries: 3}})
+	transaction, err := provider.GetTransaction("abcd", &GetTransactionOptions{Prove: true})
 	c.NoError(err)
 	c.NotEmpty(transaction)
 
@@ -212,13 +213,13 @@ func TestJSONRPCProvider_GetBlockHeight(t *testing.T) {
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryHeightRoute), http.StatusOK, "samples/query_height.json")
 
-	blockNumber, err := provider.GetBlockHeight(&GetBlockHeightOptions{RequestOptions: &RequestOptions{HTTPRetries: 3}})
+	blockNumber, err := provider.GetBlockHeight()
 	c.NoError(err)
 	c.Equal(21, blockNumber)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryHeightRoute), http.StatusInternalServerError, "samples/query_height.json")
 
-	blockNumber, err = provider.GetBlockHeight(nil)
+	blockNumber, err = provider.GetBlockHeight()
 	c.Equal(Err5xxOnConnection, err)
 	c.Empty(blockNumber)
 }
@@ -233,7 +234,7 @@ func TestJSONRPCProvider_GetNodes(t *testing.T) {
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryNodesRoute), http.StatusOK, "samples/query_nodes.json")
 
-	nodes, err := provider.GetNodes(21, &GetNodesOptions{Page: 2, RequestOptions: &RequestOptions{HTTPRetries: 3}})
+	nodes, err := provider.GetNodes(21, &GetNodesOptions{Page: 2})
 	c.NoError(err)
 	c.NotEmpty(nodes)
 
@@ -254,7 +255,7 @@ func TestJSONRPCProvider_GetApps(t *testing.T) {
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAppsRoute), http.StatusOK, "samples/query_apps.json")
 
-	apps, err := provider.GetApps(21, &GetAppsOptions{Page: 2, RequestOptions: &RequestOptions{HTTPRetries: 3}})
+	apps, err := provider.GetApps(21, &GetAppsOptions{Page: 2})
 	c.NoError(err)
 	c.NotEmpty(apps)
 
@@ -275,7 +276,7 @@ func TestJSONRPCProvider_GetNode(t *testing.T) {
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryNodeRoute), http.StatusOK, "samples/query_node.json")
 
-	node, err := provider.GetNode("pjog", &GetNodeOptions{Height: 2, RequestOptions: &RequestOptions{HTTPRetries: 3}})
+	node, err := provider.GetNode("pjog", &GetNodeOptions{Height: 2})
 	c.NoError(err)
 	c.NotEmpty(node)
 
@@ -296,7 +297,7 @@ func TestJSONRPCProvider_GetApp(t *testing.T) {
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAppRoute), http.StatusOK, "samples/query_app.json")
 
-	app, err := provider.GetApp("pjog", &GetAppOptions{Height: 2, RequestOptions: &RequestOptions{HTTPRetries: 3}})
+	app, err := provider.GetApp("pjog", &GetAppOptions{Height: 2})
 	c.NoError(err)
 	c.NotEmpty(app)
 
@@ -317,7 +318,7 @@ func TestJSONRPCProvider_GetAccount(t *testing.T) {
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountRoute), http.StatusOK, "samples/query_account.json")
 
-	account, err := provider.GetAccount("pjog", &GetAccountOptions{Height: 21, RequestOptions: &RequestOptions{HTTPRetries: 3}})
+	account, err := provider.GetAccount("pjog", &GetAccountOptions{Height: 21})
 	c.NoError(err)
 	c.NotEmpty(account)
 
@@ -338,17 +339,21 @@ func TestJSONRPCProvider_Dispatch(t *testing.T) {
 		rpcURL: "https://dummy.com",
 	}
 
-	dispatch, err := provider.Dispatch("pjog", "abcd", &DispatchRequestOptions{Height: 21, RequestOptions: &RequestOptions{HTTPRetries: 3}})
+	dispatch, err := provider.Dispatch("pjog", "abcd", &DispatchRequestOptions{Height: 21})
 	c.Equal(ErrNoDispatchers, err)
 	c.Empty(dispatch)
 
 	provider.dispatchers = []string{"https://dummy.com"}
+
+	provider.UpdateRequestConfig(0, 5*time.Second)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientDispatchRoute), http.StatusOK, "samples/client_dispatch.json")
 
 	dispatch, err = provider.Dispatch("pjog", "abcd", nil)
 	c.NoError(err)
 	c.NotEmpty(dispatch)
+
+	provider.ResetRequestConfigToDefault()
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientDispatchRoute), http.StatusInternalServerError, "samples/client_dispatch.json")
 
@@ -367,7 +372,7 @@ func TestJSONRPCProvider_Relay(t *testing.T) {
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientRelayRoute), http.StatusOK, "samples/client_relay.json")
 
-	relay, err := provider.Relay("https://dummy.com", &Relay{}, &RelayRequestOptions{RequestOptions: &RequestOptions{HTTPRetries: 3}})
+	relay, err := provider.Relay("https://dummy.com", &Relay{}, nil)
 	c.NoError(err)
 	c.NotEmpty(relay)
 
