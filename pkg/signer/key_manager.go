@@ -3,8 +3,14 @@ package signer
 import (
 	"crypto/ed25519"
 	"encoding/hex"
+	"errors"
 
 	"github.com/pokt-foundation/pocket-go/pkg/utils"
+)
+
+var (
+	// ErrMissingPrivateKey error when private key is not sent
+	ErrMissingPrivateKey = errors.New("missing private key")
 )
 
 // KeyManager struct handler
@@ -35,6 +41,10 @@ func NewRandomKeyManager() (*KeyManager, error) {
 
 // NewKeyManagerFromPrivateKey returns KeyManager from private key
 func NewKeyManagerFromPrivateKey(privateKey string) (*KeyManager, error) {
+	if privateKey == "" {
+		return nil, ErrMissingPrivateKey
+	}
+
 	publicKey := utils.PublicKeyFromPrivate(privateKey)
 
 	address, err := utils.GetAddressFromPublickey(publicKey)
