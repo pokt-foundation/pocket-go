@@ -34,7 +34,7 @@ var (
 type JSONRPCProvider struct {
 	rpcURL      string
 	dispatchers []string
-	client      *client.Client
+	Client      *client.Client
 }
 
 // NewJSONRPCProvider returns JSONRPCProvider instance from input
@@ -42,18 +42,18 @@ func NewJSONRPCProvider(rpcURL string, dispatchers []string) *JSONRPCProvider {
 	return &JSONRPCProvider{
 		rpcURL:      rpcURL,
 		dispatchers: dispatchers,
-		client:      client.NewDefaultClient(),
+		Client:      client.NewDefaultClient(),
 	}
 }
 
 // UpdateRequestConfig updates retries and timeout used for RPC requests
 func (p *JSONRPCProvider) UpdateRequestConfig(retries int, timeout time.Duration) {
-	p.client = client.NewCustomClient(retries, timeout)
+	p.Client = client.NewCustomClient(retries, timeout)
 }
 
 // ResetRequestConfigToDefault resets request config to default
 func (p *JSONRPCProvider) ResetRequestConfigToDefault() {
-	p.client = client.NewDefaultClient()
+	p.Client = client.NewDefaultClient()
 }
 
 func (p *JSONRPCProvider) getFinalRPCURL(rpcURL string, route V1RPCRoute) (string, error) {
@@ -79,7 +79,7 @@ func (p *JSONRPCProvider) doPostRequest(rpcURL string, params interface{}, route
 		return nil, err
 	}
 
-	output, err := p.client.PostWithURLJSONParams(fmt.Sprintf("%s%s", finalRPCURL, route), params, http.Header{})
+	output, err := p.Client.PostWithURLJSONParams(fmt.Sprintf("%s%s", finalRPCURL, route), params, http.Header{})
 	if err != nil {
 		return nil, err
 	}
