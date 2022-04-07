@@ -353,6 +353,8 @@ func TestJSONRPCProvider_Dispatch(t *testing.T) {
 	c.NoError(err)
 	c.NotEmpty(dispatch)
 
+	provider.ResetRequestConfigToDefault()
+
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientDispatchRoute), http.StatusInternalServerError, "samples/client_dispatch.json")
 
 	dispatch, err = provider.Dispatch("pjog", "abcd", &DispatchRequestOptions{Height: 21})

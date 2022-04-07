@@ -51,6 +51,11 @@ func (p *JSONRPCProvider) UpdateRequestConfig(retries int, timeout time.Duration
 	p.client = client.NewCustomClient(retries, timeout)
 }
 
+// ResetRequestConfigToDefault resets request config to default
+func (p *JSONRPCProvider) ResetRequestConfigToDefault() {
+	p.client = client.NewDefaultClient()
+}
+
 func (p *JSONRPCProvider) getFinalRPCURL(rpcURL string, route V1RPCRoute) (string, error) {
 	if rpcURL != "" {
 		return rpcURL, nil
