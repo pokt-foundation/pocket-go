@@ -18,9 +18,6 @@ func TestNewDefaultClient(t *testing.T) {
 
 	client = NewCustomClient(5, 3*time.Second)
 	c.NotEmpty(client)
-
-	client = NewCustomClient(0, 0*time.Second)
-	c.NotEmpty(client)
 }
 
 func TestClient_PostWithURLJSONParams(t *testing.T) {

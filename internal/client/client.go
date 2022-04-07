@@ -13,7 +13,7 @@ import (
 
 const (
 	defaultHTTPClientTimeout = 5 * time.Second
-	defaultHTTPClientRetries = 3
+	defaultHTTPClientRetries = 0
 
 	initialBackoffTimeout = 2 * time.Millisecond
 	maxBackoffTimeout     = 9 * time.Millisecond
@@ -44,14 +44,6 @@ func NewDefaultClient() *Client {
 
 // NewCustomClient returns httpclient instance with given custom config
 func NewCustomClient(retries int, timeout time.Duration) *Client {
-	if retries == 0 {
-		retries = defaultHTTPClientRetries
-	}
-
-	if timeout == 0*time.Second {
-		timeout = defaultHTTPClientTimeout
-	}
-
 	return &Client{
 		Client: httpclient.NewClient(
 			httpclient.WithHTTPTimeout(timeout),
