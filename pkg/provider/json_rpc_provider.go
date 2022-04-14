@@ -261,11 +261,8 @@ func (p *JSONRPCProvider) GetType(address string, options *GetTypeOptions) (Addr
 }
 
 // SendTransaction sends raw transaction to be relayed to a target address
-func (p *JSONRPCProvider) SendTransaction(signerAddress, signedTransaction string) (*SendTransactionOutput, error) {
-	rawOutput, err := p.doPostRequest("", map[string]string{
-		"address":       signerAddress,
-		"raw_hex_bytes": signedTransaction,
-	}, ClientRawTXRoute)
+func (p *JSONRPCProvider) SendTransaction(input *SendTransactionInput) (*SendTransactionOutput, error) {
+	rawOutput, err := p.doPostRequest("", input, ClientRawTXRoute)
 
 	defer closeOrLog(rawOutput)
 

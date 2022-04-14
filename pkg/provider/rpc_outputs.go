@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"math/big"
 	"time"
+
+	"github.com/pokt-network/pocket-core/types"
 )
 
 type queryBalanceOutput struct {
@@ -94,25 +96,6 @@ type GetNodesOutput struct {
 	TotalPages int             `json:"total_pages"`
 }
 
-// SendTransactionOutput represents output for SendTransaction request
-type SendTransactionOutput struct {
-	Height string `json:"height"`
-	Txhash string `json:"txhash"`
-	RawLog string `json:"raw_log"`
-	Logs   []struct {
-		MsgIndex int    `json:"msg_index"`
-		Success  bool   `json:"success"`
-		Log      string `json:"log"`
-		Events   []struct {
-			Type       string `json:"type"`
-			Attributes []struct {
-				Key   string `json:"key"`
-				Value string `json:"value"`
-			} `json:"attributes"`
-		} `json:"events"`
-	} `json:"logs"`
-}
-
 // GetBlockOutput represents output for GetBlock request
 type GetBlockOutput struct {
 	Block struct {
@@ -197,13 +180,10 @@ type GetTransactionOutput struct {
 		} `json:"proof"`
 	} `json:"proof"`
 	StdTx struct {
-		Entropy int `json:"entropy"`
-		Fee     []struct {
-			Amount string `json:"amount"`
-			Denom  string `json:"denom"`
-		} `json:"fee"`
-		Memo string `json:"memo"`
-		Msg  struct {
+		Entropy int         `json:"entropy"`
+		Fee     types.Coins `json:"fee"`
+		Memo    string      `json:"memo"`
+		Msg     struct {
 		} `json:"msg"`
 		Signature struct {
 			PubKey    string `json:"pub_key"`
@@ -218,12 +198,9 @@ type queryHeightOutput struct {
 
 // GetAccountOutput represents output for GetAccount request
 type GetAccountOutput struct {
-	Address string `json:"address"`
-	Coins   []struct {
-		Amount string `json:"amount"`
-		Denom  string `json:"denom"`
-	} `json:"coins"`
-	PublicKey string `json:"public_key"`
+	Address   string      `json:"address"`
+	Coins     types.Coins `json:"coins"`
+	PublicKey string      `json:"public_key"`
 }
 
 // DispatchOutput represents output for Dispatch request

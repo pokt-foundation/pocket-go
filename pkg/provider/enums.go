@@ -43,3 +43,10 @@ const (
 	// AscendantOrder represents lower to greater order
 	AscendantOrder Order = "asc"
 )
+
+type CoinDenom string
+
+const (
+	Upokt CoinDenom = "Upokt"
+	Pokt  CoinDenom = "Pokt"
+)

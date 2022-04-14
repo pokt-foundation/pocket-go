@@ -2,7 +2,7 @@
     "address": "string",
     "coins": [
       {
-        "amount": "string",
+        "amount": "10000",
         "denom": "string"
       }
     ],
