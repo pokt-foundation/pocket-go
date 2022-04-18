@@ -45,7 +45,7 @@ func (t *PocketTransactionBuilder) CreateTransaction(chainID, memo string, fee i
 		return nil, err
 	}
 
-	signature, err := t.signer.GetKeyManager().Sign(signBytes)
+	signature, err := t.signer.GetKeyManager().SignBytes(signBytes)
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +55,7 @@ func (t *PocketTransactionBuilder) CreateTransaction(chainID, memo string, fee i
 		return nil, err
 	}
 
-	signatureStruct := authTypes.StdSignature{PublicKey: publicKey, Signature: []byte(signature)}
+	signatureStruct := authTypes.StdSignature{PublicKey: publicKey, Signature: signature}
 
 	tx := authTypes.NewTx(txMsg, feeStruct, signatureStruct, memo, entropy.Int64())
 

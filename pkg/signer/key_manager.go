@@ -70,6 +70,15 @@ func (km *KeyManager) Sign(payload []byte) (string, error) {
 	return hex.EncodeToString(ed25519.Sign(decodedKey, payload)), nil
 }
 
+func (km *KeyManager) SignBytes(payload []byte) ([]byte, error) {
+	decodedKey, err := hex.DecodeString(km.privateKey)
+	if err != nil {
+		return nil, err
+	}
+
+	return ed25519.Sign(decodedKey, payload), nil
+}
+
 // GetAddress returns address value
 func (km *KeyManager) GetAddress() string {
 	return km.address
