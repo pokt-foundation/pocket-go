@@ -150,13 +150,13 @@ func TestJSONRPCProvider_SendTransaction(t *testing.T) {
 
 	provider := NewJSONRPCProvider("https://dummy.com", []string{"https://dummy.com"})
 
-	transaction, err := provider.SendTransaction(&SendTransactionInput{Adress: "pjog", RawHexBytes: "abcd"})
+	transaction, err := provider.SendTransaction(&SendTransactionInput{Address: "pjog", RawHexBytes: "abcd"})
 	c.Contains(err.Error(), "Post \"https://dummy.com/v1/client/rawtx\": no responder found")
 	c.Empty(transaction)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientRawTXRoute), http.StatusOK, "samples/client_raw_tx.json")
 
-	transaction, err = provider.SendTransaction(&SendTransactionInput{Adress: "pjog", RawHexBytes: "abcd"})
+	transaction, err = provider.SendTransaction(&SendTransactionInput{Address: "pjog", RawHexBytes: "abcd"})
 	c.NoError(err)
 	c.NotEmpty(transaction)
 }

@@ -65,7 +65,7 @@ func (t *PocketTransactionBuilder) CreateTransaction(chainID, memo string, fee i
 	}
 
 	return &provider.SendTransactionInput{
-		Adress:      t.signer.GetKeyManager().GetAddress(),
+		Address:     t.signer.GetKeyManager().GetAddress(),
 		RawHexBytes: hex.EncodeToString(txBytes),
 	}, nil
 }

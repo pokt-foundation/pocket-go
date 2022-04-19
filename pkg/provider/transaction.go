@@ -20,6 +20,6 @@ type SendTransactionOutput struct {
 }
 
 type SendTransactionInput struct {
-	Adress      string `json:"address"`
+	Address     string `json:"address"`
 	RawHexBytes string `json:"raw_hex_bytes"`
 }
