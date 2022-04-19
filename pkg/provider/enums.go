@@ -47,6 +47,6 @@ const (
 type CoinDenom string
 
 const (
-	Upokt CoinDenom = "Upokt"
-	Pokt  CoinDenom = "Pokt"
+	Upokt CoinDenom = "upokt"
+	Pokt  CoinDenom = "pokt"
 )
