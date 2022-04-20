@@ -69,7 +69,7 @@ func (km *KeyManager) Sign(payload []byte) (string, error) {
 	return hex.EncodeToString(ed25519.Sign(decodedKey, payload)), nil
 }
 
-// Sign returns a signed request as raw bytes
+// SignBytes returns a signed request as raw bytes
 func (km *KeyManager) SignBytes(payload []byte) ([]byte, error) {
 	decodedKey, err := hex.DecodeString(km.privateKey)
 	if err != nil {

@@ -4,9 +4,9 @@ import (
 	"encoding/hex"
 
 	"github.com/pokt-network/pocket-core/crypto"
-	"github.com/pokt-network/pocket-core/types"
+	coreTypes "github.com/pokt-network/pocket-core/types"
 	appsType "github.com/pokt-network/pocket-core/x/apps/types"
-	nodeTypes "github.com/pokt-network/pocket-core/x/nodes/types"
+	nodesTypes "github.com/pokt-network/pocket-core/x/nodes/types"
 )
 
 // NewMsgSend returns message for send transaction
@@ -21,10 +21,10 @@ func NewMsgSend(fromAddress, toAddress string, amount int64) (TxMsg, error) {
 		return nil, err
 	}
 
-	return &nodeTypes.MsgSend{
+	return &nodesTypes.MsgSend{
 		FromAddress: decodedFromAddress,
 		ToAddress:   decodedToAddress,
-		Amount:      types.NewInt(amount),
+		Amount:      coreTypes.NewInt(amount),
 	}, nil
 }
 
@@ -38,7 +38,7 @@ func NewStakeApp(publicKey string, chains []string, amount int64) (TxMsg, error)
 	return &appsType.MsgStake{
 		PubKey: cryptoPublicKey,
 		Chains: chains,
-		Value:  types.NewInt(amount),
+		Value:  coreTypes.NewInt(amount),
 	}, nil
 }
 
@@ -67,7 +67,7 @@ func NewUnjailApp(address string) (TxMsg, error) {
 }
 
 // NewStakeNode returns message for Stake Node transaction
-func NewStakeNode(publicKey, serviceUrl, outputAddress string, chains []string, amount int64) (TxMsg, error) {
+func NewStakeNode(publicKey, serviceURL, outputAddress string, chains []string, amount int64) (TxMsg, error) {
 	cryptoPublicKey, err := crypto.NewPublicKey(publicKey)
 	if err != nil {
 		return nil, err
@@ -78,11 +78,11 @@ func NewStakeNode(publicKey, serviceUrl, outputAddress string, chains []string, 
 		return nil, err
 	}
 
-	return &nodeTypes.MsgStake{
+	return &nodesTypes.MsgStake{
 		PublicKey:  cryptoPublicKey,
 		Chains:     chains,
-		Value:      types.NewInt(amount),
-		ServiceUrl: serviceUrl,
+		Value:      coreTypes.NewInt(amount),
+		ServiceUrl: serviceURL,
 		Output:     decodedAddress,
 	}, nil
 }
@@ -99,7 +99,7 @@ func NewUnstakeNode(fromAddress, operatorAddress string) (TxMsg, error) {
 		return nil, err
 	}
 
-	return &nodeTypes.MsgBeginUnstake{
+	return &nodesTypes.MsgBeginUnstake{
 		Address: decodedOperatorAddress,
 		Signer:  decodedFromAddress,
 	}, nil
@@ -117,7 +117,7 @@ func NewUnjailNode(fromAddress, operatorAddress string) (TxMsg, error) {
 		return nil, err
 	}
 
-	return &nodeTypes.MsgUnjail{
+	return &nodesTypes.MsgUnjail{
 		ValidatorAddr: decodedOperatorAddress,
 		Signer:        decodedFromAddress,
 	}, nil

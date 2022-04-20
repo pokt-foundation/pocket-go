@@ -10,7 +10,7 @@ import (
 	"github.com/pokt-foundation/pocket-go/pkg/signer"
 	"github.com/pokt-network/pocket-core/app"
 	"github.com/pokt-network/pocket-core/crypto"
-	"github.com/pokt-network/pocket-core/types"
+	coreTypes "github.com/pokt-network/pocket-core/types"
 	"github.com/pokt-network/pocket-core/x/auth"
 	authTypes "github.com/pokt-network/pocket-core/x/auth/types"
 )
@@ -30,10 +30,10 @@ func NewPocketTransactionBuilder(provider provider.Provider, signer signer.Signe
 }
 
 // CreateTransaction returns input necessary for doing a transaction
-func (t *PocketTransactionBuilder) CreateTransaction(chainID, memo string, fee int64, txMsg TxMsg, coinDenom provider.CoinDenom) (*provider.SendTransactionInput, error) {
-	feeStruct := types.Coins{
-		types.Coin{
-			Amount: types.NewInt(fee),
+func (t *PocketTransactionBuilder) CreateTransaction(chainID, memo string, fee int64, txMsg TxMsg, coinDenom CoinDenom) (*provider.SendTransactionInput, error) {
+	feeStruct := coreTypes.Coins{
+		coreTypes.Coin{
+			Amount: coreTypes.NewInt(fee),
 			Denom:  string(coinDenom),
 		},
 	}
@@ -74,7 +74,7 @@ func (t *PocketTransactionBuilder) CreateTransaction(chainID, memo string, fee i
 }
 
 // Submit does the transaction from raw input
-func (t *PocketTransactionBuilder) Submit(chainID, memo string, fee int64, txMsg TxMsg, coinDenom provider.CoinDenom) (*provider.SendTransactionOutput, error) {
+func (t *PocketTransactionBuilder) Submit(chainID, memo string, fee int64, txMsg TxMsg, coinDenom CoinDenom) (*provider.SendTransactionOutput, error) {
 	sendTransactionInput, err := t.CreateTransaction(chainID, memo, fee, txMsg, coinDenom)
 	if err != nil {
 		return nil, err

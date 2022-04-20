@@ -19,6 +19,7 @@ type SendTransactionOutput struct {
 	} `json:"logs"`
 }
 
+// SendTransactionInput represents input needed for SendTransaction request
 type SendTransactionInput struct {
 	Address     string `json:"address"`
 	RawHexBytes string `json:"raw_hex_bytes"`

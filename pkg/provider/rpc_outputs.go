@@ -5,7 +5,7 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/pokt-network/pocket-core/types"
+	coreTypes "github.com/pokt-network/pocket-core/types"
 )
 
 type queryBalanceOutput struct {
@@ -180,9 +180,9 @@ type GetTransactionOutput struct {
 		} `json:"proof"`
 	} `json:"proof"`
 	StdTx struct {
-		Entropy int         `json:"entropy"`
-		Fee     types.Coins `json:"fee"`
-		Memo    string      `json:"memo"`
+		Entropy int             `json:"entropy"`
+		Fee     coreTypes.Coins `json:"fee"`
+		Memo    string          `json:"memo"`
 		Msg     struct {
 		} `json:"msg"`
 		Signature struct {
@@ -198,9 +198,9 @@ type queryHeightOutput struct {
 
 // GetAccountOutput represents output for GetAccount request
 type GetAccountOutput struct {
-	Address   string      `json:"address"`
-	Coins     types.Coins `json:"coins"`
-	PublicKey string      `json:"public_key"`
+	Address   string          `json:"address"`
+	Coins     coreTypes.Coins `json:"coins"`
+	PublicKey string          `json:"public_key"`
 }
 
 // DispatchOutput represents output for Dispatch request
