@@ -102,8 +102,3 @@ func (km *KeyManager) GetAccount() *Account {
 		PrivateKey: km.privateKey,
 	}
 }
-
-// IsConnected returns if KeyManger is connected or not
-func (km *KeyManager) IsConnected() bool {
-	return km.address != "" && km.publicKey != "" && km.privateKey != ""
-}
