@@ -7,8 +7,8 @@ import (
 
 // TransactionBuilder interface that represents functionalities of the transaction builder package
 type TransactionBuilder interface {
-	Submit(chainID, memo string, fee int64, txMsg TxMsg, coinDenom CoinDenom) (*provider.SendTransactionOutput, error)
-	CreateTransaction(chainID, memo string, fee int64, txMsg TxMsg, coinDenom CoinDenom) (*provider.SendTransactionInput, error)
+	Submit(chainID string, txMsg TxMsg, options *TransactionOptions) (*provider.SendTransactionOutput, error)
+	CreateTransaction(chainID string, txMsg TxMsg, options *TransactionOptions) (*provider.SendTransactionInput, error)
 }
 
 // TxMsg interface that represents message to be sent as transaction
