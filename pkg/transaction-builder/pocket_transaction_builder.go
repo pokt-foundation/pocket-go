@@ -15,11 +15,13 @@ import (
 	authTypes "github.com/pokt-network/pocket-core/x/auth/types"
 )
 
+// PocketTransactionBuilder represents implementation of transaction builder package
 type PocketTransactionBuilder struct {
 	provider provider.Provider
 	signer   signer.Signer
 }
 
+// NewPocketTransactionBuilder returns an instance of PocketTransactionBuilder
 func NewPocketTransactionBuilder(provider provider.Provider, signer signer.Signer) *PocketTransactionBuilder {
 	return &PocketTransactionBuilder{
 		provider: provider,
@@ -27,6 +29,7 @@ func NewPocketTransactionBuilder(provider provider.Provider, signer signer.Signe
 	}
 }
 
+// CreateTransaction returns input necessary for doing a transaction
 func (t *PocketTransactionBuilder) CreateTransaction(chainID, memo string, fee int64, txMsg TxMsg, coinDenom provider.CoinDenom) (*provider.SendTransactionInput, error) {
 	feeStruct := types.Coins{
 		types.Coin{
@@ -70,6 +73,7 @@ func (t *PocketTransactionBuilder) CreateTransaction(chainID, memo string, fee i
 	}, nil
 }
 
+// Submit does the transaction from raw input
 func (t *PocketTransactionBuilder) Submit(chainID, memo string, fee int64, txMsg TxMsg, coinDenom provider.CoinDenom) (*provider.SendTransactionOutput, error) {
 	sendTransactionInput, err := t.CreateTransaction(chainID, memo, fee, txMsg, coinDenom)
 	if err != nil {

@@ -59,8 +59,7 @@ func NewKeyManagerFromPrivateKey(privateKey string) (*KeyManager, error) {
 	}, nil
 }
 
-// Sign returns a signed request
-// Note that libsodium uses detached signatures
+// Sign returns a signed request as encoded hex string
 func (km *KeyManager) Sign(payload []byte) (string, error) {
 	decodedKey, err := hex.DecodeString(km.privateKey)
 	if err != nil {
@@ -70,6 +69,7 @@ func (km *KeyManager) Sign(payload []byte) (string, error) {
 	return hex.EncodeToString(ed25519.Sign(decodedKey, payload)), nil
 }
 
+// Sign returns a signed request as raw bytes
 func (km *KeyManager) SignBytes(payload []byte) ([]byte, error) {
 	decodedKey, err := hex.DecodeString(km.privateKey)
 	if err != nil {

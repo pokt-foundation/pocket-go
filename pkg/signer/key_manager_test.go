@@ -26,6 +26,10 @@ func TestKeyManager_Sign(t *testing.T) {
 	signature, err := keyManager.Sign(decodedPayload)
 	c.NoError(err)
 	c.Equal(expectedSignature, signature)
+
+	signatureBytes, err := keyManager.SignBytes(decodedPayload)
+	c.NoError(err)
+	c.Equal(expectedSignature, hex.EncodeToString(signatureBytes))
 }
 
 func TestKeyManager_GetAccount(t *testing.T) {

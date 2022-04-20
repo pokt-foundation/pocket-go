@@ -9,6 +9,7 @@ import (
 	nodeTypes "github.com/pokt-network/pocket-core/x/nodes/types"
 )
 
+// NewMsgSend returns message for send transaction
 func NewMsgSend(fromAddress, toAddress string, amount int64) (TxMsg, error) {
 	decodedFromAddress, err := hex.DecodeString(fromAddress)
 	if err != nil {
@@ -27,6 +28,7 @@ func NewMsgSend(fromAddress, toAddress string, amount int64) (TxMsg, error) {
 	}, nil
 }
 
+// NewStakeApp returns message for Stake App transaction
 func NewStakeApp(publicKey string, chains []string, amount int64) (TxMsg, error) {
 	cryptoPublicKey, err := crypto.NewPublicKey(publicKey)
 	if err != nil {
@@ -40,6 +42,7 @@ func NewStakeApp(publicKey string, chains []string, amount int64) (TxMsg, error)
 	}, nil
 }
 
+// NewUnstakeApp returns message for Unstake App transaction
 func NewUnstakeApp(address string) (TxMsg, error) {
 	decodedAddress, err := hex.DecodeString(address)
 	if err != nil {
@@ -51,6 +54,7 @@ func NewUnstakeApp(address string) (TxMsg, error) {
 	}, nil
 }
 
+// NewUnjailApp returns message for Unjail App transaction
 func NewUnjailApp(address string) (TxMsg, error) {
 	decodedAddress, err := hex.DecodeString(address)
 	if err != nil {
@@ -62,6 +66,7 @@ func NewUnjailApp(address string) (TxMsg, error) {
 	}, nil
 }
 
+// NewStakeNode returns message for Stake Node transaction
 func NewStakeNode(publicKey, serviceUrl, outputAddress string, chains []string, amount int64) (TxMsg, error) {
 	cryptoPublicKey, err := crypto.NewPublicKey(publicKey)
 	if err != nil {
@@ -82,6 +87,7 @@ func NewStakeNode(publicKey, serviceUrl, outputAddress string, chains []string, 
 	}, nil
 }
 
+// NewUnstakeNode returns message for Unstake Node transaction
 func NewUnstakeNode(fromAddress, operatorAddress string) (TxMsg, error) {
 	decodedFromAddress, err := hex.DecodeString(fromAddress)
 	if err != nil {
@@ -99,6 +105,7 @@ func NewUnstakeNode(fromAddress, operatorAddress string) (TxMsg, error) {
 	}, nil
 }
 
+// NewUnjailNode returns message for Unjail Node transaction
 func NewUnjailNode(fromAddress, operatorAddress string) (TxMsg, error) {
 	decodedFromAddress, err := hex.DecodeString(fromAddress)
 	if err != nil {
