@@ -66,7 +66,7 @@ func TestPocketTransactionBuilder_SubmitMsgSend(t *testing.T) {
 
 	txBuilder := NewPocketTransactionBuilder(provider.NewJSONRPCProvider("https://dummy.com", []string{"https://dummy.com"}), wallet)
 
-	msgSend, err := NewMsgSend("b50a6e20d3733fb89631ae32385b3c85c533c560", "b50a6e20d3733fb89631ae32385b3c85c533c561", 21)
+	msgSend, err := NewSend("b50a6e20d3733fb89631ae32385b3c85c533c560", "b50a6e20d3733fb89631ae32385b3c85c533c561", 21)
 	c.NoError(err)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", provider.ClientRawTXRoute),

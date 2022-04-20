@@ -16,6 +16,8 @@ import (
 	authTypes "github.com/pokt-network/pocket-core/x/auth/types"
 )
 
+const defaultTXFee = int64(10000)
+
 var (
 	// ErrNoSigner error when no signer is provided
 	ErrNoSigner = errors.New("no signer provided")
@@ -44,7 +46,7 @@ func NewPocketTransactionBuilder(provider provider.Provider, signer signer.Signe
 func getOptionalParams(options *TransactionOptions) (string, string, int64) {
 	memo := ""
 	coinDenom := Upokt
-	fee := int64(10000)
+	fee := defaultTXFee
 
 	if options != nil {
 		memo = options.Memo
