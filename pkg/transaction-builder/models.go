@@ -9,8 +9,8 @@ import (
 	nodesTypes "github.com/pokt-network/pocket-core/x/nodes/types"
 )
 
-// NewMsgSend returns message for send transaction
-func NewMsgSend(fromAddress, toAddress string, amount int64) (TxMsg, error) {
+// NewSend returns message for send transaction
+func NewSend(fromAddress, toAddress string, amount int64) (TxMsg, error) {
 	decodedFromAddress, err := hex.DecodeString(fromAddress)
 	if err != nil {
 		return nil, err
