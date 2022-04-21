@@ -63,7 +63,7 @@ func getOptionalParams(options *TransactionOptions) (string, string, int64) {
 	return memo, string(coinDenom), fee
 }
 
-func (t *PocketTransactionBuilder) validateTransactionRequest(chainID string, txMsg TxMsg) error {
+func (t *PocketTransactionBuilder) validateTransactionRequest(chainID ChainID, txMsg TxMsg) error {
 	if t.provider == nil {
 		return ErrNoProvider
 	}
@@ -124,7 +124,7 @@ func (t *PocketTransactionBuilder) signTransaction(chainID, memo, coinDenom stri
 }
 
 // CreateTransaction returns input necessary for doing a transaction
-func (t *PocketTransactionBuilder) CreateTransaction(chainID string, txMsg TxMsg, options *TransactionOptions) (*provider.SendTransactionInput, error) {
+func (t *PocketTransactionBuilder) CreateTransaction(chainID ChainID, txMsg TxMsg, options *TransactionOptions) (*provider.SendTransactionInput, error) {
 	err := t.validateTransactionRequest(chainID, txMsg)
 	if err != nil {
 		return nil, err
@@ -132,7 +132,7 @@ func (t *PocketTransactionBuilder) CreateTransaction(chainID string, txMsg TxMsg
 
 	memo, coinDenom, fee := getOptionalParams(options)
 
-	signedTX, err := t.signTransaction(chainID, memo, coinDenom, fee, txMsg)
+	signedTX, err := t.signTransaction(string(chainID), memo, coinDenom, fee, txMsg)
 	if err != nil {
 		return nil, err
 	}
@@ -144,7 +144,7 @@ func (t *PocketTransactionBuilder) CreateTransaction(chainID string, txMsg TxMsg
 }
 
 // Submit does the transaction from raw input
-func (t *PocketTransactionBuilder) Submit(chainID string, txMsg TxMsg, options *TransactionOptions) (*provider.SendTransactionOutput, error) {
+func (t *PocketTransactionBuilder) Submit(chainID ChainID, txMsg TxMsg, options *TransactionOptions) (*provider.SendTransactionOutput, error) {
 	sendTransactionInput, err := t.CreateTransaction(chainID, txMsg, options)
 	if err != nil {
 		return nil, err

@@ -9,3 +9,15 @@ const (
 	// Pokt represents pokt denomination
 	Pokt CoinDenom = "pokt"
 )
+
+// ChainID enum that represents possible chain IDs for transactions
+type ChainID string
+
+const (
+	// Mainnet use for connecting to Pocket Mainnet
+	Mainnet ChainID = "mainnet"
+	// Testnet use for connecting to Pocket Testnet
+	Testnet ChainID = "testnet"
+	// Localnet use for connecting to Pocket Localnet
+	Localnet ChainID = "localnet"
+)

@@ -50,7 +50,7 @@ func TestPocketTransactionBuilder_SubmitError(t *testing.T) {
 	c.Empty(output)
 	c.Equal(ErrNoChainID, err)
 
-	output, err = txBuilder.Submit("0021", nil, nil)
+	output, err = txBuilder.Submit(Mainnet, nil, nil)
 	c.Empty(output)
 	c.Equal(ErrNoTxMsg, err)
 }
@@ -72,7 +72,7 @@ func TestPocketTransactionBuilder_SubmitMsgSend(t *testing.T) {
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", provider.ClientRawTXRoute),
 		http.StatusOK, "../provider/samples/client_raw_tx.json")
 
-	output, err := txBuilder.Submit("0021", msgSend, &TransactionOptions{
+	output, err := txBuilder.Submit(Mainnet, msgSend, &TransactionOptions{
 		CoinDenom: Upokt,
 		Fee:       23,
 		Memo:      "ohana",
@@ -83,7 +83,7 @@ func TestPocketTransactionBuilder_SubmitMsgSend(t *testing.T) {
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", provider.ClientRawTXRoute),
 		http.StatusInternalServerError, "../provider/samples/client_raw_tx.json")
 
-	output, err = txBuilder.Submit("0021", msgSend, nil)
+	output, err = txBuilder.Submit(Mainnet, msgSend, nil)
 	c.Empty(output)
 	c.Equal(provider.Err5xxOnConnection, err)
 }
@@ -105,14 +105,14 @@ func TestPocketTransactionBuilder_SubmitStakeApp(t *testing.T) {
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", provider.ClientRawTXRoute),
 		http.StatusOK, "../provider/samples/client_raw_tx.json")
 
-	output, err := txBuilder.Submit("0021", stakeApp, nil)
+	output, err := txBuilder.Submit(Mainnet, stakeApp, nil)
 	c.NotEmpty(output)
 	c.NoError(err)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", provider.ClientRawTXRoute),
 		http.StatusInternalServerError, "../provider/samples/client_raw_tx.json")
 
-	output, err = txBuilder.Submit("0021", stakeApp, nil)
+	output, err = txBuilder.Submit(Mainnet, stakeApp, nil)
 	c.Empty(output)
 	c.Equal(provider.Err5xxOnConnection, err)
 }
@@ -134,14 +134,14 @@ func TestPocketTransactionBuilder_SubmitUnstakeApp(t *testing.T) {
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", provider.ClientRawTXRoute),
 		http.StatusOK, "../provider/samples/client_raw_tx.json")
 
-	output, err := txBuilder.Submit("0021", unstakeApp, nil)
+	output, err := txBuilder.Submit(Mainnet, unstakeApp, nil)
 	c.NoError(err)
 	c.NotEmpty(output)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", provider.ClientRawTXRoute),
 		http.StatusInternalServerError, "../provider/samples/client_raw_tx.json")
 
-	output, err = txBuilder.Submit("0021", unstakeApp, nil)
+	output, err = txBuilder.Submit(Mainnet, unstakeApp, nil)
 	c.Empty(output)
 	c.Equal(provider.Err5xxOnConnection, err)
 }
@@ -163,14 +163,14 @@ func TestPocketTransactionBuilder_SubmitUnjailApp(t *testing.T) {
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", provider.ClientRawTXRoute),
 		http.StatusOK, "../provider/samples/client_raw_tx.json")
 
-	output, err := txBuilder.Submit("0021", unjailApp, nil)
+	output, err := txBuilder.Submit(Mainnet, unjailApp, nil)
 	c.NotEmpty(output)
 	c.NoError(err)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", provider.ClientRawTXRoute),
 		http.StatusInternalServerError, "../provider/samples/client_raw_tx.json")
 
-	output, err = txBuilder.Submit("0021", unjailApp, nil)
+	output, err = txBuilder.Submit(Mainnet, unjailApp, nil)
 	c.Empty(output)
 	c.Equal(provider.Err5xxOnConnection, err)
 }
@@ -192,14 +192,14 @@ func TestPocketTransactionBuilder_SubmitStakeNode(t *testing.T) {
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", provider.ClientRawTXRoute),
 		http.StatusOK, "../provider/samples/client_raw_tx.json")
 
-	output, err := txBuilder.Submit("0021", stakeNode, nil)
+	output, err := txBuilder.Submit(Mainnet, stakeNode, nil)
 	c.NotEmpty(output)
 	c.NoError(err)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", provider.ClientRawTXRoute),
 		http.StatusInternalServerError, "../provider/samples/client_raw_tx.json")
 
-	output, err = txBuilder.Submit("0021", stakeNode, nil)
+	output, err = txBuilder.Submit(Mainnet, stakeNode, nil)
 	c.Empty(output)
 	c.Equal(provider.Err5xxOnConnection, err)
 }
@@ -221,14 +221,14 @@ func TestPocketTransactionBuilder_SubmitUnstakeNode(t *testing.T) {
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", provider.ClientRawTXRoute),
 		http.StatusOK, "../provider/samples/client_raw_tx.json")
 
-	output, err := txBuilder.Submit("0021", unstakeNode, nil)
+	output, err := txBuilder.Submit(Mainnet, unstakeNode, nil)
 	c.NotEmpty(output)
 	c.NoError(err)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", provider.ClientRawTXRoute),
 		http.StatusInternalServerError, "../provider/samples/client_raw_tx.json")
 
-	output, err = txBuilder.Submit("0021", unstakeNode, nil)
+	output, err = txBuilder.Submit(Mainnet, unstakeNode, nil)
 	c.Empty(output)
 	c.Equal(provider.Err5xxOnConnection, err)
 }
@@ -250,14 +250,14 @@ func TestPocketTransactionBuilder_SubmitUnjailNode(t *testing.T) {
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", provider.ClientRawTXRoute),
 		http.StatusOK, "../provider/samples/client_raw_tx.json")
 
-	output, err := txBuilder.Submit("0021", unjailNode, nil)
+	output, err := txBuilder.Submit(Mainnet, unjailNode, nil)
 	c.NotEmpty(output)
 	c.NoError(err)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", provider.ClientRawTXRoute),
 		http.StatusInternalServerError, "../provider/samples/client_raw_tx.json")
 
-	output, err = txBuilder.Submit("0021", unjailNode, nil)
+	output, err = txBuilder.Submit(Mainnet, unjailNode, nil)
 	c.Empty(output)
 	c.Equal(provider.Err5xxOnConnection, err)
 }
