@@ -11,7 +11,7 @@ type Provider interface {
 	GetTransactionCount(address string, options *GetTransactionCountOptions) (int, error)
 	GetType(address string, options *GetTypeOptions) (AddressType, error)
 	// TXs
-	SendTransaction(signerAddress string, signedTransaction string) (*SendTransactionOutput, error)
+	SendTransaction(input *SendTransactionInput) (*SendTransactionOutput, error)
 	// Network
 	GetBlock(blockNumber int) (*GetBlockOutput, error)
 	GetTransaction(transactionHash string, options *GetTransactionOptions) (*GetTransactionOutput, error)
