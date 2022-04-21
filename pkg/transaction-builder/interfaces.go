@@ -15,3 +15,8 @@ type TransactionBuilder interface {
 type TxMsg interface {
 	coreTypes.ProtoMsg
 }
+
+// Provider interface representing provider functions necessary for Transaction Builder Package
+type Provider interface {
+	SendTransaction(input *provider.SendTransactionInput) (*provider.SendTransactionOutput, error)
+}
