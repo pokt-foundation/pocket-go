@@ -6,3 +6,8 @@ import "github.com/pokt-foundation/pocket-go/pkg/provider"
 type Relayer interface {
 	Relay(input *RelayInput, options *provider.RelayRequestOptions) (*Output, error)
 }
+
+// Provider interface representing provider functions necessary for Relayer Package
+type Provider interface {
+	Relay(rpcURL string, input *provider.Relay, options *provider.RelayRequestOptions) (*provider.RelayOutput, error)
+}
