@@ -8,7 +8,6 @@ import (
 	"math/big"
 
 	"github.com/pokt-foundation/pocket-go/pkg/provider"
-	"github.com/pokt-foundation/pocket-go/pkg/signer"
 	"github.com/pokt-network/pocket-core/app"
 	"github.com/pokt-network/pocket-core/crypto"
 	coreTypes "github.com/pokt-network/pocket-core/types"
@@ -32,11 +31,11 @@ var (
 // PocketTransactionBuilder represents implementation of transaction builder package
 type PocketTransactionBuilder struct {
 	provider Provider
-	signer   signer.Signer
+	signer   Signer
 }
 
 // NewPocketTransactionBuilder returns an instance of PocketTransactionBuilder
-func NewPocketTransactionBuilder(provider Provider, signer signer.Signer) *PocketTransactionBuilder {
+func NewPocketTransactionBuilder(provider Provider, signer Signer) *PocketTransactionBuilder {
 	return &PocketTransactionBuilder{
 		provider: provider,
 		signer:   signer,
