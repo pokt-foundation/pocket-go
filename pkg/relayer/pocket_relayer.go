@@ -9,7 +9,6 @@ import (
 	"math/big"
 
 	"github.com/pokt-foundation/pocket-go/pkg/provider"
-	"github.com/pokt-foundation/pocket-go/pkg/signer"
 	"golang.org/x/crypto/sha3"
 )
 
@@ -32,12 +31,12 @@ var (
 
 // PocketRelayer implementation of relayer interface
 type PocketRelayer struct {
-	signer   signer.Signer
+	signer   Signer
 	provider Provider
 }
 
 // NewPocketRelayer returns instance of PocketRelayer with given input
-func NewPocketRelayer(signer signer.Signer, provider Provider) *PocketRelayer {
+func NewPocketRelayer(signer Signer, provider Provider) *PocketRelayer {
 	return &PocketRelayer{
 		signer:   signer,
 		provider: provider,
