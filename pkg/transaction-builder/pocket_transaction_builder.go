@@ -31,12 +31,12 @@ var (
 
 // PocketTransactionBuilder represents implementation of transaction builder package
 type PocketTransactionBuilder struct {
-	provider provider.Provider
+	provider Provider
 	signer   signer.Signer
 }
 
 // NewPocketTransactionBuilder returns an instance of PocketTransactionBuilder
-func NewPocketTransactionBuilder(provider provider.Provider, signer signer.Signer) *PocketTransactionBuilder {
+func NewPocketTransactionBuilder(provider Provider, signer signer.Signer) *PocketTransactionBuilder {
 	return &PocketTransactionBuilder{
 		provider: provider,
 		signer:   signer,
