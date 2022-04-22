@@ -33,11 +33,11 @@ var (
 // PocketRelayer implementation of relayer interface
 type PocketRelayer struct {
 	signer   signer.Signer
-	provider provider.Provider
+	provider Provider
 }
 
 // NewPocketRelayer returns instance of PocketRelayer with given input
-func NewPocketRelayer(signer signer.Signer, provider provider.Provider) *PocketRelayer {
+func NewPocketRelayer(signer signer.Signer, provider Provider) *PocketRelayer {
 	return &PocketRelayer{
 		signer:   signer,
 		provider: provider,
