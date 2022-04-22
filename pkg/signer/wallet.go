@@ -1,21 +1,8 @@
 package signer
 
-import (
-	"errors"
-
-	"github.com/pokt-foundation/pocket-go/pkg/provider"
-)
-
-var (
-	// ErrNotImplemented error when function is not implemented
-	ErrNotImplemented = errors.New("not implemented yet")
-)
-
 // Wallet struct handler
 type Wallet struct {
-	requestProvider provider.Provider
-	isSigner        bool
-	keyManager      *KeyManager
+	keyManager *KeyManager
 }
 
 // NewRandomWallet returns Wallet from random values
@@ -26,7 +13,6 @@ func NewRandomWallet() (*Wallet, error) {
 	}
 
 	return &Wallet{
-		isSigner:   true,
 		keyManager: keyManager,
 	}, nil
 }
@@ -39,34 +25,31 @@ func NewWalletFromPrivatekey(privateKey string) (*Wallet, error) {
 	}
 
 	return &Wallet{
-		isSigner:   true,
 		keyManager: keyManager,
 	}, nil
 }
 
-// Connect assigns provider and changes isSigner accordingly
-func (w *Wallet) Connect(requestProvider provider.Provider) {
-	w.requestProvider = requestProvider
-	w.isSigner = w.isSigner || w.keyManager.IsConnected()
+// Sign returns a signed request as encoded hex string
+func (w *Wallet) Sign(payload []byte) (string, error) {
+	return w.keyManager.Sign(payload)
 }
 
-// SignTransaction not implemented
-// TODO: implement SignTransaction
-func (w *Wallet) SignTransaction(req TransactionRequest) (string, error) {
-	return "", ErrNotImplemented
+// SignBytes returns a signed request as raw bytes
+func (w *Wallet) SignBytes(payload []byte) ([]byte, error) {
+	return w.keyManager.SignBytes(payload)
 }
 
-// GetKeyManager returns KeyManager value
-func (w *Wallet) GetKeyManager() *KeyManager {
-	return w.keyManager
+// GetAddress returns address value
+func (w *Wallet) GetAddress() string {
+	return w.keyManager.address
 }
 
-// GetProvider returns Provider value
-func (w *Wallet) GetProvider() provider.Provider {
-	return w.requestProvider
+// GetPublicKey returns public key value
+func (w *Wallet) GetPublicKey() string {
+	return w.keyManager.publicKey
 }
 
-// IsSigner returns IsSigner value
-func (w *Wallet) IsSigner() bool {
-	return w.isSigner
+// GetPrivateKey returns private key value
+func (w *Wallet) GetPrivateKey() string {
+	return w.keyManager.privateKey
 }

@@ -90,7 +90,7 @@ func (r *PocketRelayer) getSignedProofBytes(proof *provider.RelayProof) (string,
 		return "", err
 	}
 
-	return r.signer.GetKeyManager().Sign(proofBytes)
+	return r.signer.Sign(proofBytes)
 }
 
 // Relay does relay request with given input

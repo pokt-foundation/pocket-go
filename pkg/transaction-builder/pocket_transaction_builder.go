@@ -101,12 +101,12 @@ func (t *PocketTransactionBuilder) signTransaction(chainID, memo, coinDenom stri
 		return "", err
 	}
 
-	signature, err := t.signer.GetKeyManager().SignBytes(signBytes)
+	signature, err := t.signer.SignBytes(signBytes)
 	if err != nil {
 		return "", err
 	}
 
-	publicKey, err := crypto.NewPublicKey(t.signer.GetKeyManager().GetPublicKey())
+	publicKey, err := crypto.NewPublicKey(t.signer.GetPublicKey())
 	if err != nil {
 		return "", err
 	}
@@ -138,7 +138,7 @@ func (t *PocketTransactionBuilder) CreateTransaction(chainID ChainID, txMsg TxMs
 	}
 
 	return &provider.SendTransactionInput{
-		Address:     t.signer.GetKeyManager().GetAddress(),
+		Address:     t.signer.GetAddress(),
 		RawHexBytes: signedTX,
 	}, nil
 }
