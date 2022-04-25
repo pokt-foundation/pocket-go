@@ -11,3 +11,8 @@ type Relayer interface {
 type Provider interface {
 	Relay(rpcURL string, input *provider.Relay, options *provider.RelayRequestOptions) (*provider.RelayOutput, error)
 }
+
+// Signer interface representing signer functions necessary for Relayer Package
+type Signer interface {
+	Sign(payload []byte) (string, error)
+}
