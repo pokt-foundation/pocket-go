@@ -35,7 +35,7 @@ func TestPocketTransactionBuilder_SubmitError(t *testing.T) {
 	c.Empty(output)
 	c.Equal(ErrNoProvider, err)
 
-	txBuilder.provider = provider.NewJSONRPCProvider("https://dummy.com", []string{"https://dummy.com"})
+	txBuilder.provider = provider.NewProvider("https://dummy.com", []string{"https://dummy.com"})
 
 	output, err = txBuilder.Submit("", nil, nil)
 	c.Empty(output)
@@ -64,7 +64,7 @@ func TestPocketTransactionBuilder_SubmitMsgSend(t *testing.T) {
 	wallet, err := signer.NewRandomWallet()
 	c.NoError(err)
 
-	txBuilder := NewPocketTransactionBuilder(provider.NewJSONRPCProvider("https://dummy.com", []string{"https://dummy.com"}), wallet)
+	txBuilder := NewPocketTransactionBuilder(provider.NewProvider("https://dummy.com", []string{"https://dummy.com"}), wallet)
 
 	msgSend, err := NewSend("b50a6e20d3733fb89631ae32385b3c85c533c560", "b50a6e20d3733fb89631ae32385b3c85c533c561", 21)
 	c.NoError(err)
@@ -97,7 +97,7 @@ func TestPocketTransactionBuilder_SubmitStakeApp(t *testing.T) {
 	wallet, err := signer.NewRandomWallet()
 	c.NoError(err)
 
-	txBuilder := NewPocketTransactionBuilder(provider.NewJSONRPCProvider("https://dummy.com", []string{"https://dummy.com"}), wallet)
+	txBuilder := NewPocketTransactionBuilder(provider.NewProvider("https://dummy.com", []string{"https://dummy.com"}), wallet)
 
 	stakeApp, err := NewStakeApp("b243b27bc9fbe5580457a46370ae5f03a6f6753633e51efdaf2cf534fdc26cc3", []string{"0021"}, 21)
 	c.NoError(err)
@@ -126,7 +126,7 @@ func TestPocketTransactionBuilder_SubmitUnstakeApp(t *testing.T) {
 	wallet, err := signer.NewRandomWallet()
 	c.NoError(err)
 
-	txBuilder := NewPocketTransactionBuilder(provider.NewJSONRPCProvider("https://dummy.com", []string{"https://dummy.com"}), wallet)
+	txBuilder := NewPocketTransactionBuilder(provider.NewProvider("https://dummy.com", []string{"https://dummy.com"}), wallet)
 
 	unstakeApp, err := NewUnstakeApp("b50a6e20d3733fb89631ae32385b3c85c533c560")
 	c.NoError(err)
@@ -155,7 +155,7 @@ func TestPocketTransactionBuilder_SubmitUnjailApp(t *testing.T) {
 	wallet, err := signer.NewRandomWallet()
 	c.NoError(err)
 
-	txBuilder := NewPocketTransactionBuilder(provider.NewJSONRPCProvider("https://dummy.com", []string{"https://dummy.com"}), wallet)
+	txBuilder := NewPocketTransactionBuilder(provider.NewProvider("https://dummy.com", []string{"https://dummy.com"}), wallet)
 
 	unjailApp, err := NewUnjailApp("b50a6e20d3733fb89631ae32385b3c85c533c560")
 	c.NoError(err)
@@ -184,7 +184,7 @@ func TestPocketTransactionBuilder_SubmitStakeNode(t *testing.T) {
 	wallet, err := signer.NewRandomWallet()
 	c.NoError(err)
 
-	txBuilder := NewPocketTransactionBuilder(provider.NewJSONRPCProvider("https://dummy.com", []string{"https://dummy.com"}), wallet)
+	txBuilder := NewPocketTransactionBuilder(provider.NewProvider("https://dummy.com", []string{"https://dummy.com"}), wallet)
 
 	stakeNode, err := NewStakeNode("b243b27bc9fbe5580457a46370ae5f03a6f6753633e51efdaf2cf534fdc26cc3", "https://dummy.com:443", "b50a6e20d3733fb89631ae32385b3c85c533c560", []string{"0021"}, 21)
 	c.NoError(err)
@@ -213,7 +213,7 @@ func TestPocketTransactionBuilder_SubmitUnstakeNode(t *testing.T) {
 	wallet, err := signer.NewRandomWallet()
 	c.NoError(err)
 
-	txBuilder := NewPocketTransactionBuilder(provider.NewJSONRPCProvider("https://dummy.com", []string{"https://dummy.com"}), wallet)
+	txBuilder := NewPocketTransactionBuilder(provider.NewProvider("https://dummy.com", []string{"https://dummy.com"}), wallet)
 
 	unstakeNode, err := NewUnstakeNode("b50a6e20d3733fb89631ae32385b3c85c533c560", "b50a6e20d3733fb89631ae32385b3c85c533c561")
 	c.NoError(err)
@@ -242,7 +242,7 @@ func TestPocketTransactionBuilder_SubmitUnjailNode(t *testing.T) {
 	wallet, err := signer.NewRandomWallet()
 	c.NoError(err)
 
-	txBuilder := NewPocketTransactionBuilder(provider.NewJSONRPCProvider("https://dummy.com", []string{"https://dummy.com"}), wallet)
+	txBuilder := NewPocketTransactionBuilder(provider.NewProvider("https://dummy.com", []string{"https://dummy.com"}), wallet)
 
 	unjailNode, err := NewUnjailNode("b50a6e20d3733fb89631ae32385b3c85c533c560", "b50a6e20d3733fb89631ae32385b3c85c533c561")
 	c.NoError(err)

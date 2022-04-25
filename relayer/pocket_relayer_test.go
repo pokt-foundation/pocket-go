@@ -45,7 +45,7 @@ func TestPocketRelayer_Relay(t *testing.T) {
 	c.Equal(ErrNoProvider, err)
 	c.Empty(relay)
 
-	relayer.provider = provider.NewJSONRPCProvider("https://dummy.com", []string{"https://dummy.com"})
+	relayer.provider = provider.NewProvider("https://dummy.com", []string{"https://dummy.com"})
 
 	relay, err = relayer.Relay(relayInput, nil)
 	c.Equal(ErrNoSession, err)
