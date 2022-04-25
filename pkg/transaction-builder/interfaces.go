@@ -20,3 +20,10 @@ type TxMsg interface {
 type Provider interface {
 	SendTransaction(input *provider.SendTransactionInput) (*provider.SendTransactionOutput, error)
 }
+
+// Signer interface representing signer functions necessary for Transaction Builder package
+type Signer interface {
+	SignBytes(payload []byte) ([]byte, error)
+	GetAddress() string
+	GetPublicKey() string
+}
