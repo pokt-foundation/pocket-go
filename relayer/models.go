@@ -1,7 +1,7 @@
 package relayer
 
 import (
-	"github.com/pokt-foundation/pocket-go/pkg/provider"
+	"github.com/pokt-foundation/pocket-go/provider"
 )
 
 // RelayInput struct that represents data needed for doing a relay request

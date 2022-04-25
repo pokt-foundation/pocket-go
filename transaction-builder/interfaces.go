@@ -1,7 +1,7 @@
 package transactionbuilder
 
 import (
-	"github.com/pokt-foundation/pocket-go/pkg/provider"
+	"github.com/pokt-foundation/pocket-go/provider"
 	coreTypes "github.com/pokt-network/pocket-core/types"
 )
 

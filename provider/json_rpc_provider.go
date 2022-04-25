@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/pokt-foundation/pocket-go/internal/client"
-	"github.com/pokt-foundation/pocket-go/pkg/utils"
+	"github.com/pokt-foundation/pocket-go/utils"
 )
 
 var (

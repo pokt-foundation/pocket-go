@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/jarcoal/httpmock"
-	"github.com/pokt-foundation/pocket-go/pkg/mock-client"
+	"github.com/pokt-foundation/pocket-go/mock-client"
 	"github.com/stretchr/testify/require"
 )
 
@@ -29,7 +29,7 @@ func TestClient_PostWithURLJSONParams(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	mock.AddMockedResponseFromFile(http.MethodPost, "https://dummy.com", http.StatusCreated, "../../pkg/mock-client/samples/dummy.json")
+	mock.AddMockedResponseFromFile(http.MethodPost, "https://dummy.com", http.StatusCreated, "../../mock-client/samples/dummy.json")
 
 	response, err := client.PostWithURLJSONParams("https://dummy.com", map[string]interface{}{
 		"ohana": "family",
