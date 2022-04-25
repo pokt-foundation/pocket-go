@@ -4,7 +4,7 @@ import (
 	"encoding/hex"
 	"testing"
 
-	"github.com/pokt-foundation/pocket-go/pkg/utils"
+	"github.com/pokt-foundation/pocket-go/utils"
 	"github.com/stretchr/testify/require"
 )
 

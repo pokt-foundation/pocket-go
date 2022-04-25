@@ -7,7 +7,7 @@ import (
 	"math"
 	"math/big"
 
-	"github.com/pokt-foundation/pocket-go/pkg/provider"
+	"github.com/pokt-foundation/pocket-go/provider"
 	"github.com/pokt-network/pocket-core/app"
 	"github.com/pokt-network/pocket-core/crypto"
 	coreTypes "github.com/pokt-network/pocket-core/types"

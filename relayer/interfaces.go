@@ -1,6 +1,6 @@
 package relayer
 
-import "github.com/pokt-foundation/pocket-go/pkg/provider"
+import "github.com/pokt-foundation/pocket-go/provider"
 
 // Relayer interface that represents a relayer
 type Relayer interface {

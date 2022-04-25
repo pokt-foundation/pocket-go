@@ -8,7 +8,7 @@ import (
 	"math"
 	"math/big"
 
-	"github.com/pokt-foundation/pocket-go/pkg/provider"
+	"github.com/pokt-foundation/pocket-go/provider"
 	"golang.org/x/crypto/sha3"
 )
 
