@@ -30,16 +30,16 @@ var (
 	errOnRelayRequest = errors.New("error on relay request")
 )
 
-// JSONRPCProvider struct handler por JSON RPC provider
-type JSONRPCProvider struct {
+// Provider struct handler por JSON RPC provider
+type Provider struct {
 	rpcURL      string
 	dispatchers []string
 	client      *client.Client
 }
 
-// NewJSONRPCProvider returns JSONRPCProvider instance from input
-func NewJSONRPCProvider(rpcURL string, dispatchers []string) *JSONRPCProvider {
-	return &JSONRPCProvider{
+// NewProvider returns Provider instance from input
+func NewProvider(rpcURL string, dispatchers []string) *Provider {
+	return &Provider{
 		rpcURL:      rpcURL,
 		dispatchers: dispatchers,
 		client:      client.NewDefaultClient(),
@@ -47,16 +47,16 @@ func NewJSONRPCProvider(rpcURL string, dispatchers []string) *JSONRPCProvider {
 }
 
 // UpdateRequestConfig updates retries and timeout used for RPC requests
-func (p *JSONRPCProvider) UpdateRequestConfig(retries int, timeout time.Duration) {
+func (p *Provider) UpdateRequestConfig(retries int, timeout time.Duration) {
 	p.client = client.NewCustomClient(retries, timeout)
 }
 
 // ResetRequestConfigToDefault resets request config to default
-func (p *JSONRPCProvider) ResetRequestConfigToDefault() {
+func (p *Provider) ResetRequestConfigToDefault() {
 	p.client = client.NewDefaultClient()
 }
 
-func (p *JSONRPCProvider) getFinalRPCURL(rpcURL string, route V1RPCRoute) (string, error) {
+func (p *Provider) getFinalRPCURL(rpcURL string, route V1RPCRoute) (string, error) {
 	if rpcURL != "" {
 		return rpcURL, nil
 	}
@@ -73,7 +73,7 @@ func (p *JSONRPCProvider) getFinalRPCURL(rpcURL string, route V1RPCRoute) (strin
 	return p.rpcURL, nil
 }
 
-func (p *JSONRPCProvider) doPostRequest(rpcURL string, params interface{}, route V1RPCRoute) (*http.Response, error) {
+func (p *Provider) doPostRequest(rpcURL string, params interface{}, route V1RPCRoute) (*http.Response, error) {
 	finalRPCURL, err := p.getFinalRPCURL(rpcURL, route)
 	if err != nil {
 		return nil, err
@@ -126,7 +126,7 @@ func returnRPCError(route V1RPCRoute, body io.ReadCloser) error {
 }
 
 // GetBalance requests the balance of the specified address
-func (p *JSONRPCProvider) GetBalance(address string, options *GetBalanceOptions) (*big.Int, error) {
+func (p *Provider) GetBalance(address string, options *GetBalanceOptions) (*big.Int, error) {
 	params := map[string]interface{}{
 		"address": address,
 	}
@@ -159,7 +159,7 @@ func (p *JSONRPCProvider) GetBalance(address string, options *GetBalanceOptions)
 }
 
 // GetAccountTransactions returns transactions of given address' account
-func (p *JSONRPCProvider) GetAccountTransactions(address string, options *GetAccountTransactionsOptions) (*GetAccountTransactionsOutput, error) {
+func (p *Provider) GetAccountTransactions(address string, options *GetAccountTransactionsOptions) (*GetAccountTransactionsOutput, error) {
 	params := map[string]interface{}{
 		"address": address,
 	}
@@ -197,7 +197,7 @@ func (p *JSONRPCProvider) GetAccountTransactions(address string, options *GetAcc
 }
 
 // GetTransactionCount returns number of transactions sent by the given address
-func (p *JSONRPCProvider) GetTransactionCount(address string, options *GetTransactionCountOptions) (int, error) {
+func (p *Provider) GetTransactionCount(address string, options *GetTransactionCountOptions) (int, error) {
 	optionsToSend := &GetAccountTransactionsOptions{}
 	currentPage := 1
 	totalCount := 0
@@ -226,6 +226,18 @@ func (p *JSONRPCProvider) GetTransactionCount(address string, options *GetTransa
 	return totalCount, nil
 }
 
+// AddressType enum listing all address types
+type AddressType string
+
+const (
+	// NodeType represents node type
+	NodeType AddressType = "node"
+	// AppType represents app type
+	AppType AddressType = "app"
+	// AccountType represents account type
+	AccountType AddressType = "account"
+)
+
 func returnType(appErr, nodeErr error) AddressType {
 	if nodeErr != nil && appErr == nil {
 		return AppType
@@ -239,7 +251,7 @@ func returnType(appErr, nodeErr error) AddressType {
 }
 
 // GetType returns type of given address
-func (p *JSONRPCProvider) GetType(address string, options *GetTypeOptions) (AddressType, error) {
+func (p *Provider) GetType(address string, options *GetTypeOptions) (AddressType, error) {
 	var height int
 	var errOutput *RPCError
 
@@ -261,7 +273,7 @@ func (p *JSONRPCProvider) GetType(address string, options *GetTypeOptions) (Addr
 }
 
 // SendTransaction sends raw transaction to be relayed to a target address
-func (p *JSONRPCProvider) SendTransaction(input *SendTransactionInput) (*SendTransactionOutput, error) {
+func (p *Provider) SendTransaction(input *SendTransactionInput) (*SendTransactionOutput, error) {
 	rawOutput, err := p.doPostRequest("", input, ClientRawTXRoute)
 
 	defer closeOrLog(rawOutput)
@@ -286,7 +298,7 @@ func (p *JSONRPCProvider) SendTransaction(input *SendTransactionInput) (*SendTra
 }
 
 // GetBlock returns the block structure at the specified height, height = 0 is used as latest
-func (p *JSONRPCProvider) GetBlock(blockNumber int) (*GetBlockOutput, error) {
+func (p *Provider) GetBlock(blockNumber int) (*GetBlockOutput, error) {
 	rawOutput, err := p.doPostRequest("", map[string]int{
 		"height": blockNumber,
 	}, QueryBlockRoute)
@@ -313,7 +325,7 @@ func (p *JSONRPCProvider) GetBlock(blockNumber int) (*GetBlockOutput, error) {
 }
 
 // GetTransaction returns the transaction by the given transaction hash
-func (p *JSONRPCProvider) GetTransaction(transactionHash string, options *GetTransactionOptions) (*GetTransactionOutput, error) {
+func (p *Provider) GetTransaction(transactionHash string, options *GetTransactionOptions) (*GetTransactionOutput, error) {
 	params := map[string]interface{}{
 		"hash": transactionHash,
 	}
@@ -346,7 +358,7 @@ func (p *JSONRPCProvider) GetTransaction(transactionHash string, options *GetTra
 }
 
 // GetBlockHeight returns the current height
-func (p *JSONRPCProvider) GetBlockHeight() (int, error) {
+func (p *Provider) GetBlockHeight() (int, error) {
 	rawOutput, err := p.doPostRequest("", nil, QueryHeightRoute)
 
 	defer closeOrLog(rawOutput)
@@ -372,7 +384,7 @@ func (p *JSONRPCProvider) GetBlockHeight() (int, error) {
 
 // GetNodes returns a page of nodes known at the specified height and with options
 // empty options returns all validators, page < 1 returns the first page, per_page < 1 returns 10000 elements per page
-func (p *JSONRPCProvider) GetNodes(height int, options *GetNodesOptions) (*GetNodesOutput, error) {
+func (p *Provider) GetNodes(height int, options *GetNodesOptions) (*GetNodesOutput, error) {
 	params := map[string]interface{}{
 		"height": height,
 	}
@@ -411,7 +423,7 @@ func (p *JSONRPCProvider) GetNodes(height int, options *GetNodesOptions) (*GetNo
 }
 
 // GetNode returns the node at the specified height, height = 0 is used as latest
-func (p *JSONRPCProvider) GetNode(address string, options *GetNodeOptions) (*GetNodeOutput, error) {
+func (p *Provider) GetNode(address string, options *GetNodeOptions) (*GetNodeOutput, error) {
 	params := map[string]interface{}{
 		"address": address,
 	}
@@ -445,7 +457,7 @@ func (p *JSONRPCProvider) GetNode(address string, options *GetNodeOptions) (*Get
 
 // GetApps returns a page of applications known at the specified height and staking status
 // empty ("") staking_status returns all apps, page < 1 returns the first page, per_page < 1 returns 10000 elements per page
-func (p *JSONRPCProvider) GetApps(height int, options *GetAppsOptions) (*GetAppsOutput, error) {
+func (p *Provider) GetApps(height int, options *GetAppsOptions) (*GetAppsOutput, error) {
 	params := map[string]interface{}{
 		"height": height,
 	}
@@ -483,7 +495,7 @@ func (p *JSONRPCProvider) GetApps(height int, options *GetAppsOptions) (*GetApps
 }
 
 // GetApp returns the app at the specified height, height = 0 is used as latest
-func (p *JSONRPCProvider) GetApp(address string, options *GetAppOptions) (*GetAppOutput, error) {
+func (p *Provider) GetApp(address string, options *GetAppOptions) (*GetAppOutput, error) {
 	params := map[string]interface{}{
 		"address": address,
 	}
@@ -516,7 +528,7 @@ func (p *JSONRPCProvider) GetApp(address string, options *GetAppOptions) (*GetAp
 }
 
 // GetAccount returns account at the specified address
-func (p *JSONRPCProvider) GetAccount(address string, options *GetAccountOptions) (*GetAccountOutput, error) {
+func (p *Provider) GetAccount(address string, options *GetAccountOptions) (*GetAccountOutput, error) {
 	params := map[string]interface{}{
 		"address": address,
 	}
@@ -549,7 +561,7 @@ func (p *JSONRPCProvider) GetAccount(address string, options *GetAccountOptions)
 }
 
 // Dispatch sends a dispatch request to the network and gets the nodes that will be servicing the requests for the session.
-func (p *JSONRPCProvider) Dispatch(appPublicKey, chain string, options *DispatchRequestOptions) (*DispatchOutput, error) {
+func (p *Provider) Dispatch(appPublicKey, chain string, options *DispatchRequestOptions) (*DispatchOutput, error) {
 	if len(p.dispatchers) == 0 {
 		return nil, ErrNoDispatchers
 	}
@@ -587,7 +599,7 @@ func (p *JSONRPCProvider) Dispatch(appPublicKey, chain string, options *Dispatch
 }
 
 // Relay does request to be relayed to a target blockchain
-func (p *JSONRPCProvider) Relay(rpcURL string, input *Relay, options *RelayRequestOptions) (*RelayOutput, error) {
+func (p *Provider) Relay(rpcURL string, input *Relay, options *RelayRequestOptions) (*RelayOutput, error) {
 	rawOutput, reqErr := p.doPostRequest(rpcURL, input, ClientRelayRoute)
 
 	defer closeOrLog(rawOutput)
