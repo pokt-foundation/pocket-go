@@ -23,7 +23,7 @@ func TestRelayError_ErrorInterface(t *testing.T) {
 	c.True(ok)
 }
 
-func TestJSONRPCProvider_GetBalance(t *testing.T) {
+func TestProvider_GetBalance(t *testing.T) {
 	c := require.New(t)
 
 	httpmock.Activate()
@@ -44,7 +44,7 @@ func TestJSONRPCProvider_GetBalance(t *testing.T) {
 	c.Empty(balance)
 }
 
-func TestJSONRPCProvider_GetTransactionCount(t *testing.T) {
+func TestProvider_GetTransactionCount(t *testing.T) {
 	c := require.New(t)
 
 	httpmock.Activate()
@@ -68,7 +68,7 @@ func TestJSONRPCProvider_GetTransactionCount(t *testing.T) {
 	c.Empty(count)
 }
 
-func TestJSONRPCProvider_GetAccountTransactions(t *testing.T) {
+func TestProvider_GetAccountTransactions(t *testing.T) {
 	c := require.New(t)
 
 	httpmock.Activate()
@@ -89,7 +89,7 @@ func TestJSONRPCProvider_GetAccountTransactions(t *testing.T) {
 	c.Empty(transactions)
 }
 
-func TestJSONRPCProvider_GetType(t *testing.T) {
+func TestProvider_GetType(t *testing.T) {
 	c := require.New(t)
 
 	httpmock.Activate()
@@ -131,7 +131,7 @@ func TestJSONRPCProvider_GetType(t *testing.T) {
 	c.Equal(NodeType, addressType)
 }
 
-func TestJSONRPCProvider_SendTransaction(t *testing.T) {
+func TestProvider_SendTransaction(t *testing.T) {
 	c := require.New(t)
 
 	httpmock.Activate()
@@ -150,7 +150,7 @@ func TestJSONRPCProvider_SendTransaction(t *testing.T) {
 	c.NotEmpty(transaction)
 }
 
-func TestJSONRPCProvider_GetBlock(t *testing.T) {
+func TestProvider_GetBlock(t *testing.T) {
 	c := require.New(t)
 
 	httpmock.Activate()
@@ -171,7 +171,7 @@ func TestJSONRPCProvider_GetBlock(t *testing.T) {
 	c.Empty(block)
 }
 
-func TestJSONRPCProvider_GetTransaction(t *testing.T) {
+func TestProvider_GetTransaction(t *testing.T) {
 	c := require.New(t)
 
 	httpmock.Activate()
@@ -192,7 +192,7 @@ func TestJSONRPCProvider_GetTransaction(t *testing.T) {
 	c.Empty(transaction)
 }
 
-func TestJSONRPCProvider_GetBlockHeight(t *testing.T) {
+func TestProvider_GetBlockHeight(t *testing.T) {
 	c := require.New(t)
 
 	httpmock.Activate()
@@ -213,7 +213,7 @@ func TestJSONRPCProvider_GetBlockHeight(t *testing.T) {
 	c.Empty(blockNumber)
 }
 
-func TestJSONRPCProvider_GetNodes(t *testing.T) {
+func TestProvider_GetNodes(t *testing.T) {
 	c := require.New(t)
 
 	httpmock.Activate()
@@ -234,7 +234,7 @@ func TestJSONRPCProvider_GetNodes(t *testing.T) {
 	c.Empty(nodes)
 }
 
-func TestJSONRPCProvider_GetApps(t *testing.T) {
+func TestProvider_GetApps(t *testing.T) {
 	c := require.New(t)
 
 	httpmock.Activate()
@@ -255,7 +255,7 @@ func TestJSONRPCProvider_GetApps(t *testing.T) {
 	c.Empty(apps)
 }
 
-func TestJSONRPCProvider_GetNode(t *testing.T) {
+func TestProvider_GetNode(t *testing.T) {
 	c := require.New(t)
 
 	httpmock.Activate()
@@ -276,7 +276,7 @@ func TestJSONRPCProvider_GetNode(t *testing.T) {
 	c.Empty(node)
 }
 
-func TestJSONRPCProvider_GetApp(t *testing.T) {
+func TestProvider_GetApp(t *testing.T) {
 	c := require.New(t)
 
 	httpmock.Activate()
@@ -297,7 +297,7 @@ func TestJSONRPCProvider_GetApp(t *testing.T) {
 	c.Empty(app)
 }
 
-func TestJSONRPCProvider_GetAccount(t *testing.T) {
+func TestProvider_GetAccount(t *testing.T) {
 	c := require.New(t)
 
 	httpmock.Activate()
@@ -318,7 +318,7 @@ func TestJSONRPCProvider_GetAccount(t *testing.T) {
 	c.Empty(account)
 }
 
-func TestJSONRPCProvider_Dispatch(t *testing.T) {
+func TestProvider_Dispatch(t *testing.T) {
 	c := require.New(t)
 
 	httpmock.Activate()
@@ -351,7 +351,7 @@ func TestJSONRPCProvider_Dispatch(t *testing.T) {
 	c.Empty(dispatch)
 }
 
-func TestJSONRPCProvider_Relay(t *testing.T) {
+func TestProvider_Relay(t *testing.T) {
 	c := require.New(t)
 
 	httpmock.Activate()
@@ -361,27 +361,27 @@ func TestJSONRPCProvider_Relay(t *testing.T) {
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientRelayRoute), http.StatusOK, "samples/client_relay.json")
 
-	relay, err := provider.Relay("https://dummy.com", &Relay{}, nil)
+	relay, err := provider.Relay("https://dummy.com", &RelayInput{}, nil)
 	c.NoError(err)
 	c.NotEmpty(relay)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientRelayRoute), http.StatusInternalServerError, "samples/client_relay.json")
 
-	relay, err = provider.Relay("https://dummy.com", &Relay{}, nil)
+	relay, err = provider.Relay("https://dummy.com", &RelayInput{}, nil)
 	c.Equal(Err5xxOnConnection, err)
 	c.False(IsErrorCode(EmptyPayloadDataError, err))
 	c.Empty(relay)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientRelayRoute), http.StatusBadRequest, "samples/client_relay_error.json")
 
-	relay, err = provider.Relay("https://dummy.com", &Relay{Proof: &RelayProof{ServicerPubKey: "PJOG"}}, nil)
+	relay, err = provider.Relay("https://dummy.com", &RelayInput{Proof: &RelayProof{ServicerPubKey: "PJOG"}}, nil)
 	c.Equal("Request failed with code: 25, codespace: pocketcore and message: the payload data of the relay request is empty\nWith ServicerPubKey: PJOG", err.Error())
 	c.True(IsErrorCode(EmptyPayloadDataError, err))
 	c.Empty(relay)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientRelayRoute), http.StatusOK, "samples/client_relay_non_json.json")
 
-	relay, err = provider.Relay("https://dummy.com", &Relay{}, nil)
+	relay, err = provider.Relay("https://dummy.com", &RelayInput{}, nil)
 	c.Equal(ErrNonJSONResponse, err)
 	c.Empty(relay)
 }

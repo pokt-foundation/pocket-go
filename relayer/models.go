@@ -4,8 +4,8 @@ import (
 	"github.com/pokt-foundation/pocket-go/provider"
 )
 
-// RelayInput struct that represents data needed for doing a relay request
-type RelayInput struct {
+// Input struct that represents data needed for doing a relay request
+type Input struct {
 	Blockchain string
 	Data       string
 	Headers    provider.RelayHeaders
