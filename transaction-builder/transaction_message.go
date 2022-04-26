@@ -9,8 +9,13 @@ import (
 	nodesTypes "github.com/pokt-network/pocket-core/x/nodes/types"
 )
 
+// TransactionMessage interface that represents message to be sent as transaction
+type TransactionMessage interface {
+	coreTypes.ProtoMsg
+}
+
 // NewSend returns message for send transaction
-func NewSend(fromAddress, toAddress string, amount int64) (TxMsg, error) {
+func NewSend(fromAddress, toAddress string, amount int64) (TransactionMessage, error) {
 	decodedFromAddress, err := hex.DecodeString(fromAddress)
 	if err != nil {
 		return nil, err
@@ -29,7 +34,7 @@ func NewSend(fromAddress, toAddress string, amount int64) (TxMsg, error) {
 }
 
 // NewStakeApp returns message for Stake App transaction
-func NewStakeApp(publicKey string, chains []string, amount int64) (TxMsg, error) {
+func NewStakeApp(publicKey string, chains []string, amount int64) (TransactionMessage, error) {
 	cryptoPublicKey, err := crypto.NewPublicKey(publicKey)
 	if err != nil {
 		return nil, err
@@ -43,7 +48,7 @@ func NewStakeApp(publicKey string, chains []string, amount int64) (TxMsg, error)
 }
 
 // NewUnstakeApp returns message for Unstake App transaction
-func NewUnstakeApp(address string) (TxMsg, error) {
+func NewUnstakeApp(address string) (TransactionMessage, error) {
 	decodedAddress, err := hex.DecodeString(address)
 	if err != nil {
 		return nil, err
@@ -55,7 +60,7 @@ func NewUnstakeApp(address string) (TxMsg, error) {
 }
 
 // NewUnjailApp returns message for Unjail App transaction
-func NewUnjailApp(address string) (TxMsg, error) {
+func NewUnjailApp(address string) (TransactionMessage, error) {
 	decodedAddress, err := hex.DecodeString(address)
 	if err != nil {
 		return nil, err
@@ -67,7 +72,7 @@ func NewUnjailApp(address string) (TxMsg, error) {
 }
 
 // NewStakeNode returns message for Stake Node transaction
-func NewStakeNode(publicKey, serviceURL, outputAddress string, chains []string, amount int64) (TxMsg, error) {
+func NewStakeNode(publicKey, serviceURL, outputAddress string, chains []string, amount int64) (TransactionMessage, error) {
 	cryptoPublicKey, err := crypto.NewPublicKey(publicKey)
 	if err != nil {
 		return nil, err
@@ -88,7 +93,7 @@ func NewStakeNode(publicKey, serviceURL, outputAddress string, chains []string, 
 }
 
 // NewUnstakeNode returns message for Unstake Node transaction
-func NewUnstakeNode(fromAddress, operatorAddress string) (TxMsg, error) {
+func NewUnstakeNode(fromAddress, operatorAddress string) (TransactionMessage, error) {
 	decodedFromAddress, err := hex.DecodeString(fromAddress)
 	if err != nil {
 		return nil, err
@@ -106,7 +111,7 @@ func NewUnstakeNode(fromAddress, operatorAddress string) (TxMsg, error) {
 }
 
 // NewUnjailNode returns message for Unjail Node transaction
-func NewUnjailNode(fromAddress, operatorAddress string) (TxMsg, error) {
+func NewUnjailNode(fromAddress, operatorAddress string) (TransactionMessage, error) {
 	decodedFromAddress, err := hex.DecodeString(fromAddress)
 	if err != nil {
 		return nil, err
