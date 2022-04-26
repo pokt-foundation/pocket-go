@@ -17,6 +17,28 @@ import (
 
 const defaultTXFee = int64(10000)
 
+// CoinDenom enum that represents all coin denominations of Pocket
+type CoinDenom string
+
+const (
+	// Upokt represents upokt denomination
+	Upokt CoinDenom = "upokt"
+	// Pokt represents pokt denomination
+	Pokt CoinDenom = "pokt"
+)
+
+// ChainID enum that represents possible chain IDs for transactions
+type ChainID string
+
+const (
+	// Mainnet use for connecting to Pocket Mainnet
+	Mainnet ChainID = "mainnet"
+	// Testnet use for connecting to Pocket Testnet
+	Testnet ChainID = "testnet"
+	// Localnet use for connecting to Pocket Localnet
+	Localnet ChainID = "localnet"
+)
+
 var (
 	// ErrNoSigner error when no signer is provided
 	ErrNoSigner = errors.New("no signer provided")
@@ -24,19 +46,38 @@ var (
 	ErrNoProvider = errors.New("no provider provided")
 	// ErrNoChainID error when no chain ID is provided
 	ErrNoChainID = errors.New("no chain id provided")
-	// ErrNoTxMsg error when no Tx Msg is provided
-	ErrNoTxMsg = errors.New("no tx msg provided")
+	// ErrNoTransactionMessage error when no Transaction Message is provided
+	ErrNoTransactionMessage = errors.New("no transaction message provided")
 )
 
-// PocketTransactionBuilder represents implementation of transaction builder package
-type PocketTransactionBuilder struct {
+// Provider interface representing provider functions necessary for Transaction Builder Package
+type Provider interface {
+	SendTransaction(input *provider.SendTransactionInput) (*provider.SendTransactionOutput, error)
+}
+
+// Signer interface representing signer functions necessary for Transaction Builder package
+type Signer interface {
+	SignBytes(payload []byte) ([]byte, error)
+	GetAddress() string
+	GetPublicKey() string
+}
+
+// TransactionBuilder represents implementation of transaction builder package
+type TransactionBuilder struct {
 	provider Provider
 	signer   Signer
 }
 
-// NewPocketTransactionBuilder returns an instance of PocketTransactionBuilder
-func NewPocketTransactionBuilder(provider Provider, signer Signer) *PocketTransactionBuilder {
-	return &PocketTransactionBuilder{
+// TransactionOptions represents optional parameters for transaction request
+type TransactionOptions struct {
+	Memo      string
+	Fee       int64
+	CoinDenom CoinDenom
+}
+
+// NewTransactionBuilder returns an instance of TransactionBuilder
+func NewTransactionBuilder(provider Provider, signer Signer) *TransactionBuilder {
+	return &TransactionBuilder{
 		provider: provider,
 		signer:   signer,
 	}
@@ -62,7 +103,7 @@ func getOptionalParams(options *TransactionOptions) (string, string, int64) {
 	return memo, string(coinDenom), fee
 }
 
-func (t *PocketTransactionBuilder) validateTransactionRequest(chainID ChainID, txMsg TxMsg) error {
+func (t *TransactionBuilder) validateTransactionRequest(chainID ChainID, txMsg TransactionMessage) error {
 	if t.provider == nil {
 		return ErrNoProvider
 	}
@@ -76,13 +117,13 @@ func (t *PocketTransactionBuilder) validateTransactionRequest(chainID ChainID, t
 	}
 
 	if txMsg == nil {
-		return ErrNoTxMsg
+		return ErrNoTransactionMessage
 	}
 
 	return nil
 }
 
-func (t *PocketTransactionBuilder) signTransaction(chainID, memo, coinDenom string, fee int64, txMsg TxMsg) (string, error) {
+func (t *TransactionBuilder) signTransaction(chainID, memo, coinDenom string, fee int64, txMsg TransactionMessage) (string, error) {
 	feeStruct := coreTypes.Coins{
 		coreTypes.Coin{
 			Amount: coreTypes.NewInt(fee),
@@ -123,7 +164,7 @@ func (t *PocketTransactionBuilder) signTransaction(chainID, memo, coinDenom stri
 }
 
 // CreateTransaction returns input necessary for doing a transaction
-func (t *PocketTransactionBuilder) CreateTransaction(chainID ChainID, txMsg TxMsg, options *TransactionOptions) (*provider.SendTransactionInput, error) {
+func (t *TransactionBuilder) CreateTransaction(chainID ChainID, txMsg TransactionMessage, options *TransactionOptions) (*provider.SendTransactionInput, error) {
 	err := t.validateTransactionRequest(chainID, txMsg)
 	if err != nil {
 		return nil, err
@@ -143,7 +184,7 @@ func (t *PocketTransactionBuilder) CreateTransaction(chainID ChainID, txMsg TxMs
 }
 
 // Submit does the transaction from raw input
-func (t *PocketTransactionBuilder) Submit(chainID ChainID, txMsg TxMsg, options *TransactionOptions) (*provider.SendTransactionOutput, error) {
+func (t *TransactionBuilder) Submit(chainID ChainID, txMsg TransactionMessage, options *TransactionOptions) (*provider.SendTransactionOutput, error) {
 	sendTransactionInput, err := t.CreateTransaction(chainID, txMsg, options)
 	if err != nil {
 		return nil, err
