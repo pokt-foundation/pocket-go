@@ -30,10 +30,10 @@ func TestTransactionBuilder_SubmitError(t *testing.T) {
 	c.Empty(output)
 	c.Equal(ErrNoSigner, err)
 
-	wallet, err := signer.NewRandomWallet()
+	signer, err := signer.NewRandomSigner()
 	c.NoError(err)
 
-	txBuilder.signer = wallet
+	txBuilder.signer = signer
 
 	output, err = txBuilder.Submit("", nil, nil)
 	c.Empty(output)
@@ -50,10 +50,10 @@ func TestTransactionBuilder_SubmitMsgSend(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	wallet, err := signer.NewRandomWallet()
+	signer, err := signer.NewRandomSigner()
 	c.NoError(err)
 
-	txBuilder := NewTransactionBuilder(provider.NewProvider("https://dummy.com", []string{"https://dummy.com"}), wallet)
+	txBuilder := NewTransactionBuilder(provider.NewProvider("https://dummy.com", []string{"https://dummy.com"}), signer)
 
 	msgSend, err := NewSend("b50a6e20d3733fb89631ae32385b3c85c533c560", "b50a6e20d3733fb89631ae32385b3c85c533c561", 21)
 	c.NoError(err)
@@ -83,10 +83,10 @@ func TestTransactionBuilder_SubmitStakeApp(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	wallet, err := signer.NewRandomWallet()
+	signer, err := signer.NewRandomSigner()
 	c.NoError(err)
 
-	txBuilder := NewTransactionBuilder(provider.NewProvider("https://dummy.com", []string{"https://dummy.com"}), wallet)
+	txBuilder := NewTransactionBuilder(provider.NewProvider("https://dummy.com", []string{"https://dummy.com"}), signer)
 
 	stakeApp, err := NewStakeApp("b243b27bc9fbe5580457a46370ae5f03a6f6753633e51efdaf2cf534fdc26cc3", []string{"0021"}, 21)
 	c.NoError(err)
@@ -112,10 +112,10 @@ func TestTransactionBuilder_SubmitUnstakeApp(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	wallet, err := signer.NewRandomWallet()
+	signer, err := signer.NewRandomSigner()
 	c.NoError(err)
 
-	txBuilder := NewTransactionBuilder(provider.NewProvider("https://dummy.com", []string{"https://dummy.com"}), wallet)
+	txBuilder := NewTransactionBuilder(provider.NewProvider("https://dummy.com", []string{"https://dummy.com"}), signer)
 
 	unstakeApp, err := NewUnstakeApp("b50a6e20d3733fb89631ae32385b3c85c533c560")
 	c.NoError(err)
@@ -141,10 +141,10 @@ func TestTransactionBuilder_SubmitUnjailApp(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	wallet, err := signer.NewRandomWallet()
+	signer, err := signer.NewRandomSigner()
 	c.NoError(err)
 
-	txBuilder := NewTransactionBuilder(provider.NewProvider("https://dummy.com", []string{"https://dummy.com"}), wallet)
+	txBuilder := NewTransactionBuilder(provider.NewProvider("https://dummy.com", []string{"https://dummy.com"}), signer)
 
 	unjailApp, err := NewUnjailApp("b50a6e20d3733fb89631ae32385b3c85c533c560")
 	c.NoError(err)
@@ -170,10 +170,10 @@ func TestTransactionBuilder_SubmitStakeNode(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	wallet, err := signer.NewRandomWallet()
+	signer, err := signer.NewRandomSigner()
 	c.NoError(err)
 
-	txBuilder := NewTransactionBuilder(provider.NewProvider("https://dummy.com", []string{"https://dummy.com"}), wallet)
+	txBuilder := NewTransactionBuilder(provider.NewProvider("https://dummy.com", []string{"https://dummy.com"}), signer)
 
 	stakeNode, err := NewStakeNode("b243b27bc9fbe5580457a46370ae5f03a6f6753633e51efdaf2cf534fdc26cc3", "https://dummy.com:443",
 		"b50a6e20d3733fb89631ae32385b3c85c533c560", []string{"0021"}, 21)
@@ -200,10 +200,10 @@ func TestTransactionBuilder_SubmitUnstakeNode(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	wallet, err := signer.NewRandomWallet()
+	signer, err := signer.NewRandomSigner()
 	c.NoError(err)
 
-	txBuilder := NewTransactionBuilder(provider.NewProvider("https://dummy.com", []string{"https://dummy.com"}), wallet)
+	txBuilder := NewTransactionBuilder(provider.NewProvider("https://dummy.com", []string{"https://dummy.com"}), signer)
 
 	unstakeNode, err := NewUnstakeNode("b50a6e20d3733fb89631ae32385b3c85c533c560", "b50a6e20d3733fb89631ae32385b3c85c533c561")
 	c.NoError(err)
@@ -229,10 +229,10 @@ func TestTransactionBuilder_SubmitUnjailNode(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	wallet, err := signer.NewRandomWallet()
+	signer, err := signer.NewRandomSigner()
 	c.NoError(err)
 
-	txBuilder := NewTransactionBuilder(provider.NewProvider("https://dummy.com", []string{"https://dummy.com"}), wallet)
+	txBuilder := NewTransactionBuilder(provider.NewProvider("https://dummy.com", []string{"https://dummy.com"}), signer)
 
 	unjailNode, err := NewUnjailNode("b50a6e20d3733fb89631ae32385b3c85c533c560", "b50a6e20d3733fb89631ae32385b3c85c533c561")
 	c.NoError(err)

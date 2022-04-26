@@ -25,10 +25,10 @@ func TestRelayer_Relay(t *testing.T) {
 	c.Equal(ErrNoSigner, err)
 	c.Empty(relay)
 
-	wallet, err := signer.NewRandomWallet()
+	signer, err := signer.NewRandomSigner()
 	c.NoError(err)
 
-	relayer.signer = wallet
+	relayer.signer = signer
 
 	relay, err = relayer.Relay(input, nil)
 	c.Equal(ErrNoProvider, err)
