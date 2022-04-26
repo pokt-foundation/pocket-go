@@ -4,8 +4,8 @@ import (
 	"fmt"
 )
 
-// Relay represents a Relay to Pocket
-type Relay struct {
+// RelayInput represents input needed to do a Relay to Pocket
+type RelayInput struct {
 	Payload *RelayPayload `json:"payload"`
 	Meta    *RelayMeta    `json:"meta"`
 	Proof   *RelayProof   `json:"proof"`

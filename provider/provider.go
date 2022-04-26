@@ -599,7 +599,7 @@ func (p *Provider) Dispatch(appPublicKey, chain string, options *DispatchRequest
 }
 
 // Relay does request to be relayed to a target blockchain
-func (p *Provider) Relay(rpcURL string, input *Relay, options *RelayRequestOptions) (*RelayOutput, error) {
+func (p *Provider) Relay(rpcURL string, input *RelayInput, options *RelayRequestOptions) (*RelayOutput, error) {
 	rawOutput, reqErr := p.doPostRequest(rpcURL, input, ClientRelayRoute)
 
 	defer closeOrLog(rawOutput)

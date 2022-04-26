@@ -29,21 +29,31 @@ var (
 	ErrNodeNotInSession = errors.New("node not in session")
 )
 
-// PocketRelayer implementation of relayer interface
-type PocketRelayer struct {
+// Provider interface representing provider functions necessary for Relayer Package
+type Provider interface {
+	Relay(rpcURL string, input *provider.RelayInput, options *provider.RelayRequestOptions) (*provider.RelayOutput, error)
+}
+
+// Signer interface representing signer functions necessary for Relayer Package
+type Signer interface {
+	Sign(payload []byte) (string, error)
+}
+
+// Relayer implementation of relayer interface
+type Relayer struct {
 	signer   Signer
 	provider Provider
 }
 
-// NewPocketRelayer returns instance of PocketRelayer with given input
-func NewPocketRelayer(signer Signer, provider Provider) *PocketRelayer {
-	return &PocketRelayer{
+// NewRelayer returns instance of Relayer with given input
+func NewRelayer(signer Signer, provider Provider) *Relayer {
+	return &Relayer{
 		signer:   signer,
 		provider: provider,
 	}
 }
 
-func (r *PocketRelayer) validateRelayRequest(input *RelayInput) error {
+func (r *Relayer) validateRelayRequest(input *Input) error {
 	if r.signer == nil {
 		return ErrNoSigner
 	}
@@ -71,7 +81,7 @@ func (r *PocketRelayer) validateRelayRequest(input *RelayInput) error {
 	return nil
 }
 
-func getNode(input *RelayInput) (*provider.Node, error) {
+func getNode(input *Input) (*provider.Node, error) {
 	if input.Node == nil {
 		return GetRandomSessionNode(input.Session)
 	}
@@ -83,7 +93,7 @@ func getNode(input *RelayInput) (*provider.Node, error) {
 	return input.Node, nil
 }
 
-func (r *PocketRelayer) getSignedProofBytes(proof *provider.RelayProof) (string, error) {
+func (r *Relayer) getSignedProofBytes(proof *provider.RelayProof) (string, error) {
 	proofBytes, err := GenerateProofBytes(proof)
 	if err != nil {
 		return "", err
@@ -93,7 +103,7 @@ func (r *PocketRelayer) getSignedProofBytes(proof *provider.RelayProof) (string,
 }
 
 // Relay does relay request with given input
-func (r *PocketRelayer) Relay(input *RelayInput, options *provider.RelayRequestOptions) (*Output, error) {
+func (r *Relayer) Relay(input *Input, options *provider.RelayRequestOptions) (*Output, error) {
 	err := r.validateRelayRequest(input)
 	if err != nil {
 		return nil, err
@@ -150,7 +160,7 @@ func (r *PocketRelayer) Relay(input *RelayInput, options *provider.RelayRequestO
 		Signature:          signedProofBytes,
 	}
 
-	relay := &provider.Relay{
+	relay := &provider.RelayInput{
 		Payload: relayPayload,
 		Meta:    relayMeta,
 		Proof:   relayProof,

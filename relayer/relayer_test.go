@@ -12,27 +12,16 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestPocketRelayer_RelayerInterface(t *testing.T) {
-	c := require.New(t)
-
-	relayer := &PocketRelayer{}
-
-	var i interface{} = relayer
-
-	_, ok := i.(Relayer)
-	c.True(ok)
-}
-
-func TestPocketRelayer_Relay(t *testing.T) {
+func TestRelayer_Relay(t *testing.T) {
 	c := require.New(t)
 
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	relayer := NewPocketRelayer(nil, nil)
-	relayInput := &RelayInput{}
+	relayer := NewRelayer(nil, nil)
+	input := &Input{}
 
-	relay, err := relayer.Relay(relayInput, nil)
+	relay, err := relayer.Relay(input, nil)
 	c.Equal(ErrNoSigner, err)
 	c.Empty(relay)
 
@@ -41,47 +30,47 @@ func TestPocketRelayer_Relay(t *testing.T) {
 
 	relayer.signer = wallet
 
-	relay, err = relayer.Relay(relayInput, nil)
+	relay, err = relayer.Relay(input, nil)
 	c.Equal(ErrNoProvider, err)
 	c.Empty(relay)
 
 	relayer.provider = provider.NewProvider("https://dummy.com", []string{"https://dummy.com"})
 
-	relay, err = relayer.Relay(relayInput, nil)
+	relay, err = relayer.Relay(input, nil)
 	c.Equal(ErrNoSession, err)
 	c.Empty(relay)
 
-	relayInput.Session = &provider.Session{}
+	input.Session = &provider.Session{}
 
-	relay, err = relayer.Relay(relayInput, nil)
+	relay, err = relayer.Relay(input, nil)
 	c.Equal(ErrNoPocketAAT, err)
 	c.Empty(relay)
 
-	relayInput.PocketAAT = &provider.PocketAAT{}
+	input.PocketAAT = &provider.PocketAAT{}
 
-	relay, err = relayer.Relay(relayInput, nil)
+	relay, err = relayer.Relay(input, nil)
 	c.Equal(ErrSessionHasNoNodes, err)
 	c.Empty(relay)
 
-	relayInput.Session.Nodes = []*provider.Node{{PublicKey: "AOG"}}
+	input.Session.Nodes = []*provider.Node{{PublicKey: "AOG"}}
 
-	relay, err = relayer.Relay(relayInput, nil)
+	relay, err = relayer.Relay(input, nil)
 	c.Equal(ErrNoSessionHeader, err)
 	c.Empty(relay)
 
-	relayInput.Session.Header = &provider.SessionHeader{}
-	relayInput.Node = &provider.Node{PublicKey: "PJOG"}
+	input.Session.Header = &provider.SessionHeader{}
+	input.Node = &provider.Node{PublicKey: "PJOG"}
 
-	relay, err = relayer.Relay(relayInput, nil)
+	relay, err = relayer.Relay(input, nil)
 	c.Equal(ErrNodeNotInSession, err)
 	c.Empty(relay)
 
-	relayInput.Node = nil
+	input.Node = nil
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", provider.ClientRelayRoute),
 		http.StatusInternalServerError, "../provider/samples/client_relay.json")
 
-	relay, err = relayer.Relay(relayInput, nil)
+	relay, err = relayer.Relay(input, nil)
 	c.Equal(provider.Err5xxOnConnection, err)
 	c.Empty(relay)
 
@@ -90,20 +79,20 @@ func TestPocketRelayer_Relay(t *testing.T) {
 
 	var relayError *provider.RelayError
 
-	relay, err = relayer.Relay(relayInput, nil)
+	relay, err = relayer.Relay(input, nil)
 	c.ErrorAs(err, &relayError)
 	c.Empty(relay)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", provider.ClientRelayRoute),
 		http.StatusOK, "../provider/samples/client_relay.json")
 
-	relay, err = relayer.Relay(relayInput, nil)
+	relay, err = relayer.Relay(input, nil)
 	c.NoError(err)
 	c.NotEmpty(relay)
 
-	relayInput.Node = &provider.Node{PublicKey: "AOG"}
+	input.Node = &provider.Node{PublicKey: "AOG"}
 
-	relay, err = relayer.Relay(relayInput, nil)
+	relay, err = relayer.Relay(input, nil)
 	c.NoError(err)
 	c.NotEmpty(relay)
 }
