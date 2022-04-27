@@ -13,15 +13,15 @@ var (
 	ErrMissingPrivateKey = errors.New("missing private key")
 )
 
-// KeyManager struct handler
-type KeyManager struct {
+// Signer struct handler
+type Signer struct {
 	address    string
 	publicKey  string
 	privateKey string
 }
 
-// NewRandomKeyManager returns a KeyManager with random keys
-func NewRandomKeyManager() (*KeyManager, error) {
+// NewRandomSigner returns a Signer with random keys
+func NewRandomSigner() (*Signer, error) {
 	publicKey, privateKey, err := ed25519.GenerateKey(nil)
 	if err != nil {
 		return nil, err
@@ -32,15 +32,15 @@ func NewRandomKeyManager() (*KeyManager, error) {
 		return nil, err
 	}
 
-	return &KeyManager{
+	return &Signer{
 		address:    address,
 		publicKey:  hex.EncodeToString(publicKey),
 		privateKey: hex.EncodeToString(privateKey),
 	}, nil
 }
 
-// NewKeyManagerFromPrivateKey returns KeyManager from private key
-func NewKeyManagerFromPrivateKey(privateKey string) (*KeyManager, error) {
+// NewSignerFromPrivateKey returns Signer from private key
+func NewSignerFromPrivateKey(privateKey string) (*Signer, error) {
 	if privateKey == "" {
 		return nil, ErrMissingPrivateKey
 	}
@@ -52,7 +52,7 @@ func NewKeyManagerFromPrivateKey(privateKey string) (*KeyManager, error) {
 		return nil, err
 	}
 
-	return &KeyManager{
+	return &Signer{
 		address:    address,
 		publicKey:  publicKey,
 		privateKey: privateKey,
@@ -60,8 +60,8 @@ func NewKeyManagerFromPrivateKey(privateKey string) (*KeyManager, error) {
 }
 
 // Sign returns a signed request as encoded hex string
-func (km *KeyManager) Sign(payload []byte) (string, error) {
-	decodedKey, err := hex.DecodeString(km.privateKey)
+func (s *Signer) Sign(payload []byte) (string, error) {
+	decodedKey, err := hex.DecodeString(s.privateKey)
 	if err != nil {
 		return "", err
 	}
@@ -70,8 +70,8 @@ func (km *KeyManager) Sign(payload []byte) (string, error) {
 }
 
 // SignBytes returns a signed request as raw bytes
-func (km *KeyManager) SignBytes(payload []byte) ([]byte, error) {
-	decodedKey, err := hex.DecodeString(km.privateKey)
+func (s *Signer) SignBytes(payload []byte) ([]byte, error) {
+	decodedKey, err := hex.DecodeString(s.privateKey)
 	if err != nil {
 		return nil, err
 	}
@@ -80,25 +80,32 @@ func (km *KeyManager) SignBytes(payload []byte) ([]byte, error) {
 }
 
 // GetAddress returns address value
-func (km *KeyManager) GetAddress() string {
-	return km.address
+func (s *Signer) GetAddress() string {
+	return s.address
 }
 
 // GetPublicKey returns public key value
-func (km *KeyManager) GetPublicKey() string {
-	return km.publicKey
+func (s *Signer) GetPublicKey() string {
+	return s.publicKey
 }
 
 // GetPrivateKey returns private key value
-func (km *KeyManager) GetPrivateKey() string {
-	return km.privateKey
+func (s *Signer) GetPrivateKey() string {
+	return s.privateKey
+}
+
+// Account holds an account's data
+type Account struct {
+	Address    string
+	PublicKey  string
+	PrivateKey string
 }
 
 // GetAccount returns Account struct holding all key values
-func (km *KeyManager) GetAccount() *Account {
+func (s *Signer) GetAccount() *Account {
 	return &Account{
-		Address:    km.address,
-		PublicKey:  km.publicKey,
-		PrivateKey: km.privateKey,
+		Address:    s.address,
+		PublicKey:  s.publicKey,
+		PrivateKey: s.privateKey,
 	}
 }
