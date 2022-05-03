@@ -25,6 +25,7 @@ type SendTransactionInput struct {
 	RawHexBytes string `json:"raw_hex_bytes"`
 }
 
+// Transaction represents a transaction in Pocket
 type Transaction struct {
 	Hash   string `json:"hash"`
 	Height int    `json:"height"`

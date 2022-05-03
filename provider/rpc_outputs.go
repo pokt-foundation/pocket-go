@@ -16,6 +16,7 @@ type GetAccountTransactionsOutput struct {
 	TotalCount int            `json:"total_count"`
 }
 
+// GetBlockTransactionsOutput represents output for GetBlockTransactions request
 type GetBlockTransactionsOutput struct {
 	PageCount int            `json:"page_count"`
 	TotalTxs  int            `json:"total_txs"`
