@@ -24,3 +24,51 @@ type SendTransactionInput struct {
 	Address     string `json:"address"`
 	RawHexBytes string `json:"raw_hex_bytes"`
 }
+
+type Transaction struct {
+	Hash   string `json:"hash"`
+	Height int    `json:"height"`
+	Index  int    `json:"index"`
+	Proof  struct {
+		Data  interface{} `json:"data"`
+		Proof struct {
+			Aunts    interface{} `json:"aunts"`
+			Index    int         `json:"index"`
+			LeafHash interface{} `json:"leaf_hash"`
+			Total    int         `json:"total"`
+		} `json:"proof"`
+		RootHash string `json:"root_hash"`
+	} `json:"proof"`
+	StdTx struct {
+		Entropy int64 `json:"entropy"`
+		Fee     []struct {
+			Amount string `json:"amount"`
+			Denom  string `json:"denom"`
+		} `json:"fee"`
+		Memo string `json:"memo"`
+		Msg  struct {
+			Type  string `json:"type"`
+			Value struct {
+				Amount      string `json:"amount"`
+				FromAddress string `json:"from_address"`
+				ToAddress   string `json:"to_address"`
+			} `json:"value"`
+		} `json:"msg"`
+		Signature struct {
+			PubKey    string `json:"pub_key"`
+			Signature string `json:"signature"`
+		} `json:"signature"`
+	} `json:"stdTx"`
+	Tx       string `json:"tx"`
+	TxResult struct {
+		Code        int         `json:"code"`
+		Codespace   string      `json:"codespace"`
+		Data        interface{} `json:"data"`
+		Events      interface{} `json:"events"`
+		Info        string      `json:"info"`
+		Log         string      `json:"log"`
+		MessageType string      `json:"message_type"`
+		Recipient   string      `json:"recipient"`
+		Signer      string      `json:"signer"`
+	} `json:"tx_result"`
+}
