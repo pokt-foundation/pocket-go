@@ -62,12 +62,8 @@ type Transaction struct {
 		} `json:"fee"`
 		Memo string `json:"memo"`
 		Msg  struct {
-			Type  string `json:"type"`
-			Value struct {
-				Amount      string `json:"amount"`
-				FromAddress string `json:"from_address"`
-				ToAddress   string `json:"to_address"`
-			} `json:"value"`
+			Type  string      `json:"type"`
+			Value interface{} `json:"value"`
 		} `json:"msg"`
 		Signature struct {
 			PubKey    string `json:"pub_key"`
