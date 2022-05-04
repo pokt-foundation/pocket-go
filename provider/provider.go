@@ -165,7 +165,6 @@ func (p *Provider) GetAccountTransactions(address string, options *GetAccountTra
 	}
 
 	if options != nil {
-		params["height"] = options.Height
 		params["page"] = options.Page
 		params["per_page"] = options.PerPage
 		params["prove"] = options.Prove
@@ -196,34 +195,40 @@ func (p *Provider) GetAccountTransactions(address string, options *GetAccountTra
 	return &output, nil
 }
 
-// GetTransactionCount returns number of transactions sent by the given address
-func (p *Provider) GetTransactionCount(address string, options *GetTransactionCountOptions) (int, error) {
-	optionsToSend := &GetAccountTransactionsOptions{}
-	currentPage := 1
-	totalCount := 0
+// GetBlockTransactions returns transactions of given block
+func (p *Provider) GetBlockTransactions(blockHeight int, options *GetBlockTransactionsOptions) (*GetBlockTransactionsOutput, error) {
+	params := map[string]interface{}{
+		"height": blockHeight,
+	}
 
 	if options != nil {
-		optionsToSend.Height = options.Height
-		optionsToSend.Received = options.Received
+		params["page"] = options.Page
+		params["per_page"] = options.PerPage
+		params["prove"] = options.Prove
+		params["order"] = options.Order
 	}
 
-	for {
-		optionsToSend.Page = currentPage
+	rawOutput, err := p.doPostRequest("", params, QueryBlockTXsRoute)
 
-		output, err := p.GetAccountTransactions(address, optionsToSend)
-		if err != nil {
-			return 0, err
-		}
+	defer closeOrLog(rawOutput)
 
-		if output.TotalCount == 0 {
-			break
-		}
-
-		totalCount += output.TotalCount
-		currentPage++
+	if err != nil {
+		return nil, err
 	}
 
-	return totalCount, nil
+	bodyBytes, err := ioutil.ReadAll(rawOutput.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	output := GetBlockTransactionsOutput{}
+
+	err = json.Unmarshal(bodyBytes, &output)
+	if err != nil {
+		return nil, err
+	}
+
+	return &output, nil
 }
 
 // AddressType enum listing all address types

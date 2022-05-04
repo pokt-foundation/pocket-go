@@ -10,52 +10,6 @@ type queryBalanceOutput struct {
 	Balance *big.Int `json:"balance"`
 }
 
-// GetAccountTransactionsOutput represents output for GetAccountTransactions request
-type GetAccountTransactionsOutput struct {
-	Txs []struct {
-		Hash     string `json:"hash"`
-		Height   int    `json:"height"`
-		Index    int    `json:"index"`
-		TxResult struct {
-			Code        int      `json:"code"`
-			Data        string   `json:"data"`
-			Log         string   `json:"log"`
-			Info        string   `json:"info"`
-			Events      []string `json:"events"`
-			Codespace   string   `json:"codespace"`
-			Signer      string   `json:"signer"`
-			Recipient   string   `json:"recipient"`
-			MessageType string   `json:"message_type"`
-		} `json:"tx_result"`
-		Tx    string `json:"tx"`
-		Proof struct {
-			RootHash string `json:"root_hash"`
-			Data     string `json:"data"`
-			Proof    struct {
-				Total    int      `json:"total"`
-				Index    int      `json:"index"`
-				LeafHash string   `json:"leaf_hash"`
-				Aunts    []string `json:"aunts"`
-			} `json:"proof"`
-		} `json:"proof"`
-		StdTx struct {
-			Entropy int `json:"entropy"`
-			Fee     []struct {
-				Amount string `json:"amount"`
-				Denom  string `json:"denom"`
-			} `json:"fee"`
-			Memo string `json:"memo"`
-			Msg  struct {
-			} `json:"msg"`
-			Signature struct {
-				PubKey    string `json:"pub_key"`
-				Signature string `json:"signature"`
-			} `json:"signature"`
-		} `json:"stdTx"`
-	} `json:"txs"`
-	TotalCount int `json:"total_count"`
-}
-
 // GetAppOutput represents output for GetApp request
 type GetAppOutput struct {
 	Address       string    `json:"address"`

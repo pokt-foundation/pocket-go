@@ -53,7 +53,6 @@ type GetNodesOptions struct {
 
 // GetAccountTransactionsOptions represents optional arguments for GetAccountTransactions request
 type GetAccountTransactionsOptions struct {
-	Height   int
 	Page     int
 	PerPage  int
 	Prove    bool
@@ -61,10 +60,12 @@ type GetAccountTransactionsOptions struct {
 	Order    Order
 }
 
-// GetTransactionCountOptions represents optional arguments for GetTransactionCount request
-type GetTransactionCountOptions struct {
-	Height   int
-	Received bool
+// GetBlockTransactionsOptions represents optional arguments for GetBlockTransactions request
+type GetBlockTransactionsOptions struct {
+	Page    int
+	PerPage int
+	Prove   bool
+	Order   Order
 }
 
 // GetAppOptions represents optional arguments for GetApp request
