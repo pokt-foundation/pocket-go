@@ -56,4 +56,6 @@ const (
 	QueryTXRoute V1RPCRoute = "/v1/query/tx"
 	// QueryUpgradeRoute represents query upgrade route
 	QueryUpgradeRoute V1RPCRoute = "/v1/query/upgrade"
+	// QueryUnconfirmedTXsRoute represents query unconfirmed txs route
+	QueryUnconfirmedTXsRoute V1RPCRoute = "/unconfirmed_txs"
 )

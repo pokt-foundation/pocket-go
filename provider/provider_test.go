@@ -44,30 +44,6 @@ func TestProvider_GetBalance(t *testing.T) {
 	c.Empty(balance)
 }
 
-func TestProvider_GetTransactionCount(t *testing.T) {
-	c := require.New(t)
-
-	httpmock.Activate()
-	defer httpmock.DeactivateAndReset()
-
-	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"})
-
-	mock.AddMultipleMockedResponses(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountTXsRoute), http.StatusOK, []string{
-		"samples/query_account_txs.json",
-		"samples/query_account_txs_empty.json",
-	})
-
-	count, err := provider.GetTransactionCount("pjog", &GetTransactionCountOptions{Height: 21})
-	c.NoError(err)
-	c.Equal(21, count)
-
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountTXsRoute), http.StatusInternalServerError, "samples/query_account_txs.json")
-
-	count, err = provider.GetTransactionCount("pjog", nil)
-	c.Equal(Err5xxOnConnection, err)
-	c.Empty(count)
-}
-
 func TestProvider_GetAccountTransactions(t *testing.T) {
 	c := require.New(t)
 
@@ -78,13 +54,34 @@ func TestProvider_GetAccountTransactions(t *testing.T) {
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountTXsRoute), http.StatusOK, "samples/query_account_txs.json")
 
-	transactions, err := provider.GetAccountTransactions("pjog", &GetAccountTransactionsOptions{Height: 21})
+	transactions, err := provider.GetAccountTransactions("pjog", &GetAccountTransactionsOptions{Prove: false})
 	c.NoError(err)
 	c.NotEmpty(transactions)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountTXsRoute), http.StatusInternalServerError, "samples/query_account_txs.json")
 
 	transactions, err = provider.GetAccountTransactions("pjog", nil)
+	c.Equal(Err5xxOnConnection, err)
+	c.Empty(transactions)
+}
+
+func TestProvider_GetBlockTransactions(t *testing.T) {
+	c := require.New(t)
+
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"})
+
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryBlockTXsRoute), http.StatusOK, "samples/query_block_txs.json")
+
+	transactions, err := provider.GetBlockTransactions(21, &GetBlockTransactionsOptions{Prove: false})
+	c.NoError(err)
+	c.NotEmpty(transactions)
+
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryBlockTXsRoute), http.StatusInternalServerError, "samples/query_block_txs.json")
+
+	transactions, err = provider.GetBlockTransactions(21, nil)
 	c.Equal(Err5xxOnConnection, err)
 	c.Empty(transactions)
 }
@@ -384,4 +381,25 @@ func TestProvider_Relay(t *testing.T) {
 	relay, err = provider.Relay("https://dummy.com", &RelayInput{}, nil)
 	c.Equal(ErrNonJSONResponse, err)
 	c.Empty(relay)
+}
+
+func TestProvider_GetUnconfirmedTXs(t *testing.T) {
+	c := require.New(t)
+
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"})
+
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryUnconfirmedTXsRoute), http.StatusOK, "samples/query_unconfirmed_txs.json")
+
+	transactions, err := provider.GetUnconfirmedTXs()
+	c.NoError(err)
+	c.NotEmpty(transactions)
+
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryUnconfirmedTXsRoute), http.StatusInternalServerError, "samples/query_unconfirmed_txs.json")
+
+	transactions, err = provider.GetUnconfirmedTXs()
+	c.Equal(Err5xxOnConnection, err)
+	c.Empty(transactions)
 }

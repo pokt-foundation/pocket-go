@@ -10,19 +10,6 @@ type queryBalanceOutput struct {
 	Balance *big.Int `json:"balance"`
 }
 
-// GetAccountTransactionsOutput represents output for GetAccountTransactions request
-type GetAccountTransactionsOutput struct {
-	Txs        []*Transaction `json:"txs"`
-	TotalCount int            `json:"total_count"`
-}
-
-// GetBlockTransactionsOutput represents output for GetBlockTransactions request
-type GetBlockTransactionsOutput struct {
-	PageCount int            `json:"page_count"`
-	TotalTxs  int            `json:"total_txs"`
-	Txs       []*Transaction `json:"txs"`
-}
-
 // GetAppOutput represents output for GetApp request
 type GetAppOutput struct {
 	Address       string    `json:"address"`

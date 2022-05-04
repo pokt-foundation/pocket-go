@@ -25,6 +25,20 @@ type SendTransactionInput struct {
 	RawHexBytes string `json:"raw_hex_bytes"`
 }
 
+// GetAccountTransactionsOutput represents output for GetAccountTransactions request
+type GetAccountTransactionsOutput struct {
+	PageCount int            `json:"page_count"`
+	TotalTxs  int            `json:"total_txs"`
+	Txs       []*Transaction `json:"txs"`
+}
+
+// GetBlockTransactionsOutput represents output for GetBlockTransactions request
+type GetBlockTransactionsOutput struct {
+	PageCount int            `json:"page_count"`
+	TotalTxs  int            `json:"total_txs"`
+	Txs       []*Transaction `json:"txs"`
+}
+
 // Transaction represents a transaction in Pocket
 type Transaction struct {
 	Hash   string `json:"hash"`
@@ -72,4 +86,15 @@ type Transaction struct {
 		Recipient   string      `json:"recipient"`
 		Signer      string      `json:"signer"`
 	} `json:"tx_result"`
+}
+
+type GetUnconfirmedTXsOutput struct {
+	JSONRPC string `json:"jsonrpc"`
+	ID      int    `json:"id"`
+	Result  struct {
+		NTXs       string   `json:"n_txs"`
+		Total      string   `json:"total"`
+		TotalBytes string   `json:"total_bytes"`
+		TXs        []string `json:"txs"`
+	} `json:"result"`
 }
