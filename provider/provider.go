@@ -656,31 +656,6 @@ func parseRelayErrorOutput(bodyBytes []byte, servicerPubKey string) error {
 	}
 }
 
-// GetUnconfirmedTXs gets IDs of all transactions that are not confirmed
-func (p *Provider) GetUnconfirmedTXs() (*GetUnconfirmedTXsOutput, error) {
-	rawOutput, err := p.doPostRequest("", nil, QueryUnconfirmedTXsRoute)
-
-	defer closeOrLog(rawOutput)
-
-	if err != nil {
-		return nil, err
-	}
-
-	bodyBytes, err := ioutil.ReadAll(rawOutput.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	output := GetUnconfirmedTXsOutput{}
-
-	err = json.Unmarshal(bodyBytes, &output)
-	if err != nil {
-		return nil, err
-	}
-
-	return &output, nil
-}
-
 func closeOrLog(response *http.Response) {
 	if response != nil {
 		io.Copy(ioutil.Discard, response.Body)

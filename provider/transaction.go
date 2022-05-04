@@ -87,15 +87,3 @@ type Transaction struct {
 		Signer      string      `json:"signer"`
 	} `json:"tx_result"`
 }
-
-// GetUnconfirmedTXsOutput represent output of GetUnconfirmedTXs request
-type GetUnconfirmedTXsOutput struct {
-	JSONRPC string `json:"jsonrpc"`
-	ID      int    `json:"id"`
-	Result  struct {
-		NTXs       string   `json:"n_txs"`
-		Total      string   `json:"total"`
-		TotalBytes string   `json:"total_bytes"`
-		TXs        []string `json:"txs"`
-	} `json:"result"`
-}

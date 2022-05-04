@@ -382,24 +382,3 @@ func TestProvider_Relay(t *testing.T) {
 	c.Equal(ErrNonJSONResponse, err)
 	c.Empty(relay)
 }
-
-func TestProvider_GetUnconfirmedTXs(t *testing.T) {
-	c := require.New(t)
-
-	httpmock.Activate()
-	defer httpmock.DeactivateAndReset()
-
-	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"})
-
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryUnconfirmedTXsRoute), http.StatusOK, "samples/query_unconfirmed_txs.json")
-
-	transactions, err := provider.GetUnconfirmedTXs()
-	c.NoError(err)
-	c.NotEmpty(transactions)
-
-	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryUnconfirmedTXsRoute), http.StatusInternalServerError, "samples/query_unconfirmed_txs.json")
-
-	transactions, err = provider.GetUnconfirmedTXs()
-	c.Equal(Err5xxOnConnection, err)
-	c.Empty(transactions)
-}
