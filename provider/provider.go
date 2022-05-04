@@ -656,7 +656,7 @@ func parseRelayErrorOutput(bodyBytes []byte, servicerPubKey string) error {
 	}
 }
 
-// Dispatch sends a dispatch request to the network and gets the nodes that will be servicing the requests for the session.
+// GetUnconfirmedTXs gets IDs of all transactions that are not confirmed
 func (p *Provider) GetUnconfirmedTXs() (*GetUnconfirmedTXsOutput, error) {
 	rawOutput, err := p.doPostRequest("", nil, QueryUnconfirmedTXsRoute)
 

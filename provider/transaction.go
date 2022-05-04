@@ -45,12 +45,12 @@ type Transaction struct {
 	Height int    `json:"height"`
 	Index  int    `json:"index"`
 	Proof  struct {
-		Data  interface{} `json:"data"`
+		Data  string `json:"data"`
 		Proof struct {
-			Aunts    interface{} `json:"aunts"`
-			Index    int         `json:"index"`
-			LeafHash interface{} `json:"leaf_hash"`
-			Total    int         `json:"total"`
+			Aunts    []string `json:"aunts"`
+			Index    int      `json:"index"`
+			LeafHash string   `json:"leaf_hash"`
+			Total    int      `json:"total"`
 		} `json:"proof"`
 		RootHash string `json:"root_hash"`
 	} `json:"proof"`
@@ -88,6 +88,7 @@ type Transaction struct {
 	} `json:"tx_result"`
 }
 
+// GetUnconfirmedTXsOutput represent output of GetUnconfirmedTXs request
 type GetUnconfirmedTXsOutput struct {
 	JSONRPC string `json:"jsonrpc"`
 	ID      int    `json:"id"`
