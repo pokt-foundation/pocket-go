@@ -1,7 +1,6 @@
-package utils
+package transactionbuilder
 
 import (
-	transactionbuilder "github.com/pokt-foundation/pocket-go/transaction-builder"
 	nodesTypes "github.com/pokt-network/pocket-core/x/nodes/types"
 )
 
@@ -12,11 +11,11 @@ type StdTxMsg struct {
 }
 
 // ParseStdTxMsg parses any StdTx.Msg.Value and returns a typed struct
-func ParseStdTxMsg(msg StdTxMsg) (transactionbuilder.TransactionMessage, error) {
+func ParseStdTxMsg(msg StdTxMsg) (TransactionMessage, error) {
 	switch msg.Type {
 	case "pos/Send":
 		parsedValue := msg.Value.(*nodesTypes.MsgSend)
-		return transactionbuilder.NewSend(parsedValue.FromAddress.String(), parsedValue.ToAddress.String(), parsedValue.Amount.Int64())
+		return NewSend(parsedValue.FromAddress.String(), parsedValue.ToAddress.String(), parsedValue.Amount.Int64())
 	default:
 		return nil, nil
 	}
