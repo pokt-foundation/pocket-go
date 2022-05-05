@@ -5,13 +5,13 @@ import (
 	nodesTypes "github.com/pokt-network/pocket-core/x/nodes/types"
 )
 
-// Represents 'StdTx' field from a Transaction
+// StdTxMsg represents 'StdTx' field from a Transaction
 type StdTxMsg struct {
 	Type  string      `json:"type"`
 	Value interface{} `json:"value"`
 }
 
-// This function parses any StdTx.Msg.Value and returns a typed struct
+// ParseStdTxMsg parses any StdTx.Msg.Value and returns a typed struct
 func ParseStdTxMsg(msg StdTxMsg) (transactionbuilder.TransactionMessage, error) {
 	switch msg.Type {
 	case "pos/Send":
