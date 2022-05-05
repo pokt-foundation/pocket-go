@@ -62,8 +62,8 @@ type Transaction struct {
 		} `json:"fee"`
 		Memo string `json:"memo"`
 		Msg  struct {
-			Type  string      `json:"type"`
-			Value interface{} `json:"value"`
+			Type  string                 `json:"type"`
+			Value map[string]interface{} `json:"value"`
 		} `json:"msg"`
 		Signature struct {
 			PubKey    string `json:"pub_key"`
