@@ -39,47 +39,56 @@ type GetBlockTransactionsOutput struct {
 	Txs       []*Transaction `json:"txs"`
 }
 
+// TransactionProof represents the proof of transaction
+type TransactionProof struct {
+	Data  string `json:"data"`
+	Proof struct {
+		Aunts    []string `json:"aunts"`
+		Index    int      `json:"index"`
+		LeafHash string   `json:"leaf_hash"`
+		Total    int      `json:"total"`
+	} `json:"proof"`
+	RootHash string `json:"root_hash"`
+}
+
+// StdTx represents standard transaction fields
+type StdTx struct {
+	Entropy int64 `json:"entropy"`
+	Fee     []struct {
+		Amount string `json:"amount"`
+		Denom  string `json:"denom"`
+	} `json:"fee"`
+	Memo string `json:"memo"`
+	Msg  struct {
+		Type  string                 `json:"type"`
+		Value map[string]interface{} `json:"value"`
+	} `json:"msg"`
+	Signature struct {
+		PubKey    string `json:"pub_key"`
+		Signature string `json:"signature"`
+	} `json:"signature"`
+}
+
+// TxResult represents transaction result
+type TxResult struct {
+	Code        int    `json:"code"`
+	Codespace   string `json:"codespace"`
+	Data        string `json:"data"`
+	Events      string `json:"events"`
+	Info        string `json:"info"`
+	Log         string `json:"log"`
+	MessageType string `json:"message_type"`
+	Recipient   string `json:"recipient"`
+	Signer      string `json:"signer"`
+}
+
 // Transaction represents a transaction in Pocket
 type Transaction struct {
-	Hash   string `json:"hash"`
-	Height int    `json:"height"`
-	Index  int    `json:"index"`
-	Proof  struct {
-		Data  string `json:"data"`
-		Proof struct {
-			Aunts    []string `json:"aunts"`
-			Index    int      `json:"index"`
-			LeafHash string   `json:"leaf_hash"`
-			Total    int      `json:"total"`
-		} `json:"proof"`
-		RootHash string `json:"root_hash"`
-	} `json:"proof"`
-	StdTx struct {
-		Entropy int64 `json:"entropy"`
-		Fee     []struct {
-			Amount string `json:"amount"`
-			Denom  string `json:"denom"`
-		} `json:"fee"`
-		Memo string `json:"memo"`
-		Msg  struct {
-			Type  string                 `json:"type"`
-			Value map[string]interface{} `json:"value"`
-		} `json:"msg"`
-		Signature struct {
-			PubKey    string `json:"pub_key"`
-			Signature string `json:"signature"`
-		} `json:"signature"`
-	} `json:"stdTx"`
-	Tx       string `json:"tx"`
-	TxResult struct {
-		Code        int         `json:"code"`
-		Codespace   string      `json:"codespace"`
-		Data        interface{} `json:"data"`
-		Events      interface{} `json:"events"`
-		Info        string      `json:"info"`
-		Log         string      `json:"log"`
-		MessageType string      `json:"message_type"`
-		Recipient   string      `json:"recipient"`
-		Signer      string      `json:"signer"`
-	} `json:"tx_result"`
+	Hash     string            `json:"hash"`
+	Height   int               `json:"height"`
+	Index    int               `json:"index"`
+	Proof    *TransactionProof `json:"proof"`
+	StdTx    *StdTx            `json:"stdTx"`
+	Tx       string            `json:"tx"`
+	TxResult *TxResult         `json:"tx_result"`
 }

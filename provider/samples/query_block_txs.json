@@ -9,9 +9,7 @@
           "data": "string",
           "log": "string",
           "info": "string",
-          "events": [
-            "string"
-          ],
+          "events": "string",
           "codespace": "string",
           "signer": "string",
           "recipient": "string",
