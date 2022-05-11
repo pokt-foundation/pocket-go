@@ -4,25 +4,34 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
 
-type dummyClosable struct{}
+type closableMock struct {
+	mock.Mock
+}
 
-func (c dummyClosable) Close() error { return nil }
+func (c *closableMock) Close() error {
+	args := c.Called()
 
-type dummyErrorClosable struct{}
-
-func (c dummyErrorClosable) Close() error { return errors.New("error") }
+	return args.Error(0)
+}
 
 func TestCloseOrLog(t *testing.T) {
 	c := require.New(t)
 
-	c.NotPanics(func() {
-		CloseOrLog(dummyClosable{})
-	})
+	closableMock := &closableMock{}
+
+	closableMock.On("Close").Return(nil).Once()
 
 	c.NotPanics(func() {
-		CloseOrLog(dummyErrorClosable{})
+		CloseOrLog(closableMock)
+	})
+
+	closableMock.On("Close").Return(errors.New("error")).Once()
+
+	c.NotPanics(func() {
+		CloseOrLog(closableMock)
 	})
 }

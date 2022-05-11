@@ -60,8 +60,8 @@ type StdTx struct {
 	} `json:"fee"`
 	Memo string `json:"memo"`
 	Msg  struct {
-		Type  string                 `json:"type"`
-		Value map[string]interface{} `json:"value"`
+		Type  string         `json:"type"`
+		Value map[string]any `json:"value"`
 	} `json:"msg"`
 	Signature struct {
 		PubKey    string `json:"pub_key"`

@@ -31,7 +31,7 @@ func TestClient_PostWithURLJSONParams(t *testing.T) {
 
 	mock.AddMockedResponseFromFile(http.MethodPost, "https://dummy.com", http.StatusCreated, "../../mock-client/samples/dummy.json")
 
-	response, err := client.PostWithURLJSONParams("https://dummy.com", map[string]interface{}{
+	response, err := client.PostWithURLJSONParams("https://dummy.com", map[string]string{
 		"ohana": "family",
 	}, http.Header{})
 	c.NoError(err)
