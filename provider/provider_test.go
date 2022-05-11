@@ -17,7 +17,7 @@ func TestRelayError_ErrorInterface(t *testing.T) {
 
 	err := &RelayError{}
 
-	var i interface{} = err
+	var i any = err
 
 	_, ok := i.(error)
 	c.True(ok)

@@ -55,7 +55,7 @@ type GetBlockOutput struct {
 			Txs []string `json:"txs"`
 		} `json:"data"`
 		Evidence struct {
-			Evidence []interface{} `json:"evidence"`
+			Evidence []any `json:"evidence"`
 		} `json:"evidence"`
 		Header struct {
 			AppHash       string `json:"app_hash"`

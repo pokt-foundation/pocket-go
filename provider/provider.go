@@ -73,7 +73,7 @@ func (p *Provider) getFinalRPCURL(rpcURL string, route V1RPCRoute) (string, erro
 	return p.rpcURL, nil
 }
 
-func (p *Provider) doPostRequest(rpcURL string, params interface{}, route V1RPCRoute) (*http.Response, error) {
+func (p *Provider) doPostRequest(rpcURL string, params any, route V1RPCRoute) (*http.Response, error) {
 	finalRPCURL, err := p.getFinalRPCURL(rpcURL, route)
 	if err != nil {
 		return nil, err
@@ -127,7 +127,7 @@ func returnRPCError(route V1RPCRoute, body io.ReadCloser) error {
 
 // GetBalance requests the balance of the specified address
 func (p *Provider) GetBalance(address string, options *GetBalanceOptions) (*big.Int, error) {
-	params := map[string]interface{}{
+	params := map[string]any{
 		"address": address,
 	}
 
@@ -160,7 +160,7 @@ func (p *Provider) GetBalance(address string, options *GetBalanceOptions) (*big.
 
 // GetAccountTransactions returns transactions of given address' account
 func (p *Provider) GetAccountTransactions(address string, options *GetAccountTransactionsOptions) (*GetAccountTransactionsOutput, error) {
-	params := map[string]interface{}{
+	params := map[string]any{
 		"address": address,
 	}
 
@@ -197,7 +197,7 @@ func (p *Provider) GetAccountTransactions(address string, options *GetAccountTra
 
 // GetBlockTransactions returns transactions of given block
 func (p *Provider) GetBlockTransactions(blockHeight int, options *GetBlockTransactionsOptions) (*GetBlockTransactionsOutput, error) {
-	params := map[string]interface{}{
+	params := map[string]any{
 		"height": blockHeight,
 	}
 
@@ -331,7 +331,7 @@ func (p *Provider) GetBlock(blockNumber int) (*GetBlockOutput, error) {
 
 // GetTransaction returns the transaction by the given transaction hash
 func (p *Provider) GetTransaction(transactionHash string, options *GetTransactionOptions) (*GetTransactionOutput, error) {
-	params := map[string]interface{}{
+	params := map[string]any{
 		"hash": transactionHash,
 	}
 
@@ -390,12 +390,12 @@ func (p *Provider) GetBlockHeight() (int, error) {
 // GetNodes returns a page of nodes known at the specified height and with options
 // empty options returns all validators, page < 1 returns the first page, per_page < 1 returns 10000 elements per page
 func (p *Provider) GetNodes(height int, options *GetNodesOptions) (*GetNodesOutput, error) {
-	params := map[string]interface{}{
+	params := map[string]any{
 		"height": height,
 	}
 
 	if options != nil {
-		params["opts"] = map[string]interface{}{
+		params["opts"] = map[string]any{
 			"staking_status": options.StakingStatus,
 			"page":           options.Page,
 			"per_page":       options.PerPage,
@@ -429,7 +429,7 @@ func (p *Provider) GetNodes(height int, options *GetNodesOptions) (*GetNodesOutp
 
 // GetNode returns the node at the specified height, height = 0 is used as latest
 func (p *Provider) GetNode(address string, options *GetNodeOptions) (*GetNodeOutput, error) {
-	params := map[string]interface{}{
+	params := map[string]any{
 		"address": address,
 	}
 
@@ -463,12 +463,12 @@ func (p *Provider) GetNode(address string, options *GetNodeOptions) (*GetNodeOut
 // GetApps returns a page of applications known at the specified height and staking status
 // empty ("") staking_status returns all apps, page < 1 returns the first page, per_page < 1 returns 10000 elements per page
 func (p *Provider) GetApps(height int, options *GetAppsOptions) (*GetAppsOutput, error) {
-	params := map[string]interface{}{
+	params := map[string]any{
 		"height": height,
 	}
 
 	if options != nil {
-		params["opts"] = map[string]interface{}{
+		params["opts"] = map[string]any{
 			"staking_status": options.StakingStatus,
 			"page":           options.Page,
 			"per_page":       options.PerPage,
@@ -501,7 +501,7 @@ func (p *Provider) GetApps(height int, options *GetAppsOptions) (*GetAppsOutput,
 
 // GetApp returns the app at the specified height, height = 0 is used as latest
 func (p *Provider) GetApp(address string, options *GetAppOptions) (*GetAppOutput, error) {
-	params := map[string]interface{}{
+	params := map[string]any{
 		"address": address,
 	}
 
@@ -534,7 +534,7 @@ func (p *Provider) GetApp(address string, options *GetAppOptions) (*GetAppOutput
 
 // GetAccount returns account at the specified address
 func (p *Provider) GetAccount(address string, options *GetAccountOptions) (*GetAccountOutput, error) {
-	params := map[string]interface{}{
+	params := map[string]any{
 		"address": address,
 	}
 
@@ -571,7 +571,7 @@ func (p *Provider) Dispatch(appPublicKey, chain string, options *DispatchRequest
 		return nil, ErrNoDispatchers
 	}
 
-	params := map[string]interface{}{
+	params := map[string]any{
 		"app_public_key": appPublicKey,
 		"chain":          chain,
 	}
