@@ -55,7 +55,7 @@ type GetBlockOutput struct {
 			Txs []string `json:"txs"`
 		} `json:"data"`
 		Evidence struct {
-			Evidence interface{} `json:"evidence"`
+			Evidence []interface{} `json:"evidence"`
 		} `json:"evidence"`
 		Header struct {
 			AppHash       string `json:"app_hash"`
@@ -92,7 +92,22 @@ type GetBlockOutput struct {
 					Total string `json:"total"`
 				} `json:"parts"`
 			} `json:"block_id"`
-			Precommits []interface{} `json:"precommits"`
+			Precommits []struct {
+				BlockID struct {
+					Hash  string `json:"hash"`
+					Parts struct {
+						Hash  string `json:"hash"`
+						Total string `json:"total"`
+					} `json:"parts"`
+				} `json:"block_id"`
+				Height           string    `json:"height"`
+				Round            string    `json:"round"`
+				Signature        string    `json:"signature"`
+				Timestamp        time.Time `json:"timestamp"`
+				Type             int       `json:"type"`
+				ValidatorAddress string    `json:"validator_address"`
+				ValidatorIndex   string    `json:"validator_index"`
+			} `json:"precommits"`
 		} `json:"last_commit"`
 	} `json:"block"`
 	BlockID struct {
