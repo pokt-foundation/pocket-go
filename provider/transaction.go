@@ -25,6 +25,11 @@ type SendTransactionInput struct {
 	RawHexBytes string `json:"raw_hex_bytes"`
 }
 
+// GetTransactionOutput represents output for GetTransaction request
+type GetTransactionOutput struct {
+	*Transaction
+}
+
 // GetAccountTransactionsOutput represents output for GetAccountTransactions request
 type GetAccountTransactionsOutput struct {
 	PageCount int            `json:"page_count"`
@@ -53,20 +58,29 @@ type TransactionProof struct {
 
 // StdTx represents standard transaction fields
 type StdTx struct {
-	Entropy int64 `json:"entropy"`
-	Fee     []struct {
-		Amount string `json:"amount"`
-		Denom  string `json:"denom"`
-	} `json:"fee"`
-	Memo string `json:"memo"`
-	Msg  struct {
-		Type  string         `json:"type"`
-		Value map[string]any `json:"value"`
-	} `json:"msg"`
-	Signature struct {
-		PubKey    string `json:"pub_key"`
-		Signature string `json:"signature"`
-	} `json:"signature"`
+	Entropy   int64        `json:"entropy"`
+	Fee       []*Fee       `json:"fee"`
+	Memo      string       `json:"memo"`
+	Msg       *TxMsg       `json:"msg"`
+	Signature *TxSignature `json:"signature"`
+}
+
+// Fee represents fee values
+type Fee struct {
+	Amount string `json:"amount"`
+	Denom  string `json:"denom"`
+}
+
+// TxMsg represents message for transactions
+type TxMsg struct {
+	Type  string         `json:"type"`
+	Value map[string]any `json:"value"`
+}
+
+// TxSignature represents values of transaction signature
+type TxSignature struct {
+	PubKey    string `json:"pub_key"`
+	Signature string `json:"signature"`
 }
 
 // TxResult represents transaction result
