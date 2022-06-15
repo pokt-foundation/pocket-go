@@ -75,13 +75,13 @@ func TestProvider_GetBlockTransactions(t *testing.T) {
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryBlockTXsRoute), http.StatusOK, "samples/query_block_txs.json")
 
-	transactions, err := provider.GetBlockTransactions(21, &GetBlockTransactionsOptions{Prove: false})
+	transactions, err := provider.GetBlockTransactions(&GetBlockTransactionsOptions{Prove: false})
 	c.NoError(err)
 	c.NotEmpty(transactions)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryBlockTXsRoute), http.StatusInternalServerError, "samples/query_block_txs.json")
 
-	transactions, err = provider.GetBlockTransactions(21, nil)
+	transactions, err = provider.GetBlockTransactions(nil)
 	c.Equal(Err5xxOnConnection, err)
 	c.Empty(transactions)
 }
@@ -220,13 +220,13 @@ func TestProvider_GetNodes(t *testing.T) {
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryNodesRoute), http.StatusOK, "samples/query_nodes.json")
 
-	nodes, err := provider.GetNodes(21, &GetNodesOptions{Page: 2})
+	nodes, err := provider.GetNodes(&GetNodesOptions{Page: 2})
 	c.NoError(err)
 	c.NotEmpty(nodes)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryNodesRoute), http.StatusInternalServerError, "samples/query_nodes.json")
 
-	nodes, err = provider.GetNodes(21, nil)
+	nodes, err = provider.GetNodes(nil)
 	c.Equal(Err5xxOnConnection, err)
 	c.Empty(nodes)
 }
@@ -241,13 +241,13 @@ func TestProvider_GetApps(t *testing.T) {
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAppsRoute), http.StatusOK, "samples/query_apps.json")
 
-	apps, err := provider.GetApps(21, &GetAppsOptions{Page: 2})
+	apps, err := provider.GetApps(&GetAppsOptions{Page: 2})
 	c.NoError(err)
 	c.NotEmpty(apps)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAppsRoute), http.StatusInternalServerError, "samples/query_apps.json")
 
-	apps, err = provider.GetApps(21, nil)
+	apps, err = provider.GetApps(nil)
 	c.Equal(Err5xxOnConnection, err)
 	c.Empty(apps)
 }
