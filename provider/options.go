@@ -44,6 +44,7 @@ type GetNodeOptions struct {
 
 // GetNodesOptions represents optional arguments for GetNodes request
 type GetNodesOptions struct {
+	Height        int
 	StakingStatus StakingStatus
 	Page          int
 	PerPage       int
@@ -62,6 +63,7 @@ type GetAccountTransactionsOptions struct {
 
 // GetBlockTransactionsOptions represents optional arguments for GetBlockTransactions request
 type GetBlockTransactionsOptions struct {
+	Height  int
 	Page    int
 	PerPage int
 	Prove   bool
@@ -85,6 +87,7 @@ type GetTypeOptions struct {
 
 // GetAppsOptions represents optional arguments for GetApps request
 type GetAppsOptions struct {
+	Height        int
 	StakingStatus StakingStatus
 	Page          int
 	PerPage       int

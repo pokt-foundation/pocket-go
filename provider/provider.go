@@ -196,12 +196,11 @@ func (p *Provider) GetAccountTransactions(address string, options *GetAccountTra
 }
 
 // GetBlockTransactions returns transactions of given block
-func (p *Provider) GetBlockTransactions(blockHeight int, options *GetBlockTransactionsOptions) (*GetBlockTransactionsOutput, error) {
-	params := map[string]any{
-		"height": blockHeight,
-	}
+func (p *Provider) GetBlockTransactions(options *GetBlockTransactionsOptions) (*GetBlockTransactionsOutput, error) {
+	params := map[string]any{}
 
 	if options != nil {
+		params["height"] = options.Height
 		params["page"] = options.Page
 		params["per_page"] = options.PerPage
 		params["prove"] = options.Prove
@@ -389,12 +388,11 @@ func (p *Provider) GetBlockHeight() (int, error) {
 
 // GetNodes returns a page of nodes known at the specified height and with options
 // empty options returns all validators, page < 1 returns the first page, per_page < 1 returns 10000 elements per page
-func (p *Provider) GetNodes(height int, options *GetNodesOptions) (*GetNodesOutput, error) {
-	params := map[string]any{
-		"height": height,
-	}
+func (p *Provider) GetNodes(options *GetNodesOptions) (*GetNodesOutput, error) {
+	params := map[string]any{}
 
 	if options != nil {
+		params["height"] = options.Height
 		params["opts"] = map[string]any{
 			"staking_status": options.StakingStatus,
 			"page":           options.Page,
@@ -462,12 +460,11 @@ func (p *Provider) GetNode(address string, options *GetNodeOptions) (*GetNodeOut
 
 // GetApps returns a page of applications known at the specified height and staking status
 // empty ("") staking_status returns all apps, page < 1 returns the first page, per_page < 1 returns 10000 elements per page
-func (p *Provider) GetApps(height int, options *GetAppsOptions) (*GetAppsOutput, error) {
-	params := map[string]any{
-		"height": height,
-	}
+func (p *Provider) GetApps(options *GetAppsOptions) (*GetAppsOutput, error) {
+	params := map[string]any{}
 
 	if options != nil {
+		params["height"] = options.Height
 		params["opts"] = map[string]any{
 			"staking_status": options.StakingStatus,
 			"page":           options.Page,
