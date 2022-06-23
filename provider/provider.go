@@ -387,7 +387,12 @@ func (p *Provider) GetBlockHeight() (int, error) {
 }
 
 // GetAllParams returns the params at the specified height
-func (p *Provider) GetAllParams(height int) (*AllParams, error) {
+func (p *Provider) GetAllParams(options *GetAllParamsOptions) (*AllParams, error) {
+	var height int
+	if options != nil {
+		height = options.Height
+	}
+
 	params := map[string]interface{}{
 		"height": height,
 	}

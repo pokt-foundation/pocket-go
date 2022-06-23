@@ -220,7 +220,7 @@ func TestProvider_GetAllParams(t *testing.T) {
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAllParamsRoute), http.StatusOK, "samples/query_allparams.json")
 
-	allParams, err := provider.GetAllParams(0)
+	allParams, err := provider.GetAllParams(nil)
 	c.NoError(err)
 
 	relaysToTokensMultiplier, exists := allParams.NodeParams.Get("pos/RelaysToTokensMultiplier")
