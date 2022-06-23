@@ -133,6 +133,34 @@ type GetAccountOutput struct {
 	PublicKey string `json:"public_key"`
 }
 
+// Param represents the output for a single param key value pair
+type Param struct {
+	Key   string `json:"param_key"`
+	Value string `json:"param_value"`
+}
+
+// ParamGroup is shorthand for a slice of Param
+type ParamGroup []Param
+
+// Get returns the value and existence state for a given key
+func (a ParamGroup) Get(k string) (string, bool) {
+	for _, p := range a {
+		if p.Key == k {
+			return p.Value, true
+		}
+	}
+	return "", false
+}
+
+// AllParams represents the output for AllParams request
+type AllParams struct {
+	AppParams    ParamGroup `json:"app_params"`
+	AuthParams   ParamGroup `json:"auth_params"`
+	GovParams    ParamGroup `json:"gov_params"`
+	NodeParams   ParamGroup `json:"node_params"`
+	PocketParams ParamGroup `json:"pocket_params"`
+}
+
 // DispatchOutput represents output for Dispatch request
 type DispatchOutput struct {
 	BlockHeight int      `json:"block_height"`

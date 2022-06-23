@@ -386,6 +386,38 @@ func (p *Provider) GetBlockHeight() (int, error) {
 	return output.Height, nil
 }
 
+// GetAllParams returns the params at the specified height
+func (p *Provider) GetAllParams(options *GetAllParamsOptions) (*AllParams, error) {
+	var height int
+	if options != nil {
+		height = options.Height
+	}
+
+	params := map[string]interface{}{
+		"height": height,
+	}
+
+	rawOutput, err := p.doPostRequest("", params, QueryAllParamsRoute)
+
+	defer closeOrLog(rawOutput)
+
+	if err != nil {
+		return nil, err
+	}
+
+	respBody, err := ioutil.ReadAll(rawOutput.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	var allParams AllParams
+	if err = json.Unmarshal(respBody, &allParams); err != nil {
+		return nil, err
+	}
+
+	return &allParams, nil
+}
+
 // GetNodes returns a page of nodes known at the specified height and with options
 // empty options returns all validators, page < 1 returns the first page, per_page < 1 returns 10000 elements per page
 func (p *Provider) GetNodes(options *GetNodesOptions) (*GetNodesOutput, error) {

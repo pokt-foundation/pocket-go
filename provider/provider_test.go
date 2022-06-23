@@ -210,6 +210,24 @@ func TestProvider_GetBlockHeight(t *testing.T) {
 	c.Empty(blockNumber)
 }
 
+func TestProvider_GetAllParams(t *testing.T) {
+	c := require.New(t)
+
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"})
+
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAllParamsRoute), http.StatusOK, "samples/query_allparams.json")
+
+	allParams, err := provider.GetAllParams(nil)
+	c.NoError(err)
+
+	relaysToTokensMultiplier, exists := allParams.NodeParams.Get("pos/RelaysToTokensMultiplier")
+	c.True(exists)
+	c.Equal("2109", relaysToTokensMultiplier)
+}
+
 func TestProvider_GetNodes(t *testing.T) {
 	c := require.New(t)
 

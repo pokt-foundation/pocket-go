@@ -42,6 +42,11 @@ type GetNodeOptions struct {
 	Height int
 }
 
+// GetAllParamsOptions represents optional arguments for GetAllParams request
+type GetAllParamsOptions struct {
+	Height int
+}
+
 // GetNodesOptions represents optional arguments for GetNodes request
 type GetNodesOptions struct {
 	Height        int
