@@ -12,6 +12,11 @@ type queryBalanceOutput struct {
 
 // GetAppOutput represents output for GetApp request
 type GetAppOutput struct {
+	*App
+}
+
+// App represents app from RPC request
+type App struct {
 	Address       string    `json:"address"`
 	PublicKey     string    `json:"public_key"`
 	Jailed        bool      `json:"jailed"`
@@ -24,28 +29,21 @@ type GetAppOutput struct {
 
 // GetAppsOutput represents output for GetApps request
 type GetAppsOutput struct {
-	Result     []GetAppOutput `json:"result"`
-	Page       int            `json:"page"`
-	TotalPages int            `json:"total_pages"`
+	Result     []*App `json:"result"`
+	Page       int    `json:"page"`
+	TotalPages int    `json:"total_pages"`
 }
 
 // GetNodeOutput represents output for GetNode request
 type GetNodeOutput struct {
-	Address       string    `json:"address"`
-	Chains        []string  `json:"chains"`
-	Jailed        bool      `json:"jailed"`
-	PublicKey     string    `json:"public_key"`
-	ServiceURL    string    `json:"service_url"`
-	Status        int       `json:"status"`
-	Tokens        string    `json:"tokens"`
-	UnstakingTime time.Time `json:"unstaking_time"`
+	*Node
 }
 
 // GetNodesOutput represents output for GetNodes request
 type GetNodesOutput struct {
-	Result     []GetNodeOutput `json:"result"`
-	Page       int             `json:"page"`
-	TotalPages int             `json:"total_pages"`
+	Result     []*Node `json:"result"`
+	Page       int     `json:"page"`
+	TotalPages int     `json:"total_pages"`
 }
 
 // GetBlockOutput represents output for GetBlock request
