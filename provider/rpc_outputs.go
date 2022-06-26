@@ -22,7 +22,7 @@ type App struct {
 	Jailed        bool      `json:"jailed"`
 	Status        int       `json:"status"`
 	Chains        []string  `json:"chains"`
-	Tokens        string    `json:"tokens"`
+	StakedTokens  string    `json:"staked_tokens"`
 	MaxRelays     string    `json:"max_relays"`
 	UnstakingTime time.Time `json:"unstaking_time"`
 }
