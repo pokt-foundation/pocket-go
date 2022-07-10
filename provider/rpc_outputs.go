@@ -189,6 +189,7 @@ type Node struct {
 	Status        int       `json:"status"`
 	Tokens        string    `json:"tokens"`
 	UnstakingTime time.Time `json:"unstaking_time"`
+	OutputAddress string    `json:"output_address"`
 }
 
 // RPCError reprensents error output from RPC request

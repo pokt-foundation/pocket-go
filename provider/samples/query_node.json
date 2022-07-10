@@ -8,5 +8,6 @@
     "service_url": "0.0.0.0:8081",
     "status": 2,
     "tokens": "1000000000000000",
-    "unstaking_time": "0001-01-01T00:00:00Z"
+    "unstaking_time": "0001-01-01T00:00:00Z",
+    "output_address": "05d98fbedf63cd4b4e337ef488ec2ad7e5072cb3"
 }
