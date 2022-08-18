@@ -11,8 +11,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/pokt-foundation/pocket-go/internal/client"
 	"github.com/pokt-foundation/pocket-go/utils"
+	"github.com/pokt-foundation/utils-go/client"
 )
 
 var (
