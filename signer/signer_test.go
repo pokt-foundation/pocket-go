@@ -21,11 +21,40 @@ func TestNewRandomSigner(t *testing.T) {
 	c.Equal(expectedAddres, signer.GetAddress())
 }
 
+func TestNewSignerFromPPK(t *testing.T) {
+	c := require.New(t)
+
+	privateKey := "1f8cbde30ef5a9db0a5a9d5eb40536fc9defc318b8581d543808b7504e0902bcb243b27bc9fbe5580457a46370ae5f03a6f6753633e51efdaf2cf534fdc26cc3"
+	password := "bebitofiufiu"
+	hint := "fiufiu"
+
+	ppk, err := NewPPK(privateKey, password, hint)
+	c.NoError(err)
+	c.True(ppk.Validate())
+
+	ppkSigner, err := NewSignerFromPPK(password, &PPK{SecParam: "FIU"})
+	c.Equal(ErrInvalidPPK, err)
+	c.Empty(ppkSigner)
+
+	ppkSigner, err = NewSignerFromPPK(password, ppk)
+	c.NoError(err)
+	c.NotEmpty(ppkSigner)
+
+	fromPrivKeySigner, err := NewSignerFromPrivateKey(privateKey)
+	c.NoError(err)
+	c.NotEmpty(fromPrivKeySigner)
+
+	c.Equal(fromPrivKeySigner.GetAddress(), ppkSigner.GetAddress())
+	c.Equal(fromPrivKeySigner.GetPrivateKey(), ppkSigner.GetPrivateKey())
+	c.Equal(fromPrivKeySigner.GetPublicKey(), ppkSigner.GetPublicKey())
+}
+
 func TestSigner_Sign(t *testing.T) {
 	c := require.New(t)
 
 	signer, err := NewSignerFromPrivateKey("")
-	c.Equal(ErrMissingPrivateKey, err)
+	c.Equal(ErrInvalidPrivateKey, err)
+	c.Empty(signer)
 
 	privateKey := "1f8cbde30ef5a9db0a5a9d5eb40536fc9defc318b8581d543808b7504e0902bcb243b27bc9fbe5580457a46370ae5f03a6f6753633e51efdaf2cf534fdc26cc3"
 	payload := "deadbeef"
