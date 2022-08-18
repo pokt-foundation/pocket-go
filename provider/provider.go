@@ -1,3 +1,4 @@
+// Package provider has the functions to do the RPC requests to a node in the protocol
 package provider
 
 import (
