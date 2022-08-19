@@ -1,3 +1,4 @@
+// Package provider has the functions to do the RPC requests to a node in the protocol
 package provider
 
 import (
@@ -11,8 +12,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/pokt-foundation/pocket-go/internal/client"
 	"github.com/pokt-foundation/pocket-go/utils"
+	"github.com/pokt-foundation/utils-go/client"
 )
 
 var (

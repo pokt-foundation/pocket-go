@@ -1,3 +1,4 @@
+// Package signer creates crypto safe signature with different inputs
 package signer
 
 import (

@@ -1,3 +1,5 @@
+// Package relayer is a helper for doing relays with simpler input that just using the package Provider
+// Underneath uses the package Provider
 package relayer
 
 import (
