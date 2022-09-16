@@ -595,6 +595,40 @@ func (p *Provider) GetAccount(address string, options *GetAccountOptions) (*GetA
 	return &output, nil
 }
 
+// GetAccounts returns a page of accounts known at the specified height and with options
+// empty options returns all accounts on last height, page < 1 returns the first page, per_page < 1 returns 10000 elements per page
+func (p *Provider) GetAccounts(options *GetAccountsOptions) (*GetAccountsOutput, error) {
+	params := map[string]any{}
+
+	if options != nil {
+		params["height"] = options.Height
+		params["page"] = options.Page
+		params["per_page"] = options.PerPage
+	}
+
+	rawOutput, err := p.doPostRequest("", params, QueryAccountsRoute)
+
+	defer closeOrLog(rawOutput)
+
+	if err != nil {
+		return nil, err
+	}
+
+	bodyBytes, err := ioutil.ReadAll(rawOutput.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	output := GetAccountsOutput{}
+
+	err = json.Unmarshal(bodyBytes, &output)
+	if err != nil {
+		return nil, err
+	}
+
+	return &output, nil
+}
+
 // Dispatch sends a dispatch request to the network and gets the nodes that will be servicing the requests for the session.
 func (p *Provider) Dispatch(appPublicKey, chain string, options *DispatchRequestOptions) (*DispatchOutput, error) {
 	if len(p.dispatchers) == 0 {

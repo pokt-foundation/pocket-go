@@ -1,0 +1,16 @@
+{
+    "page": 1,
+    "result": [
+        {
+            "address": "string",
+            "coins": [
+                {
+                    "amount": "0",
+                    "denom": "string"
+                }
+            ],
+            "public_key": "string"
+        }
+    ],
+    "total_pages": 506
+}

@@ -14,6 +14,8 @@ const (
 	ClientRelayRoute V1RPCRoute = "/v1/client/relay"
 	// QueryAccountRoute represents query account route
 	QueryAccountRoute V1RPCRoute = "/v1/query/account"
+	// QueryAccountsRoute represents query accounts route
+	QueryAccountsRoute V1RPCRoute = "/v1/query/accounts"
 	// QueryAccountTXsRoute represents query account TXs route
 	QueryAccountTXsRoute V1RPCRoute = "/v1/query/accounttxs"
 	// QueryAllParamsRoute represents query all params route

@@ -85,6 +85,13 @@ type GetAccountOptions struct {
 	Height int
 }
 
+// GetAccountsOptions represents optional arguments for GetAccounts request
+type GetAccountsOptions struct {
+	Height  int
+	Page    int
+	PerPage int
+}
+
 // GetTypeOptions represents optional arguments for GetType request
 type GetTypeOptions struct {
 	Height int
