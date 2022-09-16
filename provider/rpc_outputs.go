@@ -131,6 +131,13 @@ type GetAccountOutput struct {
 	PublicKey string `json:"public_key"`
 }
 
+// GetAccountsOutput represents output for GetAccounts request
+type GetAccountsOutput struct {
+	Result     []*GetAccountOutput `json:"result"`
+	Page       int                 `json:"page"`
+	TotalPages int                 `json:"total_pages"`
+}
+
 // Param represents the output for a single param key value pair
 type Param struct {
 	Key   string `json:"param_key"`

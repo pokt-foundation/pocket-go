@@ -333,6 +333,27 @@ func TestProvider_GetAccount(t *testing.T) {
 	c.Empty(account)
 }
 
+func TestProvider_GetAccounts(t *testing.T) {
+	c := require.New(t)
+
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"})
+
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountsRoute), http.StatusOK, "samples/query_accounts.json")
+
+	account, err := provider.GetAccounts(&GetAccountsOptions{Height: 21})
+	c.NoError(err)
+	c.NotEmpty(account)
+
+	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountsRoute), http.StatusInternalServerError, "samples/query_accounts.json")
+
+	account, err = provider.GetAccounts(nil)
+	c.Equal(Err5xxOnConnection, err)
+	c.Empty(account)
+}
+
 func TestProvider_Dispatch(t *testing.T) {
 	c := require.New(t)
 
