@@ -105,11 +105,11 @@ func (p *Provider) doPostRequest(rpcURL string, params any, route V1RPCRoute) (*
 }
 
 func returnRPCError(route V1RPCRoute, body io.ReadCloser) error {
+	defer utils.CloseOrLog(body)
+
 	if route == ClientRelayRoute {
 		return errOnRelayRequest
 	}
-
-	defer utils.CloseOrLog(body)
 
 	bodyBytes, err := ioutil.ReadAll(body)
 	if err != nil {
