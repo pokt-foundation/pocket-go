@@ -2,6 +2,8 @@
 package provider
 
 import (
+	"bytes"
+	"context"
 	"crypto/rand"
 	"encoding/json"
 	"errors"
@@ -80,11 +82,13 @@ func (p *Provider) doPostRequest(rpcURL string, params any, route V1RPCRoute) (*
 		return nil, err
 	}
 
+	// TODO ----
 	output, err := p.client.PostWithURLJSONParams(fmt.Sprintf("%s%s", finalRPCURL, route), params, http.Header{})
 	if err != nil {
 		return nil, err
 	}
 
+	// TODO ----
 	if output.StatusCode == http.StatusBadRequest {
 		return output, returnRPCError(route, output.Body)
 	}
@@ -629,38 +633,69 @@ func (p *Provider) GetAccounts(options *GetAccountsOptions) (*GetAccountsOutput,
 	return &output, nil
 }
 
+type dispatchOptions struct {
+	PublicKey     string `json:"app_public_key"`
+	Chain         string `json:"chain"`
+	SessionHeight int    `json:"session_height"`
+}
+
+func dispatchRequest(appPublicKey, chain string, options DispatchRequestOptions) ([]byte, error) {
+	opts := dispatchOptions{
+		PublicKey:     appPublicKey,
+		Chain:         chain,
+		SessionHeight: options.Height,
+	}
+
+	return json.Marshal(opts)
+}
+
 // Dispatch sends a dispatch request to the network and gets the nodes that will be servicing the requests for the session.
 func (p *Provider) Dispatch(appPublicKey, chain string, options *DispatchRequestOptions) (*DispatchOutput, error) {
+	fmt.Printf("Dispatch called\n")
+	// TODO: move this to a validator
 	if len(p.dispatchers) == 0 {
 		return nil, ErrNoDispatchers
 	}
 
-	params := map[string]any{
-		"app_public_key": appPublicKey,
-		"chain":          chain,
+	// TODO: combine with the URL building code below
+	finalRPCURL, err := p.getFinalRPCURL("", ClientDispatchRoute)
+	if err != nil {
+		return nil, err
 	}
+	url := fmt.Sprintf("%s%s", finalRPCURL, ClientDispatchRoute)
 
+	var opts DispatchRequestOptions
 	if options != nil {
-		params["session_height"] = options.Height
+		opts = *options
 	}
 
-	rawOutput, err := p.doPostRequest("", params, ClientDispatchRoute)
-
-	defer closeOrLog(rawOutput)
-
+	requestBytes, err := dispatchRequest(appPublicKey, chain, opts)
 	if err != nil {
 		return nil, err
 	}
 
-	bodyBytes, err := ioutil.ReadAll(rawOutput.Body)
+	// TODO: timeout
+	// TODO: retry
+	request, err := http.NewRequestWithContext(context.Background(), "POST", url, bytes.NewReader(requestBytes))
+	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("Connection", "close")
+
+	var httpClient http.Client
+	response, err := httpClient.Do(request)
 	if err != nil {
 		return nil, err
 	}
 
-	output := DispatchOutput{}
+	defer response.Body.Close()
 
-	err = json.Unmarshal(bodyBytes, &output)
+	bodyBytes, err := ioutil.ReadAll(response.Body)
 	if err != nil {
+		return nil, err
+	}
+
+	var output DispatchOutput
+
+	if err := json.Unmarshal(bodyBytes, &output); err != nil {
 		return nil, err
 	}
 
