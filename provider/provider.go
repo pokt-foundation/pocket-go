@@ -2,6 +2,7 @@
 package provider
 
 import (
+	"bytes"
 	"crypto/rand"
 	"encoding/json"
 	"errors"
@@ -10,10 +11,8 @@ import (
 	"io/ioutil"
 	"math/big"
 	"net/http"
-	"time"
 
 	"github.com/pokt-foundation/pocket-go/utils"
-	"github.com/pokt-foundation/utils-go/client"
 )
 
 var (
@@ -35,7 +34,7 @@ var (
 type Provider struct {
 	rpcURL      string
 	dispatchers []string
-	client      *client.Client
+	client      *http.Client
 }
 
 // NewProvider returns Provider instance from input
@@ -43,18 +42,8 @@ func NewProvider(rpcURL string, dispatchers []string) *Provider {
 	return &Provider{
 		rpcURL:      rpcURL,
 		dispatchers: dispatchers,
-		client:      client.NewDefaultClient(),
+		client:      &http.Client{},
 	}
-}
-
-// UpdateRequestConfig updates retries and timeout used for RPC requests
-func (p *Provider) UpdateRequestConfig(retries int, timeout time.Duration) {
-	p.client = client.NewCustomClient(retries, timeout)
-}
-
-// ResetRequestConfigToDefault resets request config to default
-func (p *Provider) ResetRequestConfigToDefault() {
-	p.client = client.NewDefaultClient()
 }
 
 func (p *Provider) getFinalRPCURL(rpcURL string, route V1RPCRoute) (string, error) {
@@ -80,7 +69,18 @@ func (p *Provider) doPostRequest(rpcURL string, params any, route V1RPCRoute) (*
 		return nil, err
 	}
 
-	output, err := p.client.PostWithURLJSONParams(fmt.Sprintf("%s%s", finalRPCURL, route), params, http.Header{})
+	jsonParams, err := json.Marshal(params)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s%s", finalRPCURL, route), bytes.NewBuffer(jsonParams))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	output, err := p.client.Do(req)
 	if err != nil {
 		return nil, err
 	}

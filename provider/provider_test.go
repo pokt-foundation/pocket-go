@@ -5,7 +5,6 @@ import (
 	"math/big"
 	"net/http"
 	"testing"
-	"time"
 
 	"github.com/jarcoal/httpmock"
 	"github.com/pokt-foundation/utils-go/mock-client"
@@ -370,15 +369,11 @@ func TestProvider_Dispatch(t *testing.T) {
 
 	provider.dispatchers = []string{"https://dummy.com"}
 
-	provider.UpdateRequestConfig(0, 5*time.Second)
-
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientDispatchRoute), http.StatusOK, "samples/client_dispatch.json")
 
 	dispatch, err = provider.Dispatch("pjog", "abcd", nil)
 	c.NoError(err)
 	c.NotEmpty(dispatch)
-
-	provider.ResetRequestConfigToDefault()
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientDispatchRoute), http.StatusInternalServerError, "samples/client_dispatch.json")
 
