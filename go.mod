@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/jarcoal/httpmock v1.2.0
-	github.com/pokt-foundation/utils-go v0.2.0
+	github.com/pokt-foundation/utils-go v0.4.1
 	github.com/pokt-network/pocket-core v0.0.0-20220412195259-d51116005a26
 	github.com/stretchr/testify v1.8.0
 	golang.org/x/crypto v0.0.0-20220315160706-3147a52a75dd
@@ -22,8 +22,6 @@ require (
 	github.com/go-kit/log v0.2.0 // indirect
 	github.com/go-logfmt/logfmt v0.5.1 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
-	github.com/gojektech/heimdall v5.0.2+incompatible // indirect
-	github.com/gojektech/valkyrie v0.0.0-20190210220504-8f62c1e7ba45 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/btree v1.0.0 // indirect
