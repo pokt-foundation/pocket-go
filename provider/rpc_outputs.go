@@ -174,9 +174,9 @@ type DispatchOutput struct {
 
 // Session represents session output from RPC request
 type Session struct {
-	Header *SessionHeader `json:"header"`
+	Header SessionHeader `json:"header"`
 	Key    string         `json:"key"`
-	Nodes  []*Node        `json:"nodes"`
+	Nodes  []Node        `json:"nodes"`
 }
 
 // SessionHeader represents the headers of a session output
