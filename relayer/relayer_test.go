@@ -52,13 +52,13 @@ func TestRelayer_Relay(t *testing.T) {
 	c.Equal(ErrSessionHasNoNodes, err)
 	c.Empty(relay)
 
-	input.Session.Nodes = []*provider.Node{{PublicKey: "AOG"}}
+	input.Session.Nodes = []provider.Node{{PublicKey: "AOG"}}
 
 	relay, err = relayer.Relay(input, nil)
 	c.Equal(ErrNoSessionHeader, err)
 	c.Empty(relay)
 
-	input.Session.Header = &provider.SessionHeader{}
+	input.Session.Header = provider.SessionHeader{Chain: "chain"}
 	input.Node = &provider.Node{PublicKey: "PJOG"}
 
 	relay, err = relayer.Relay(input, nil)

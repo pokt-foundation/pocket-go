@@ -76,7 +76,7 @@ func (r *Relayer) validateRelayRequest(input *Input) error {
 		return ErrSessionHasNoNodes
 	}
 
-	if input.Session.Header == nil {
+	if input.Session.Header == (provider.SessionHeader{}) {
 		return ErrNoSessionHeader
 	}
 
@@ -187,7 +187,8 @@ func GetRandomSessionNode(session *provider.Session) (*provider.Node, error) {
 		return nil, err
 	}
 
-	return session.Nodes[index.Int64()], nil
+	node := session.Nodes[index.Int64()]
+	return &node, nil
 }
 
 // IsNodeInSession verifies if given node is in given session
