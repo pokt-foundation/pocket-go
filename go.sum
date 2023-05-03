@@ -395,8 +395,8 @@ github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINE
 github.com/pkg/profile v1.2.1/go.mod h1:hJw3o1OdXxsrSjjVksARp5W95eeEaEfptyVZyv6JUPA=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
-github.com/pokt-foundation/utils-go v0.5.1 h1:sL1bQOIDJBKXjYn6+6rJFlnyDfOwl6/0Pkb2eyks1Dc=
-github.com/pokt-foundation/utils-go v0.5.1/go.mod h1:VMYNYtm1NKfCceLqzs6QSRhLcivafktirc3FSnB7Hxs=
+github.com/pokt-foundation/utils-go v0.6.0 h1:951VGbxSSgJs90lFoMhmb2esSDucQNX6I6Tp4NYBFuo=
+github.com/pokt-foundation/utils-go v0.6.0/go.mod h1:VMYNYtm1NKfCceLqzs6QSRhLcivafktirc3FSnB7Hxs=
 github.com/pokt-network/pocket-core v0.0.0-20220412195259-d51116005a26 h1:u31P5yZ8TCkQCfpLLpLCZ0t1EdcKoRWsqSpDoXZ9sfc=
 github.com/pokt-network/pocket-core v0.0.0-20220412195259-d51116005a26/go.mod h1:0w862E1EonKDe+jHYupBhMdtlBn7jlio9Eg+VQXFxoI=
 github.com/pokt-network/tendermint v0.32.11-0.20220330172101-d29c97194a7f h1:DJeK+takEPoDJOHGT9bDhSs3pVXAgq4fc8nK+KPGYes=
