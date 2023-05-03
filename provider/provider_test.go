@@ -370,7 +370,10 @@ func TestProvider_Dispatch(t *testing.T) {
 
 	provider.dispatchers = []string{"https://dummy.com"}
 
-	provider.UpdateRequestConfig(0, 5*time.Second)
+	provider.UpdateRequestConfig(RequestConfigOpts{
+		Retries: 0,
+		Timeout: 5 * time.Second,
+	})
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientDispatchRoute), http.StatusOK, "samples/client_dispatch.json")
 

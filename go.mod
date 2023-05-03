@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/jarcoal/httpmock v1.2.0
-	github.com/pokt-foundation/utils-go v0.5.1
+	github.com/pokt-foundation/utils-go v0.6.0
 	github.com/pokt-network/pocket-core v0.0.0-20220412195259-d51116005a26
 	github.com/stretchr/testify v1.8.0
 	golang.org/x/crypto v0.0.0-20220315160706-3147a52a75dd

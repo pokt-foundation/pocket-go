@@ -47,9 +47,20 @@ func NewProvider(rpcURL string, dispatchers []string) *Provider {
 	}
 }
 
-// UpdateRequestConfig updates retries and timeout used for RPC requests
-func (p *Provider) UpdateRequestConfig(retries int, timeout time.Duration) {
-	p.client = client.NewCustomClient(retries, timeout)
+// RequestConfigOpts are the optional values for request config
+type RequestConfigOpts struct {
+	Retries   int
+	Timeout   time.Duration
+	Transport http.RoundTripper
+}
+
+// UpdateRequestConfig updates the config used for RPC requests
+func (p *Provider) UpdateRequestConfig(opts RequestConfigOpts) {
+	p.client = client.NewCustomClientWithOptions(client.CustomClientOpts{
+		Retries:   opts.Retries,
+		Timeout:   opts.Timeout,
+		Transport: opts.Transport,
+	})
 }
 
 // ResetRequestConfigToDefault resets request config to default
