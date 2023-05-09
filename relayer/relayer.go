@@ -3,6 +3,7 @@
 package relayer
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
@@ -33,7 +34,7 @@ var (
 
 // Provider interface representing provider functions necessary for Relayer Package
 type Provider interface {
-	Relay(rpcURL string, input *provider.RelayInput, options *provider.RelayRequestOptions) (*provider.RelayOutput, error)
+	RelayWithCtx(ctx context.Context, rpcURL string, input *provider.RelayInput, options *provider.RelayRequestOptions) (*provider.RelayOutput, error)
 }
 
 // Signer interface representing signer functions necessary for Relayer Package
@@ -104,18 +105,7 @@ func (r *Relayer) getSignedProofBytes(proof *provider.RelayProof) (string, error
 	return r.signer.Sign(proofBytes)
 }
 
-// Relay does relay request with given input
-func (r *Relayer) Relay(input *Input, options *provider.RelayRequestOptions) (*Output, error) {
-	err := r.validateRelayRequest(input)
-	if err != nil {
-		return nil, err
-	}
-
-	node, err := getNode(input)
-	if err != nil {
-		return nil, err
-	}
-
+func (r *Relayer) buildRelay(node *provider.Node, input *Input, options *provider.RelayRequestOptions) (*provider.RelayInput, error) {
 	relayPayload := &provider.RelayPayload{
 		Data:    input.Data,
 		Method:  input.Method,
@@ -162,20 +152,43 @@ func (r *Relayer) Relay(input *Input, options *provider.RelayRequestOptions) (*O
 		Signature:          signedProofBytes,
 	}
 
-	relay := &provider.RelayInput{
+	return &provider.RelayInput{
 		Payload: relayPayload,
 		Meta:    relayMeta,
 		Proof:   relayProof,
+	}, nil
+}
+
+// Relay does relay request with given input
+func (r *Relayer) Relay(input *Input, options *provider.RelayRequestOptions) (*Output, error) {
+	return r.RelayWithCtx(context.Background(), input, options)
+}
+
+// RelayWithCtx does relay request with given input
+func (r *Relayer) RelayWithCtx(ctx context.Context, input *Input, options *provider.RelayRequestOptions) (*Output, error) {
+	err := r.validateRelayRequest(input)
+	if err != nil {
+		return nil, err
 	}
 
-	relayOutput, err := r.provider.Relay(node.ServiceURL, relay, options)
+	node, err := getNode(input)
+	if err != nil {
+		return nil, err
+	}
+
+	relayInput, err := r.buildRelay(node, input, options)
+	if err != nil {
+		return nil, err
+	}
+
+	relayOutput, err := r.provider.RelayWithCtx(ctx, node.ServiceURL, relayInput, options)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Output{
 		RelayOutput: relayOutput,
-		Proof:       relayProof,
+		Proof:       relayInput.Proof,
 		Node:        node,
 	}, nil
 }
