@@ -3,6 +3,7 @@
 package transactionbuilder
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/hex"
 	"errors"
@@ -54,7 +55,7 @@ var (
 
 // Provider interface representing provider functions necessary for Transaction Builder Package
 type Provider interface {
-	SendTransaction(input *provider.SendTransactionInput) (*provider.SendTransactionOutput, error)
+	SendTransactionWithCtx(ctx context.Context, input *provider.SendTransactionInput) (*provider.SendTransactionOutput, error)
 }
 
 // Signer interface representing signer functions necessary for Transaction Builder package
@@ -187,10 +188,15 @@ func (t *TransactionBuilder) CreateTransaction(chainID ChainID, txMsg Transactio
 
 // Submit does the transaction from raw input
 func (t *TransactionBuilder) Submit(chainID ChainID, txMsg TransactionMessage, options *TransactionOptions) (*provider.SendTransactionOutput, error) {
+	return t.SubmitWithCtx(context.Background(), chainID, txMsg, options)
+}
+
+// SubmitWithCtx does the transaction from raw input
+func (t *TransactionBuilder) SubmitWithCtx(ctx context.Context, chainID ChainID, txMsg TransactionMessage, options *TransactionOptions) (*provider.SendTransactionOutput, error) {
 	sendTransactionInput, err := t.CreateTransaction(chainID, txMsg, options)
 	if err != nil {
 		return nil, err
 	}
 
-	return t.provider.SendTransaction(sendTransactionInput)
+	return t.provider.SendTransactionWithCtx(ctx, sendTransactionInput)
 }

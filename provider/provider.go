@@ -2,6 +2,7 @@
 package provider
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/json"
 	"errors"
@@ -85,13 +86,13 @@ func (p *Provider) getFinalRPCURL(rpcURL string, route V1RPCRoute) (string, erro
 	return p.rpcURL, nil
 }
 
-func (p *Provider) doPostRequest(rpcURL string, params any, route V1RPCRoute) (*http.Response, error) {
+func (p *Provider) doPostRequest(ctx context.Context, rpcURL string, params any, route V1RPCRoute) (*http.Response, error) {
 	finalRPCURL, err := p.getFinalRPCURL(rpcURL, route)
 	if err != nil {
 		return nil, err
 	}
 
-	output, err := p.client.PostWithURLJSONParams(fmt.Sprintf("%s%s", finalRPCURL, route), params, http.Header{})
+	output, err := p.client.PostWithURLJSONParamsWithCtx(ctx, fmt.Sprintf("%s%s", finalRPCURL, route), params, http.Header{})
 	if err != nil {
 		return nil, err
 	}
@@ -139,6 +140,11 @@ func returnRPCError(route V1RPCRoute, body io.ReadCloser) error {
 
 // GetBalance requests the balance of the specified address
 func (p *Provider) GetBalance(address string, options *GetBalanceOptions) (*big.Int, error) {
+	return p.GetBalanceWithCtx(context.Background(), address, options)
+}
+
+// GetBalanceWithCtx requests the balance of the specified address
+func (p *Provider) GetBalanceWithCtx(ctx context.Context, address string, options *GetBalanceOptions) (*big.Int, error) {
 	params := map[string]any{
 		"address": address,
 	}
@@ -147,7 +153,7 @@ func (p *Provider) GetBalance(address string, options *GetBalanceOptions) (*big.
 		params["height"] = options.Height
 	}
 
-	rawOutput, err := p.doPostRequest("", params, QueryBalanceRoute)
+	rawOutput, err := p.doPostRequest(ctx, "", params, QueryBalanceRoute)
 
 	defer closeOrLog(rawOutput)
 
@@ -172,6 +178,11 @@ func (p *Provider) GetBalance(address string, options *GetBalanceOptions) (*big.
 
 // GetAccountTransactions returns transactions of given address' account
 func (p *Provider) GetAccountTransactions(address string, options *GetAccountTransactionsOptions) (*GetAccountTransactionsOutput, error) {
+	return p.GetAccountTransactionsWithCtx(context.Background(), address, options)
+}
+
+// GetAccountTransactionsWithCtx returns transactions of given address' account
+func (p *Provider) GetAccountTransactionsWithCtx(ctx context.Context, address string, options *GetAccountTransactionsOptions) (*GetAccountTransactionsOutput, error) {
 	params := map[string]any{
 		"address": address,
 	}
@@ -184,7 +195,7 @@ func (p *Provider) GetAccountTransactions(address string, options *GetAccountTra
 		params["order"] = options.Order
 	}
 
-	rawOutput, err := p.doPostRequest("", params, QueryAccountTXsRoute)
+	rawOutput, err := p.doPostRequest(ctx, "", params, QueryAccountTXsRoute)
 
 	defer closeOrLog(rawOutput)
 
@@ -209,6 +220,11 @@ func (p *Provider) GetAccountTransactions(address string, options *GetAccountTra
 
 // GetBlockTransactions returns transactions of given block
 func (p *Provider) GetBlockTransactions(options *GetBlockTransactionsOptions) (*GetBlockTransactionsOutput, error) {
+	return p.GetBlockTransactionsWithCtx(context.Background(), options)
+}
+
+// GetBlockTransactionsWithCtx returns transactions of given block
+func (p *Provider) GetBlockTransactionsWithCtx(ctx context.Context, options *GetBlockTransactionsOptions) (*GetBlockTransactionsOutput, error) {
 	params := map[string]any{}
 
 	if options != nil {
@@ -219,7 +235,7 @@ func (p *Provider) GetBlockTransactions(options *GetBlockTransactionsOptions) (*
 		params["order"] = options.Order
 	}
 
-	rawOutput, err := p.doPostRequest("", params, QueryBlockTXsRoute)
+	rawOutput, err := p.doPostRequest(ctx, "", params, QueryBlockTXsRoute)
 
 	defer closeOrLog(rawOutput)
 
@@ -268,6 +284,11 @@ func returnType(appErr, nodeErr error) AddressType {
 
 // GetType returns type of given address
 func (p *Provider) GetType(address string, options *GetTypeOptions) (AddressType, error) {
+	return p.GetTypeWithCtx(context.Background(), address, options)
+}
+
+// GetTypeWithCtx returns type of given address
+func (p *Provider) GetTypeWithCtx(ctx context.Context, address string, options *GetTypeOptions) (AddressType, error) {
 	var height int
 	var errOutput *RPCError
 
@@ -275,12 +296,12 @@ func (p *Provider) GetType(address string, options *GetTypeOptions) (AddressType
 		height = options.Height
 	}
 
-	_, appErr := p.GetApp(address, &GetAppOptions{Height: height})
+	_, appErr := p.GetAppWithCtx(ctx, address, &GetAppOptions{Height: height})
 	if appErr != nil && !errors.As(appErr, &errOutput) {
 		return "", appErr
 	}
 
-	_, nodeErr := p.GetNode(address, &GetNodeOptions{Height: height})
+	_, nodeErr := p.GetNodeWithCtx(ctx, address, &GetNodeOptions{Height: height})
 	if nodeErr != nil && !errors.As(nodeErr, &errOutput) {
 		return "", nodeErr
 	}
@@ -290,7 +311,12 @@ func (p *Provider) GetType(address string, options *GetTypeOptions) (AddressType
 
 // SendTransaction sends raw transaction to be relayed to a target address
 func (p *Provider) SendTransaction(input *SendTransactionInput) (*SendTransactionOutput, error) {
-	rawOutput, err := p.doPostRequest("", input, ClientRawTXRoute)
+	return p.SendTransactionWithCtx(context.Background(), input)
+}
+
+// SendTransactionWithCtx sends raw transaction to be relayed to a target address
+func (p *Provider) SendTransactionWithCtx(ctx context.Context, input *SendTransactionInput) (*SendTransactionOutput, error) {
+	rawOutput, err := p.doPostRequest(ctx, "", input, ClientRawTXRoute)
 
 	defer closeOrLog(rawOutput)
 
@@ -315,7 +341,12 @@ func (p *Provider) SendTransaction(input *SendTransactionInput) (*SendTransactio
 
 // GetBlock returns the block structure at the specified height, height = 0 is used as latest
 func (p *Provider) GetBlock(blockNumber int) (*GetBlockOutput, error) {
-	rawOutput, err := p.doPostRequest("", map[string]int{
+	return p.GetBlockWithCtx(context.Background(), blockNumber)
+}
+
+// GetBlockWithCtx returns the block structure at the specified height, height = 0 is used as latest
+func (p *Provider) GetBlockWithCtx(ctx context.Context, blockNumber int) (*GetBlockOutput, error) {
+	rawOutput, err := p.doPostRequest(ctx, "", map[string]int{
 		"height": blockNumber,
 	}, QueryBlockRoute)
 
@@ -342,6 +373,11 @@ func (p *Provider) GetBlock(blockNumber int) (*GetBlockOutput, error) {
 
 // GetTransaction returns the transaction by the given transaction hash
 func (p *Provider) GetTransaction(transactionHash string, options *GetTransactionOptions) (*GetTransactionOutput, error) {
+	return p.GetTransactionWithCtx(context.Background(), transactionHash, options)
+}
+
+// GetTransactionWithCtx returns the transaction by the given transaction hash
+func (p *Provider) GetTransactionWithCtx(ctx context.Context, transactionHash string, options *GetTransactionOptions) (*GetTransactionOutput, error) {
 	params := map[string]any{
 		"hash": transactionHash,
 	}
@@ -350,7 +386,7 @@ func (p *Provider) GetTransaction(transactionHash string, options *GetTransactio
 		params["prove"] = options.Prove
 	}
 
-	rawOutput, err := p.doPostRequest("", params, QueryTXRoute)
+	rawOutput, err := p.doPostRequest(context.Background(), "", params, QueryTXRoute)
 
 	defer closeOrLog(rawOutput)
 
@@ -375,7 +411,12 @@ func (p *Provider) GetTransaction(transactionHash string, options *GetTransactio
 
 // GetBlockHeight returns the current height
 func (p *Provider) GetBlockHeight() (int, error) {
-	rawOutput, err := p.doPostRequest("", nil, QueryHeightRoute)
+	return p.GetBlockHeightWithCtx(context.Background())
+}
+
+// GetBlockHeightWithCtx returns the current height
+func (p *Provider) GetBlockHeightWithCtx(ctx context.Context) (int, error) {
+	rawOutput, err := p.doPostRequest(ctx, "", nil, QueryHeightRoute)
 
 	defer closeOrLog(rawOutput)
 
@@ -400,6 +441,11 @@ func (p *Provider) GetBlockHeight() (int, error) {
 
 // GetAllParams returns the params at the specified height
 func (p *Provider) GetAllParams(options *GetAllParamsOptions) (*AllParams, error) {
+	return p.GetAllParamsWithCtx(context.Background(), options)
+}
+
+// GetAllParamsWithCtx returns the params at the specified height
+func (p *Provider) GetAllParamsWithCtx(ctx context.Context, options *GetAllParamsOptions) (*AllParams, error) {
 	var height int
 	if options != nil {
 		height = options.Height
@@ -409,7 +455,7 @@ func (p *Provider) GetAllParams(options *GetAllParamsOptions) (*AllParams, error
 		"height": height,
 	}
 
-	rawOutput, err := p.doPostRequest("", params, QueryAllParamsRoute)
+	rawOutput, err := p.doPostRequest(ctx, "", params, QueryAllParamsRoute)
 
 	defer closeOrLog(rawOutput)
 
@@ -433,6 +479,12 @@ func (p *Provider) GetAllParams(options *GetAllParamsOptions) (*AllParams, error
 // GetNodes returns a page of nodes known at the specified height and with options
 // empty options returns all validators, page < 1 returns the first page, per_page < 1 returns 10000 elements per page
 func (p *Provider) GetNodes(options *GetNodesOptions) (*GetNodesOutput, error) {
+	return p.GetNodesWithCtx(context.Background(), options)
+}
+
+// GetNodesWithCtx returns a page of nodes known at the specified height and with options
+// empty options returns all validators, page < 1 returns the first page, per_page < 1 returns 10000 elements per page
+func (p *Provider) GetNodesWithCtx(ctx context.Context, options *GetNodesOptions) (*GetNodesOutput, error) {
 	params := map[string]any{}
 
 	if options != nil {
@@ -446,7 +498,7 @@ func (p *Provider) GetNodes(options *GetNodesOptions) (*GetNodesOutput, error) {
 		}
 	}
 
-	rawOutput, err := p.doPostRequest("", params, QueryNodesRoute)
+	rawOutput, err := p.doPostRequest(ctx, "", params, QueryNodesRoute)
 
 	defer closeOrLog(rawOutput)
 
@@ -471,6 +523,11 @@ func (p *Provider) GetNodes(options *GetNodesOptions) (*GetNodesOutput, error) {
 
 // GetNode returns the node at the specified height, height = 0 is used as latest
 func (p *Provider) GetNode(address string, options *GetNodeOptions) (*GetNodeOutput, error) {
+	return p.GetNodeWithCtx(context.Background(), address, options)
+}
+
+// GetNodeWithCtx returns the node at the specified height, height = 0 is used as latest
+func (p *Provider) GetNodeWithCtx(ctx context.Context, address string, options *GetNodeOptions) (*GetNodeOutput, error) {
 	params := map[string]any{
 		"address": address,
 	}
@@ -479,7 +536,7 @@ func (p *Provider) GetNode(address string, options *GetNodeOptions) (*GetNodeOut
 		params["height"] = options.Height
 	}
 
-	rawOutput, err := p.doPostRequest("", params, QueryNodeRoute)
+	rawOutput, err := p.doPostRequest(ctx, "", params, QueryNodeRoute)
 
 	defer closeOrLog(rawOutput)
 
@@ -505,6 +562,12 @@ func (p *Provider) GetNode(address string, options *GetNodeOptions) (*GetNodeOut
 // GetApps returns a page of applications known at the specified height and staking status
 // empty ("") staking_status returns all apps, page < 1 returns the first page, per_page < 1 returns 10000 elements per page
 func (p *Provider) GetApps(options *GetAppsOptions) (*GetAppsOutput, error) {
+	return p.GetAppsWithCtx(context.Background(), options)
+}
+
+// GetAppsWithCtx returns a page of applications known at the specified height and staking status
+// empty ("") staking_status returns all apps, page < 1 returns the first page, per_page < 1 returns 10000 elements per page
+func (p *Provider) GetAppsWithCtx(ctx context.Context, options *GetAppsOptions) (*GetAppsOutput, error) {
 	params := map[string]any{}
 
 	if options != nil {
@@ -517,7 +580,7 @@ func (p *Provider) GetApps(options *GetAppsOptions) (*GetAppsOutput, error) {
 		}
 	}
 
-	rawOutput, err := p.doPostRequest("", params, QueryAppsRoute)
+	rawOutput, err := p.doPostRequest(ctx, "", params, QueryAppsRoute)
 
 	defer closeOrLog(rawOutput)
 
@@ -542,6 +605,11 @@ func (p *Provider) GetApps(options *GetAppsOptions) (*GetAppsOutput, error) {
 
 // GetApp returns the app at the specified height, height = 0 is used as latest
 func (p *Provider) GetApp(address string, options *GetAppOptions) (*GetAppOutput, error) {
+	return p.GetAppWithCtx(context.Background(), address, options)
+}
+
+// GetAppWithCtx returns the app at the specified height, height = 0 is used as latest
+func (p *Provider) GetAppWithCtx(ctx context.Context, address string, options *GetAppOptions) (*GetAppOutput, error) {
 	params := map[string]any{
 		"address": address,
 	}
@@ -550,7 +618,7 @@ func (p *Provider) GetApp(address string, options *GetAppOptions) (*GetAppOutput
 		params["height"] = options.Height
 	}
 
-	rawOutput, err := p.doPostRequest("", params, QueryAppRoute)
+	rawOutput, err := p.doPostRequest(ctx, "", params, QueryAppRoute)
 
 	defer closeOrLog(rawOutput)
 
@@ -575,6 +643,11 @@ func (p *Provider) GetApp(address string, options *GetAppOptions) (*GetAppOutput
 
 // GetAccount returns account at the specified address
 func (p *Provider) GetAccount(address string, options *GetAccountOptions) (*GetAccountOutput, error) {
+	return p.GetAccountWithCtx(context.Background(), address, options)
+}
+
+// GetAccountWithCtx returns account at the specified address
+func (p *Provider) GetAccountWithCtx(ctx context.Context, address string, options *GetAccountOptions) (*GetAccountOutput, error) {
 	params := map[string]any{
 		"address": address,
 	}
@@ -583,7 +656,7 @@ func (p *Provider) GetAccount(address string, options *GetAccountOptions) (*GetA
 		params["height"] = options.Height
 	}
 
-	rawOutput, err := p.doPostRequest("", params, QueryAccountRoute)
+	rawOutput, err := p.doPostRequest(ctx, "", params, QueryAccountRoute)
 
 	defer closeOrLog(rawOutput)
 
@@ -609,6 +682,12 @@ func (p *Provider) GetAccount(address string, options *GetAccountOptions) (*GetA
 // GetAccounts returns a page of accounts known at the specified height and with options
 // empty options returns all accounts on last height, page < 1 returns the first page, per_page < 1 returns 10000 elements per page
 func (p *Provider) GetAccounts(options *GetAccountsOptions) (*GetAccountsOutput, error) {
+	return p.GetAccountsWithCtx(context.Background(), options)
+}
+
+// GetAccountsWithCtx returns a page of accounts known at the specified height and with options
+// empty options returns all accounts on last height, page < 1 returns the first page, per_page < 1 returns 10000 elements per page
+func (p *Provider) GetAccountsWithCtx(ctx context.Context, options *GetAccountsOptions) (*GetAccountsOutput, error) {
 	params := map[string]any{}
 
 	if options != nil {
@@ -617,7 +696,7 @@ func (p *Provider) GetAccounts(options *GetAccountsOptions) (*GetAccountsOutput,
 		params["per_page"] = options.PerPage
 	}
 
-	rawOutput, err := p.doPostRequest("", params, QueryAccountsRoute)
+	rawOutput, err := p.doPostRequest(ctx, "", params, QueryAccountsRoute)
 
 	defer closeOrLog(rawOutput)
 
@@ -642,6 +721,11 @@ func (p *Provider) GetAccounts(options *GetAccountsOptions) (*GetAccountsOutput,
 
 // Dispatch sends a dispatch request to the network and gets the nodes that will be servicing the requests for the session.
 func (p *Provider) Dispatch(appPublicKey, chain string, options *DispatchRequestOptions) (*DispatchOutput, error) {
+	return p.DispatchWithCtx(context.Background(), appPublicKey, chain, options)
+}
+
+// DispatchWithCtx sends a dispatch request to the network and gets the nodes that will be servicing the requests for the session.
+func (p *Provider) DispatchWithCtx(ctx context.Context, appPublicKey, chain string, options *DispatchRequestOptions) (*DispatchOutput, error) {
 	if len(p.dispatchers) == 0 {
 		return nil, ErrNoDispatchers
 	}
@@ -655,7 +739,7 @@ func (p *Provider) Dispatch(appPublicKey, chain string, options *DispatchRequest
 		params["session_height"] = options.Height
 	}
 
-	rawOutput, err := p.doPostRequest("", params, ClientDispatchRoute)
+	rawOutput, err := p.doPostRequest(ctx, "", params, ClientDispatchRoute)
 
 	defer closeOrLog(rawOutput)
 
@@ -680,7 +764,12 @@ func (p *Provider) Dispatch(appPublicKey, chain string, options *DispatchRequest
 
 // Relay does request to be relayed to a target blockchain
 func (p *Provider) Relay(rpcURL string, input *RelayInput, options *RelayRequestOptions) (*RelayOutput, error) {
-	rawOutput, reqErr := p.doPostRequest(rpcURL, input, ClientRelayRoute)
+	return p.RelayWithCtx(context.Background(), rpcURL, input, options)
+}
+
+// RelayWithCtx does request to be relayed to a target blockchain
+func (p *Provider) RelayWithCtx(ctx context.Context, rpcURL string, input *RelayInput, options *RelayRequestOptions) (*RelayOutput, error) {
+	rawOutput, reqErr := p.doPostRequest(ctx, rpcURL, input, ClientRelayRoute)
 
 	defer closeOrLog(rawOutput)
 
