@@ -35,7 +35,7 @@ func TestRelayer_Relay(t *testing.T) {
 	c.Equal(ErrNoProvider, err)
 	c.Empty(relay)
 
-	relayer.provider = provider.NewProvider("https://dummy.com", []string{"https://dummy.com"})
+	relayer.provider = provider.NewProvider("https://dummy.com", []string{"https://dummy.com"}, false)
 
 	relay, err = relayer.Relay(input, nil)
 	c.Equal(ErrNoSession, err)
@@ -120,7 +120,7 @@ func TestRelayer_RelayWithCtx(t *testing.T) {
 	c.Equal(ErrNoProvider, err)
 	c.Empty(relay)
 
-	relayer.provider = provider.NewProvider("https://dummy.com", []string{"https://dummy.com"})
+	relayer.provider = provider.NewProvider("https://dummy.com", []string{"https://dummy.com"}, false)
 
 	relay, err = relayer.RelayWithCtx(context.Background(), input, nil)
 	c.Equal(ErrNoSession, err)

@@ -37,14 +37,16 @@ type Provider struct {
 	rpcURL      string
 	dispatchers []string
 	client      *client.Client
+	debug       bool
 }
 
 // NewProvider returns Provider instance from input
-func NewProvider(rpcURL string, dispatchers []string) *Provider {
+func NewProvider(rpcURL string, dispatchers []string, debug bool) *Provider {
 	return &Provider{
 		rpcURL:      rpcURL,
 		dispatchers: dispatchers,
 		client:      client.NewDefaultClient(),
+		debug:       debug,
 	}
 }
 
@@ -769,6 +771,20 @@ func (p *Provider) Relay(rpcURL string, input *RelayInput, options *RelayRequest
 
 // RelayWithCtx does request to be relayed to a target blockchain
 func (p *Provider) RelayWithCtx(ctx context.Context, rpcURL string, input *RelayInput, options *RelayRequestOptions) (*RelayOutput, error) {
+	// TODO: Use a log service instead of raw prints
+	if p.debug {
+		log := map[string]any{
+			"level":   "DEBUG",
+			"message": "relay payload",
+			"payload": input,
+		}
+		rawLog, err := json.Marshal(log)
+		if err != nil {
+			fmt.Printf("debug input unmarshall: %s \n", err.Error())
+		}
+		fmt.Println(string(rawLog))
+	}
+
 	rawOutput, reqErr := p.doPostRequest(ctx, rpcURL, input, ClientRelayRoute)
 
 	defer closeOrLog(rawOutput)

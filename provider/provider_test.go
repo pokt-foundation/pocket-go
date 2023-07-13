@@ -30,7 +30,7 @@ func TestProvider_GetBalance(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"})
+	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"}, false)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryBalanceRoute), http.StatusOK, "samples/query_balance.json")
 
@@ -51,7 +51,7 @@ func TestProvider_GetBalanceWithCtx(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"})
+	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"}, false)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryBalanceRoute), http.StatusOK, "samples/query_balance.json")
 
@@ -72,7 +72,7 @@ func TestProvider_GetAccountTransactions(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"})
+	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"}, false)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountTXsRoute), http.StatusOK, "samples/query_account_txs.json")
 
@@ -93,7 +93,7 @@ func TestProvider_GetAccountTransactionsWithCtx(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"})
+	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"}, false)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountTXsRoute), http.StatusOK, "samples/query_account_txs.json")
 
@@ -114,7 +114,7 @@ func TestProvider_GetBlockTransactions(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"})
+	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"}, false)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryBlockTXsRoute), http.StatusOK, "samples/query_block_txs.json")
 
@@ -135,7 +135,7 @@ func TestProvider_GetBlockTransactionsWithCtx(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"})
+	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"}, false)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryBlockTXsRoute), http.StatusOK, "samples/query_block_txs.json")
 
@@ -156,7 +156,7 @@ func TestProvider_GetType(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"})
+	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"}, false)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAppRoute), http.StatusOK, "samples/query_app.json")
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryNodeRoute), http.StatusOK, "samples/query_node.json")
@@ -198,7 +198,7 @@ func TestProvider_GetTypeWithCtx(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"})
+	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"}, false)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAppRoute), http.StatusOK, "samples/query_app.json")
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryNodeRoute), http.StatusOK, "samples/query_node.json")
@@ -240,7 +240,7 @@ func TestProvider_SendTransaction(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"})
+	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"}, false)
 
 	transaction, err := provider.SendTransaction(&SendTransactionInput{Address: "pjog", RawHexBytes: "abcd"})
 	c.Contains(err.Error(), "Post \"https://dummy.com/v1/client/rawtx\": no responder found")
@@ -259,7 +259,7 @@ func TestProvider_SendTransactionWithCtx(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"})
+	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"}, false)
 
 	transaction, err := provider.SendTransactionWithCtx(context.Background(), &SendTransactionInput{Address: "pjog", RawHexBytes: "abcd"})
 	c.Contains(err.Error(), "Post \"https://dummy.com/v1/client/rawtx\": no responder found")
@@ -278,7 +278,7 @@ func TestProvider_GetBlock(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"})
+	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"}, false)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryBlockRoute), http.StatusOK, "samples/query_block.json")
 
@@ -299,7 +299,7 @@ func TestProvider_GetBlockWithCtx(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"})
+	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"}, false)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryBlockRoute), http.StatusOK, "samples/query_block.json")
 
@@ -320,7 +320,7 @@ func TestProvider_GetTransaction(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"})
+	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"}, false)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryTXRoute), http.StatusOK, "samples/query_tx.json")
 
@@ -341,7 +341,7 @@ func TestProvider_GetTransactionWithCtx(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"})
+	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"}, false)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryTXRoute), http.StatusOK, "samples/query_tx.json")
 
@@ -362,7 +362,7 @@ func TestProvider_GetBlockHeight(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"})
+	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"}, false)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryHeightRoute), http.StatusOK, "samples/query_height.json")
 
@@ -383,7 +383,7 @@ func TestProvider_GetBlockHeightWithCtx(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"})
+	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"}, false)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryHeightRoute), http.StatusOK, "samples/query_height.json")
 
@@ -404,7 +404,7 @@ func TestProvider_GetAllParams(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"})
+	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"}, false)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAllParamsRoute), http.StatusOK, "samples/query_allparams.json")
 
@@ -422,7 +422,7 @@ func TestProvider_GetAllParamsWithCtx(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"})
+	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"}, false)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAllParamsRoute), http.StatusOK, "samples/query_allparams.json")
 
@@ -440,7 +440,7 @@ func TestProvider_GetNodes(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"})
+	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"}, false)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryNodesRoute), http.StatusOK, "samples/query_nodes.json")
 
@@ -461,7 +461,7 @@ func TestProvider_GetNodesWithCtx(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"})
+	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"}, false)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryNodesRoute), http.StatusOK, "samples/query_nodes.json")
 
@@ -482,7 +482,7 @@ func TestProvider_GetApps(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"})
+	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"}, false)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAppsRoute), http.StatusOK, "samples/query_apps.json")
 
@@ -503,7 +503,7 @@ func TestProvider_GetAppsWithCtx(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"})
+	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"}, false)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAppsRoute), http.StatusOK, "samples/query_apps.json")
 
@@ -524,7 +524,7 @@ func TestProvider_GetNode(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"})
+	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"}, false)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryNodeRoute), http.StatusOK, "samples/query_node.json")
 
@@ -545,7 +545,7 @@ func TestProvider_GetNodeWithCtx(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"})
+	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"}, false)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryNodeRoute), http.StatusOK, "samples/query_node.json")
 
@@ -566,7 +566,7 @@ func TestProvider_GetApp(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"})
+	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"}, false)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAppRoute), http.StatusOK, "samples/query_app.json")
 
@@ -587,7 +587,7 @@ func TestProvider_GetAppWithCtx(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"})
+	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"}, false)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAppRoute), http.StatusOK, "samples/query_app.json")
 
@@ -608,7 +608,7 @@ func TestProvider_GetAccount(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"})
+	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"}, false)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountRoute), http.StatusOK, "samples/query_account.json")
 
@@ -629,7 +629,7 @@ func TestProvider_GetAccountWithCtx(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"})
+	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"}, false)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountRoute), http.StatusOK, "samples/query_account.json")
 
@@ -650,7 +650,7 @@ func TestProvider_GetAccounts(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"})
+	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"}, false)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountsRoute), http.StatusOK, "samples/query_accounts.json")
 
@@ -671,7 +671,7 @@ func TestProvider_GetAccountsWithCtx(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"})
+	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"}, false)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAccountsRoute), http.StatusOK, "samples/query_accounts.json")
 
@@ -764,7 +764,7 @@ func TestProvider_Relay(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"})
+	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"}, false)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientRelayRoute), http.StatusOK, "samples/client_relay.json")
 
@@ -799,7 +799,7 @@ func TestProvider_RelayWithCtx(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"})
+	provider := NewProvider("https://dummy.com", []string{"https://dummy.com"}, false)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientRelayRoute), http.StatusOK, "samples/client_relay.json")
 
