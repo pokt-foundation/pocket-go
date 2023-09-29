@@ -86,13 +86,13 @@ func (p *Provider) getFinalRPCURL(rpcURL string, route V1RPCRoute) (string, erro
 	return p.rpcURL, nil
 }
 
-func (p *Provider) doPostRequest(ctx context.Context, rpcURL string, params any, route V1RPCRoute) (*http.Response, error) {
+func (p *Provider) doPostRequest(ctx context.Context, rpcURL string, params any, route V1RPCRoute, headers http.Header) (*http.Response, error) {
 	finalRPCURL, err := p.getFinalRPCURL(rpcURL, route)
 	if err != nil {
 		return nil, err
 	}
 
-	output, err := p.client.PostWithURLJSONParamsWithCtx(ctx, fmt.Sprintf("%s%s", finalRPCURL, route), params, http.Header{})
+	output, err := p.client.PostWithURLJSONParamsWithCtx(ctx, fmt.Sprintf("%s%s", finalRPCURL, route), params, headers)
 	if err != nil {
 		return nil, err
 	}
@@ -153,7 +153,7 @@ func (p *Provider) GetBalanceWithCtx(ctx context.Context, address string, option
 		params["height"] = options.Height
 	}
 
-	rawOutput, err := p.doPostRequest(ctx, "", params, QueryBalanceRoute)
+	rawOutput, err := p.doPostRequest(ctx, "", params, QueryBalanceRoute, http.Header{})
 
 	defer closeOrLog(rawOutput)
 
@@ -195,7 +195,7 @@ func (p *Provider) GetAccountTransactionsWithCtx(ctx context.Context, address st
 		params["order"] = options.Order
 	}
 
-	rawOutput, err := p.doPostRequest(ctx, "", params, QueryAccountTXsRoute)
+	rawOutput, err := p.doPostRequest(ctx, "", params, QueryAccountTXsRoute, http.Header{})
 
 	defer closeOrLog(rawOutput)
 
@@ -235,7 +235,7 @@ func (p *Provider) GetBlockTransactionsWithCtx(ctx context.Context, options *Get
 		params["order"] = options.Order
 	}
 
-	rawOutput, err := p.doPostRequest(ctx, "", params, QueryBlockTXsRoute)
+	rawOutput, err := p.doPostRequest(ctx, "", params, QueryBlockTXsRoute, http.Header{})
 
 	defer closeOrLog(rawOutput)
 
@@ -316,7 +316,7 @@ func (p *Provider) SendTransaction(input *SendTransactionInput) (*SendTransactio
 
 // SendTransactionWithCtx sends raw transaction to be relayed to a target address
 func (p *Provider) SendTransactionWithCtx(ctx context.Context, input *SendTransactionInput) (*SendTransactionOutput, error) {
-	rawOutput, err := p.doPostRequest(ctx, "", input, ClientRawTXRoute)
+	rawOutput, err := p.doPostRequest(ctx, "", input, ClientRawTXRoute, http.Header{})
 
 	defer closeOrLog(rawOutput)
 
@@ -348,7 +348,7 @@ func (p *Provider) GetBlock(blockNumber int) (*GetBlockOutput, error) {
 func (p *Provider) GetBlockWithCtx(ctx context.Context, blockNumber int) (*GetBlockOutput, error) {
 	rawOutput, err := p.doPostRequest(ctx, "", map[string]int{
 		"height": blockNumber,
-	}, QueryBlockRoute)
+	}, QueryBlockRoute, http.Header{})
 
 	defer closeOrLog(rawOutput)
 
@@ -386,7 +386,7 @@ func (p *Provider) GetTransactionWithCtx(ctx context.Context, transactionHash st
 		params["prove"] = options.Prove
 	}
 
-	rawOutput, err := p.doPostRequest(context.Background(), "", params, QueryTXRoute)
+	rawOutput, err := p.doPostRequest(context.Background(), "", params, QueryTXRoute, http.Header{})
 
 	defer closeOrLog(rawOutput)
 
@@ -416,7 +416,7 @@ func (p *Provider) GetBlockHeight() (int, error) {
 
 // GetBlockHeightWithCtx returns the current height
 func (p *Provider) GetBlockHeightWithCtx(ctx context.Context) (int, error) {
-	rawOutput, err := p.doPostRequest(ctx, "", nil, QueryHeightRoute)
+	rawOutput, err := p.doPostRequest(ctx, "", nil, QueryHeightRoute, http.Header{})
 
 	defer closeOrLog(rawOutput)
 
@@ -455,7 +455,7 @@ func (p *Provider) GetAllParamsWithCtx(ctx context.Context, options *GetAllParam
 		"height": height,
 	}
 
-	rawOutput, err := p.doPostRequest(ctx, "", params, QueryAllParamsRoute)
+	rawOutput, err := p.doPostRequest(ctx, "", params, QueryAllParamsRoute, http.Header{})
 
 	defer closeOrLog(rawOutput)
 
@@ -498,7 +498,7 @@ func (p *Provider) GetNodesWithCtx(ctx context.Context, options *GetNodesOptions
 		}
 	}
 
-	rawOutput, err := p.doPostRequest(ctx, "", params, QueryNodesRoute)
+	rawOutput, err := p.doPostRequest(ctx, "", params, QueryNodesRoute, http.Header{})
 
 	defer closeOrLog(rawOutput)
 
@@ -536,7 +536,7 @@ func (p *Provider) GetNodeWithCtx(ctx context.Context, address string, options *
 		params["height"] = options.Height
 	}
 
-	rawOutput, err := p.doPostRequest(ctx, "", params, QueryNodeRoute)
+	rawOutput, err := p.doPostRequest(ctx, "", params, QueryNodeRoute, http.Header{})
 
 	defer closeOrLog(rawOutput)
 
@@ -580,7 +580,7 @@ func (p *Provider) GetAppsWithCtx(ctx context.Context, options *GetAppsOptions) 
 		}
 	}
 
-	rawOutput, err := p.doPostRequest(ctx, "", params, QueryAppsRoute)
+	rawOutput, err := p.doPostRequest(ctx, "", params, QueryAppsRoute, http.Header{})
 
 	defer closeOrLog(rawOutput)
 
@@ -618,7 +618,7 @@ func (p *Provider) GetAppWithCtx(ctx context.Context, address string, options *G
 		params["height"] = options.Height
 	}
 
-	rawOutput, err := p.doPostRequest(ctx, "", params, QueryAppRoute)
+	rawOutput, err := p.doPostRequest(ctx, "", params, QueryAppRoute, http.Header{})
 
 	defer closeOrLog(rawOutput)
 
@@ -656,7 +656,7 @@ func (p *Provider) GetAccountWithCtx(ctx context.Context, address string, option
 		params["height"] = options.Height
 	}
 
-	rawOutput, err := p.doPostRequest(ctx, "", params, QueryAccountRoute)
+	rawOutput, err := p.doPostRequest(ctx, "", params, QueryAccountRoute, http.Header{})
 
 	defer closeOrLog(rawOutput)
 
@@ -696,7 +696,7 @@ func (p *Provider) GetAccountsWithCtx(ctx context.Context, options *GetAccountsO
 		params["per_page"] = options.PerPage
 	}
 
-	rawOutput, err := p.doPostRequest(ctx, "", params, QueryAccountsRoute)
+	rawOutput, err := p.doPostRequest(ctx, "", params, QueryAccountsRoute, http.Header{})
 
 	defer closeOrLog(rawOutput)
 
@@ -720,12 +720,12 @@ func (p *Provider) GetAccountsWithCtx(ctx context.Context, options *GetAccountsO
 }
 
 // Dispatch sends a dispatch request to the network and gets the nodes that will be servicing the requests for the session.
-func (p *Provider) Dispatch(appPublicKey, chain string, options *DispatchRequestOptions) (*DispatchOutput, error) {
-	return p.DispatchWithCtx(context.Background(), appPublicKey, chain, options)
+func (p *Provider) Dispatch(appPublicKey, chain string, options *DispatchRequestOptions, headers http.Header) (*DispatchOutput, error) {
+	return p.DispatchWithCtx(context.Background(), appPublicKey, chain, options, headers)
 }
 
 // DispatchWithCtx sends a dispatch request to the network and gets the nodes that will be servicing the requests for the session.
-func (p *Provider) DispatchWithCtx(ctx context.Context, appPublicKey, chain string, options *DispatchRequestOptions) (*DispatchOutput, error) {
+func (p *Provider) DispatchWithCtx(ctx context.Context, appPublicKey, chain string, options *DispatchRequestOptions, headers http.Header) (*DispatchOutput, error) {
 	if len(p.dispatchers) == 0 {
 		return nil, ErrNoDispatchers
 	}
@@ -739,7 +739,7 @@ func (p *Provider) DispatchWithCtx(ctx context.Context, appPublicKey, chain stri
 		params["session_height"] = options.Height
 	}
 
-	rawOutput, err := p.doPostRequest(ctx, "", params, ClientDispatchRoute)
+	rawOutput, err := p.doPostRequest(ctx, "", params, ClientDispatchRoute, headers)
 
 	defer closeOrLog(rawOutput)
 
@@ -769,7 +769,7 @@ func (p *Provider) Relay(rpcURL string, input *RelayInput, options *RelayRequest
 
 // RelayWithCtx does request to be relayed to a target blockchain
 func (p *Provider) RelayWithCtx(ctx context.Context, rpcURL string, input *RelayInput, options *RelayRequestOptions) (*RelayOutput, error) {
-	rawOutput, reqErr := p.doPostRequest(ctx, rpcURL, input, ClientRelayRoute)
+	rawOutput, reqErr := p.doPostRequest(ctx, rpcURL, input, ClientRelayRoute, http.Header{})
 
 	defer closeOrLog(rawOutput)
 
