@@ -486,13 +486,13 @@ func TestProvider_GetApps(t *testing.T) {
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAppsRoute), http.StatusOK, "samples/query_apps.json")
 
-	apps, err := provider.GetApps(&GetAppsOptions{Page: 2})
+	apps, err := provider.GetApps(&GetAppsOptions{Page: 2}, http.Header{})
 	c.NoError(err)
 	c.NotEmpty(apps)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAppsRoute), http.StatusInternalServerError, "samples/query_apps.json")
 
-	apps, err = provider.GetApps(nil)
+	apps, err = provider.GetApps(nil, http.Header{})
 	c.Equal(Err5xxOnConnection, err)
 	c.Empty(apps)
 }
@@ -507,13 +507,13 @@ func TestProvider_GetAppsWithCtx(t *testing.T) {
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAppsRoute), http.StatusOK, "samples/query_apps.json")
 
-	apps, err := provider.GetAppsWithCtx(context.Background(), &GetAppsOptions{Page: 2})
+	apps, err := provider.GetAppsWithCtx(context.Background(), &GetAppsOptions{Page: 2}, http.Header{})
 	c.NoError(err)
 	c.NotEmpty(apps)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAppsRoute), http.StatusInternalServerError, "samples/query_apps.json")
 
-	apps, err = provider.GetAppsWithCtx(context.Background(), nil)
+	apps, err = provider.GetAppsWithCtx(context.Background(), nil, http.Header{})
 	c.Equal(Err5xxOnConnection, err)
 	c.Empty(apps)
 }

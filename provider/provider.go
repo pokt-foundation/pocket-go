@@ -92,7 +92,19 @@ func (p *Provider) doPostRequest(ctx context.Context, rpcURL string, params any,
 		return nil, err
 	}
 
-	output, err := p.client.PostWithURLJSONParamsWithCtx(ctx, fmt.Sprintf("%s%s", finalRPCURL, route), params, headers)
+	finalURL := fmt.Sprintf("%s%s", finalRPCURL, route)
+
+	if route == ClientDispatchRoute {
+		fmt.Println("---- Start Log Params for cURL ----")
+		fmt.Printf("Context: %v\n", ctx)
+		fmt.Printf("URL: %s\n", finalURL)
+		fmt.Printf("Params: %v\n", params)
+		fmt.Printf("Headers: %v\n", headers)
+		fmt.Println("---- End Log Params for cURL ----")
+	}
+
+	// Existing line
+	output, err := p.client.PostWithURLJSONParamsWithCtx(ctx, finalURL, params, headers)
 	if err != nil {
 		return nil, err
 	}
@@ -561,13 +573,13 @@ func (p *Provider) GetNodeWithCtx(ctx context.Context, address string, options *
 
 // GetApps returns a page of applications known at the specified height and staking status
 // empty ("") staking_status returns all apps, page < 1 returns the first page, per_page < 1 returns 10000 elements per page
-func (p *Provider) GetApps(options *GetAppsOptions) (*GetAppsOutput, error) {
-	return p.GetAppsWithCtx(context.Background(), options)
+func (p *Provider) GetApps(options *GetAppsOptions, headers http.Header) (*GetAppsOutput, error) {
+	return p.GetAppsWithCtx(context.Background(), options, headers)
 }
 
 // GetAppsWithCtx returns a page of applications known at the specified height and staking status
 // empty ("") staking_status returns all apps, page < 1 returns the first page, per_page < 1 returns 10000 elements per page
-func (p *Provider) GetAppsWithCtx(ctx context.Context, options *GetAppsOptions) (*GetAppsOutput, error) {
+func (p *Provider) GetAppsWithCtx(ctx context.Context, options *GetAppsOptions, headers http.Header) (*GetAppsOutput, error) {
 	params := map[string]any{}
 
 	if options != nil {
@@ -580,7 +592,7 @@ func (p *Provider) GetAppsWithCtx(ctx context.Context, options *GetAppsOptions) 
 		}
 	}
 
-	rawOutput, err := p.doPostRequest(ctx, "", params, QueryAppsRoute, http.Header{})
+	rawOutput, err := p.doPostRequest(ctx, "", params, QueryAppsRoute, headers)
 
 	defer closeOrLog(rawOutput)
 
