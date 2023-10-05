@@ -92,19 +92,7 @@ func (p *Provider) doPostRequest(ctx context.Context, rpcURL string, params any,
 		return nil, err
 	}
 
-	finalURL := fmt.Sprintf("%s%s", finalRPCURL, route)
-
-	if route == ClientDispatchRoute {
-		fmt.Println("---- Start Log Params for cURL ----")
-		fmt.Printf("Context: %v\n", ctx)
-		fmt.Printf("URL: %s\n", finalURL)
-		fmt.Printf("Params: %v\n", params)
-		fmt.Printf("Headers: %v\n", headers)
-		fmt.Println("---- End Log Params for cURL ----")
-	}
-
-	// Existing line
-	output, err := p.client.PostWithURLJSONParamsWithCtx(ctx, finalURL, params, headers)
+	output, err := p.client.PostWithURLJSONParamsWithCtx(ctx, fmt.Sprintf("%s%s", finalRPCURL, route), params, headers)
 	if err != nil {
 		return nil, err
 	}
