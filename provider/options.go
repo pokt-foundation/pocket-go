@@ -1,5 +1,7 @@
 package provider
 
+import "net/http"
+
 // JailedStatus enum that represents jailed status
 type JailedStatus int
 
@@ -104,12 +106,14 @@ type GetAppsOptions struct {
 	Page          int
 	PerPage       int
 	BlockChain    string
+	Headers       http.Header
 }
 
 // DispatchRequestOptions represents optional arguments for Dispatch request
 type DispatchRequestOptions struct {
 	Height                       int
 	RejectSelfSignedCertificates bool
+	Headers                      http.Header
 }
 
 // RelayRequestOptions represents optional arguments for Relay request

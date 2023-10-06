@@ -561,13 +561,13 @@ func (p *Provider) GetNodeWithCtx(ctx context.Context, address string, options *
 
 // GetApps returns a page of applications known at the specified height and staking status
 // empty ("") staking_status returns all apps, page < 1 returns the first page, per_page < 1 returns 10000 elements per page
-func (p *Provider) GetApps(options *GetAppsOptions, headers http.Header) (*GetAppsOutput, error) {
-	return p.GetAppsWithCtx(context.Background(), options, headers)
+func (p *Provider) GetApps(options *GetAppsOptions) (*GetAppsOutput, error) {
+	return p.GetAppsWithCtx(context.Background(), options)
 }
 
 // GetAppsWithCtx returns a page of applications known at the specified height and staking status
 // empty ("") staking_status returns all apps, page < 1 returns the first page, per_page < 1 returns 10000 elements per page
-func (p *Provider) GetAppsWithCtx(ctx context.Context, options *GetAppsOptions, headers http.Header) (*GetAppsOutput, error) {
+func (p *Provider) GetAppsWithCtx(ctx context.Context, options *GetAppsOptions) (*GetAppsOutput, error) {
 	params := map[string]any{}
 
 	if options != nil {
@@ -578,6 +578,11 @@ func (p *Provider) GetAppsWithCtx(ctx context.Context, options *GetAppsOptions, 
 			"per_page":       options.PerPage,
 			"blockchain":     options.BlockChain,
 		}
+	}
+
+	headers := http.Header{}
+	if options != nil && options.Headers != nil {
+		headers = options.Headers
 	}
 
 	rawOutput, err := p.doPostRequest(ctx, "", params, QueryAppsRoute, headers)
@@ -720,12 +725,12 @@ func (p *Provider) GetAccountsWithCtx(ctx context.Context, options *GetAccountsO
 }
 
 // Dispatch sends a dispatch request to the network and gets the nodes that will be servicing the requests for the session.
-func (p *Provider) Dispatch(appPublicKey, chain string, options *DispatchRequestOptions, headers http.Header) (*DispatchOutput, error) {
-	return p.DispatchWithCtx(context.Background(), appPublicKey, chain, options, headers)
+func (p *Provider) Dispatch(appPublicKey, chain string, options *DispatchRequestOptions) (*DispatchOutput, error) {
+	return p.DispatchWithCtx(context.Background(), appPublicKey, chain, options)
 }
 
 // DispatchWithCtx sends a dispatch request to the network and gets the nodes that will be servicing the requests for the session.
-func (p *Provider) DispatchWithCtx(ctx context.Context, appPublicKey, chain string, options *DispatchRequestOptions, headers http.Header) (*DispatchOutput, error) {
+func (p *Provider) DispatchWithCtx(ctx context.Context, appPublicKey, chain string, options *DispatchRequestOptions) (*DispatchOutput, error) {
 	if len(p.dispatchers) == 0 {
 		return nil, ErrNoDispatchers
 	}
@@ -737,6 +742,11 @@ func (p *Provider) DispatchWithCtx(ctx context.Context, appPublicKey, chain stri
 
 	if options != nil {
 		params["session_height"] = options.Height
+	}
+
+	headers := http.Header{}
+	if options != nil && options.Headers != nil {
+		headers = options.Headers
 	}
 
 	rawOutput, err := p.doPostRequest(ctx, "", params, ClientDispatchRoute, headers)

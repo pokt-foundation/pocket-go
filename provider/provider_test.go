@@ -486,13 +486,13 @@ func TestProvider_GetApps(t *testing.T) {
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAppsRoute), http.StatusOK, "samples/query_apps.json")
 
-	apps, err := provider.GetApps(&GetAppsOptions{Page: 2}, http.Header{})
+	apps, err := provider.GetApps(&GetAppsOptions{Page: 2})
 	c.NoError(err)
 	c.NotEmpty(apps)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAppsRoute), http.StatusInternalServerError, "samples/query_apps.json")
 
-	apps, err = provider.GetApps(nil, http.Header{})
+	apps, err = provider.GetApps(nil)
 	c.Equal(Err5xxOnConnection, err)
 	c.Empty(apps)
 }
@@ -507,13 +507,13 @@ func TestProvider_GetAppsWithCtx(t *testing.T) {
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAppsRoute), http.StatusOK, "samples/query_apps.json")
 
-	apps, err := provider.GetAppsWithCtx(context.Background(), &GetAppsOptions{Page: 2}, http.Header{})
+	apps, err := provider.GetAppsWithCtx(context.Background(), &GetAppsOptions{Page: 2})
 	c.NoError(err)
 	c.NotEmpty(apps)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", QueryAppsRoute), http.StatusInternalServerError, "samples/query_apps.json")
 
-	apps, err = provider.GetAppsWithCtx(context.Background(), nil, http.Header{})
+	apps, err = provider.GetAppsWithCtx(context.Background(), nil)
 	c.Equal(Err5xxOnConnection, err)
 	c.Empty(apps)
 }
@@ -696,7 +696,7 @@ func TestProvider_Dispatch(t *testing.T) {
 		rpcURL: "https://dummy.com",
 	}
 
-	dispatch, err := provider.Dispatch("pjog", "abcd", &DispatchRequestOptions{Height: 21}, http.Header{})
+	dispatch, err := provider.Dispatch("pjog", "abcd", &DispatchRequestOptions{Height: 21})
 	c.Equal(ErrNoDispatchers, err)
 	c.Empty(dispatch)
 
@@ -709,7 +709,7 @@ func TestProvider_Dispatch(t *testing.T) {
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientDispatchRoute), http.StatusOK, "samples/client_dispatch.json")
 
-	dispatch, err = provider.Dispatch("pjog", "abcd", nil, http.Header{})
+	dispatch, err = provider.Dispatch("pjog", "abcd", nil)
 	c.NoError(err)
 	c.NotEmpty(dispatch)
 
@@ -717,7 +717,7 @@ func TestProvider_Dispatch(t *testing.T) {
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientDispatchRoute), http.StatusInternalServerError, "samples/client_dispatch.json")
 
-	dispatch, err = provider.Dispatch("pjog", "abcd", &DispatchRequestOptions{Height: 21}, http.Header{})
+	dispatch, err = provider.Dispatch("pjog", "abcd", &DispatchRequestOptions{Height: 21})
 	c.Equal(Err5xxOnConnection, err)
 	c.Empty(dispatch)
 }
@@ -732,7 +732,7 @@ func TestProvider_DispatchWithCtx(t *testing.T) {
 		rpcURL: "https://dummy.com",
 	}
 
-	dispatch, err := provider.DispatchWithCtx(context.Background(), "pjog", "abcd", &DispatchRequestOptions{Height: 21}, http.Header{})
+	dispatch, err := provider.DispatchWithCtx(context.Background(), "pjog", "abcd", &DispatchRequestOptions{Height: 21})
 	c.Equal(ErrNoDispatchers, err)
 	c.Empty(dispatch)
 
@@ -745,7 +745,7 @@ func TestProvider_DispatchWithCtx(t *testing.T) {
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientDispatchRoute), http.StatusOK, "samples/client_dispatch.json")
 
-	dispatch, err = provider.DispatchWithCtx(context.Background(), "pjog", "abcd", nil, http.Header{})
+	dispatch, err = provider.DispatchWithCtx(context.Background(), "pjog", "abcd", nil)
 	c.NoError(err)
 	c.NotEmpty(dispatch)
 
@@ -753,7 +753,7 @@ func TestProvider_DispatchWithCtx(t *testing.T) {
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientDispatchRoute), http.StatusInternalServerError, "samples/client_dispatch.json")
 
-	dispatch, err = provider.DispatchWithCtx(context.Background(), "pjog", "abcd", &DispatchRequestOptions{Height: 21}, http.Header{})
+	dispatch, err = provider.DispatchWithCtx(context.Background(), "pjog", "abcd", &DispatchRequestOptions{Height: 21})
 	c.Equal(Err5xxOnConnection, err)
 	c.Empty(dispatch)
 }
