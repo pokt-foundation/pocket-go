@@ -580,7 +580,12 @@ func (p *Provider) GetAppsWithCtx(ctx context.Context, options *GetAppsOptions) 
 		}
 	}
 
-	rawOutput, err := p.doPostRequest(ctx, "", params, QueryAppsRoute, http.Header{})
+	headers := http.Header{}
+	if options != nil && options.Headers != nil {
+		headers = options.Headers
+	}
+
+	rawOutput, err := p.doPostRequest(ctx, "", params, QueryAppsRoute, headers)
 
 	defer closeOrLog(rawOutput)
 
@@ -720,12 +725,12 @@ func (p *Provider) GetAccountsWithCtx(ctx context.Context, options *GetAccountsO
 }
 
 // Dispatch sends a dispatch request to the network and gets the nodes that will be servicing the requests for the session.
-func (p *Provider) Dispatch(appPublicKey, chain string, options *DispatchRequestOptions, headers http.Header) (*DispatchOutput, error) {
-	return p.DispatchWithCtx(context.Background(), appPublicKey, chain, options, headers)
+func (p *Provider) Dispatch(appPublicKey, chain string, options *DispatchRequestOptions) (*DispatchOutput, error) {
+	return p.DispatchWithCtx(context.Background(), appPublicKey, chain, options)
 }
 
 // DispatchWithCtx sends a dispatch request to the network and gets the nodes that will be servicing the requests for the session.
-func (p *Provider) DispatchWithCtx(ctx context.Context, appPublicKey, chain string, options *DispatchRequestOptions, headers http.Header) (*DispatchOutput, error) {
+func (p *Provider) DispatchWithCtx(ctx context.Context, appPublicKey, chain string, options *DispatchRequestOptions) (*DispatchOutput, error) {
 	if len(p.dispatchers) == 0 {
 		return nil, ErrNoDispatchers
 	}
@@ -737,6 +742,11 @@ func (p *Provider) DispatchWithCtx(ctx context.Context, appPublicKey, chain stri
 
 	if options != nil {
 		params["session_height"] = options.Height
+	}
+
+	headers := http.Header{}
+	if options != nil && options.Headers != nil {
+		headers = options.Headers
 	}
 
 	rawOutput, err := p.doPostRequest(ctx, "", params, ClientDispatchRoute, headers)
