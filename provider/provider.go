@@ -409,6 +409,7 @@ func (p *Provider) GetTransactionWithCtx(ctx context.Context, transactionHash st
 	return &output, nil
 }
 
+// GetNodeBlockHeight returns the blockheight reported by a specific node
 func (p *Provider) GetNodeBlockHeight(ctx context.Context, url string) (int, error) {
 	return p.getNodeBlockHeight(ctx, url)
 }
