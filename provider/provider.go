@@ -409,6 +409,11 @@ func (p *Provider) GetTransactionWithCtx(ctx context.Context, transactionHash st
 	return &output, nil
 }
 
+// GetNodeBlockHeight returns the blockheight reported by a specific node
+func (p *Provider) GetNodeBlockHeight(ctx context.Context, url string) (int, error) {
+	return p.getNodeBlockHeight(ctx, url)
+}
+
 // GetBlockHeight returns the current height
 func (p *Provider) GetBlockHeight() (int, error) {
 	return p.GetBlockHeightWithCtx(context.Background())
@@ -416,10 +421,12 @@ func (p *Provider) GetBlockHeight() (int, error) {
 
 // GetBlockHeightWithCtx returns the current height
 func (p *Provider) GetBlockHeightWithCtx(ctx context.Context) (int, error) {
-	rawOutput, err := p.doPostRequest(ctx, "", nil, QueryHeightRoute, http.Header{})
+	return p.getNodeBlockHeight(ctx, "")
+}
 
+func (p *Provider) getNodeBlockHeight(ctx context.Context, url string) (int, error) {
+	rawOutput, err := p.doPostRequest(ctx, url, nil, QueryHeightRoute, http.Header{})
 	defer closeOrLog(rawOutput)
-
 	if err != nil {
 		return 0, err
 	}
@@ -446,16 +453,21 @@ func (p *Provider) GetAllParams(options *GetAllParamsOptions) (*AllParams, error
 
 // GetAllParamsWithCtx returns the params at the specified height
 func (p *Provider) GetAllParamsWithCtx(ctx context.Context, options *GetAllParamsOptions) (*AllParams, error) {
-	var height int
+	var (
+		height int
+		url    string
+	)
+
 	if options != nil {
 		height = options.Height
+		url = options.URL
 	}
 
 	params := map[string]interface{}{
 		"height": height,
 	}
 
-	rawOutput, err := p.doPostRequest(ctx, "", params, QueryAllParamsRoute, http.Header{})
+	rawOutput, err := p.doPostRequest(ctx, url, params, QueryAllParamsRoute, http.Header{})
 
 	defer closeOrLog(rawOutput)
 

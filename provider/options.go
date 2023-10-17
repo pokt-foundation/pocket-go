@@ -47,6 +47,9 @@ type GetNodeOptions struct {
 // GetAllParamsOptions represents optional arguments for GetAllParams request
 type GetAllParamsOptions struct {
 	Height int
+	// URL specifies the URL of the node to which the request should be sent.
+	// If unspecified, the default URL (i.e. that of a dispatcher or a random node) will be used
+	URL string
 }
 
 // GetNodesOptions represents optional arguments for GetNodes request
