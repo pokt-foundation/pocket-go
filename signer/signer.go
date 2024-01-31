@@ -12,8 +12,9 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/pokt-foundation/pocket-go/utils"
 	"golang.org/x/crypto/scrypt"
+
+	"github.com/pokt-foundation/pocket-go/utils"
 )
 
 const (
@@ -62,7 +63,11 @@ func NewRandomSigner() (*Signer, error) {
 	}, nil
 }
 
-// NewSignerFromPrivateKey returns Signer from private key
+// NewSignerFromPrivateKey returns a Signer from private key.
+// The private key must be associated with the `clientPublicKey` used during AAT
+// generation. This is sometimes referred to as the `gateway` key as well.
+// It may or may not be the same as the `applicationPublicKey` depending on how
+// the AAT was generated.
 func NewSignerFromPrivateKey(privateKey string) (*Signer, error) {
 	if !utils.ValidatePrivateKey(privateKey) {
 		return nil, ErrInvalidPrivateKey
@@ -136,7 +141,6 @@ func (s *Signer) Sign(payload []byte) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
 	return hex.EncodeToString(ed25519.Sign(decodedKey, payload)), nil
 }
 
