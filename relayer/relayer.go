@@ -11,8 +11,9 @@ import (
 	"math"
 	"math/big"
 
-	"github.com/pokt-foundation/pocket-go/provider"
 	"golang.org/x/crypto/sha3"
+
+	"github.com/pokt-foundation/pocket-go/provider"
 )
 
 var (
@@ -48,7 +49,10 @@ type Relayer struct {
 	provider Provider
 }
 
-// NewRelayer returns instance of Relayer with given input
+// NewRelayer returns instance of Relayer with given input.
+// signer is the `client` that was used during AAT generation.
+// The signer is often synonymous with the `gateway` which may or may not be the
+// same as the `application` depending on how the AAT was generated.
 func NewRelayer(signer Signer, provider Provider) *Relayer {
 	return &Relayer{
 		signer:   signer,
@@ -96,16 +100,25 @@ func getNode(input *Input) (*provider.Node, error) {
 	return input.Node, nil
 }
 
+// getSignedProofBytes returns the relay proof bytes signed by the signer
 func (r *Relayer) getSignedProofBytes(proof *provider.RelayProof) (string, error) {
+	// Prepare the relay proof bytes to be signed
 	proofBytes, err := GenerateProofBytes(proof)
 	if err != nil {
 		return "", err
 	}
 
+	// Sign the relay proof bytes using the private key of the the signer, also
+	// known as the client from the AAT generation process.
 	return r.signer.Sign(proofBytes)
 }
 
-func (r *Relayer) buildRelay(node *provider.Node, input *Input, options *provider.RelayRequestOptions) (*provider.RelayInput, error) {
+// buildRelay creates a Pocket relay using the RPC payload provided
+func (r *Relayer) buildRelay(
+	servicerNode *provider.Node,
+	input *Input,
+	options *provider.RelayRequestOptions,
+) (*provider.RelayInput, error) {
 	relayPayload := &provider.RelayPayload{
 		Data:    input.Data,
 		Method:  input.Method,
@@ -117,10 +130,12 @@ func (r *Relayer) buildRelay(node *provider.Node, input *Input, options *provide
 		BlockHeight: input.Session.Header.SessionHeight,
 	}
 
-	hashedReq, err := HashRequest(&RequestHash{
+	requestHash := &RequestHash{
 		Payload: relayPayload,
 		Meta:    relayMeta,
-	})
+	}
+
+	hashedReq, err := HashRequest(requestHash)
 	if err != nil {
 		return nil, err
 	}
@@ -130,32 +145,29 @@ func (r *Relayer) buildRelay(node *provider.Node, input *Input, options *provide
 		return nil, err
 	}
 
-	signedProofBytes, err := r.getSignedProofBytes(&provider.RelayProof{
+	// Prepare the RelayProof object
+	relayProof := provider.RelayProof{
 		RequestHash:        hashedReq,
 		Entropy:            entropy.Int64(),
 		SessionBlockHeight: input.Session.Header.SessionHeight,
-		ServicerPubKey:     node.PublicKey,
+		ServicerPubKey:     servicerNode.PublicKey,
 		Blockchain:         input.Blockchain,
 		AAT:                input.PocketAAT,
-	})
+	}
+
+	// Sign the relay proof object
+	signedProofBytes, err := r.getSignedProofBytes(&relayProof)
 	if err != nil {
 		return nil, err
 	}
 
-	relayProof := &provider.RelayProof{
-		RequestHash:        hashedReq,
-		Entropy:            entropy.Int64(),
-		SessionBlockHeight: input.Session.Header.SessionHeight,
-		ServicerPubKey:     node.PublicKey,
-		Blockchain:         input.Blockchain,
-		AAT:                input.PocketAAT,
-		Signature:          signedProofBytes,
-	}
+	// Update the Signature of the RelayProof
+	relayProof.Signature = signedProofBytes
 
 	return &provider.RelayInput{
 		Payload: relayPayload,
 		Meta:    relayMeta,
-		Proof:   relayProof,
+		Proof:   &relayProof,
 	}, nil
 }
 
@@ -239,8 +251,7 @@ func GenerateProofBytes(proof *provider.RelayProof) ([]byte, error) {
 
 	hasher := sha3.New256()
 
-	_, err = hasher.Write(marshaledProof)
-	if err != nil {
+	if _, err = hasher.Write(marshaledProof); err != nil {
 		return nil, err
 	}
 
