@@ -18,6 +18,7 @@ type RelayOutput struct {
 	StatusCode string `json:"statusCode"`
 }
 
+// RelayOutputErr represents the RPC output error
 type RelayOutputErr struct {
 	Error      error  `json:"error"`
 	StatusCode string `json:"statusCode"`
