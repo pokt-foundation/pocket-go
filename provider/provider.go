@@ -786,27 +786,27 @@ func (p *Provider) DispatchWithCtx(ctx context.Context, appPublicKey, chain stri
 }
 
 // Relay does request to be relayed to a target blockchain
-func (p *Provider) Relay(rpcURL string, input *RelayInput, options *RelayRequestOptions) (*RelayOutput, error) {
+func (p *Provider) Relay(rpcURL string, input *RelayInput, options *RelayRequestOptions) (*RelayOutput, *RelayOutputErr) {
 	return p.RelayWithCtx(context.Background(), rpcURL, input, options)
 }
 
 // RelayWithCtx does request to be relayed to a target blockchain
-func (p *Provider) RelayWithCtx(ctx context.Context, rpcURL string, input *RelayInput, options *RelayRequestOptions) (*RelayOutput, error) {
+func (p *Provider) RelayWithCtx(ctx context.Context, rpcURL string, input *RelayInput, options *RelayRequestOptions) (*RelayOutput, *RelayOutputErr) {
 	rawOutput, reqErr := p.doPostRequest(ctx, rpcURL, input, ClientRelayRoute, http.Header{})
 
 	defer closeOrLog(rawOutput)
 
 	if reqErr != nil && !errors.Is(reqErr, errOnRelayRequest) {
-		return nil, reqErr
+		return nil, &RelayOutputErr{Error: reqErr, StatusCode: rawOutput.Status}
 	}
 
-	bodyBytes, err := ioutil.ReadAll(rawOutput.Body)
+	bodyBytes, err := io.ReadAll(rawOutput.Body)
 	if err != nil {
-		return nil, err
+		return nil, &RelayOutputErr{Error: err, StatusCode: rawOutput.Status}
 	}
 
 	if errors.Is(reqErr, errOnRelayRequest) {
-		return nil, parseRelayErrorOutput(bodyBytes, input.Proof.ServicerPubKey)
+		return nil, &RelayOutputErr{Error: parseRelayErrorOutput(bodyBytes, input.Proof.ServicerPubKey), StatusCode: rawOutput.Status}
 	}
 
 	return parseRelaySuccesfulOutput(bodyBytes)
@@ -832,18 +832,18 @@ func extractStatusFromResponse(response string) string {
 	return "200"
 }
 
-func parseRelaySuccesfulOutput(bodyBytes []byte) (*RelayOutput, error) {
+func parseRelaySuccesfulOutput(bodyBytes []byte) (*RelayOutput, *RelayOutputErr) {
 	output := RelayOutput{}
 
 	err := json.Unmarshal(bodyBytes, &output)
 	if err != nil {
-		return nil, err
+		return nil, &RelayOutputErr{Error: err}
 	}
 
 	output.StatusCode = extractStatusFromResponse(output.Response)
 
 	if !json.Valid([]byte(output.Response)) {
-		return &output, ErrNonJSONResponse
+		return nil, &RelayOutputErr{Error: ErrNonJSONResponse, StatusCode: output.StatusCode}
 	}
 
 	return &output, nil

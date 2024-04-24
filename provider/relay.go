@@ -18,6 +18,11 @@ type RelayOutput struct {
 	StatusCode string `json:"statusCode"`
 }
 
+type RelayOutputErr struct {
+	Error      error  `json:"error"`
+	StatusCode string `json:"statusCode"`
+}
+
 // RelayMeta represents metadata of a relay
 type RelayMeta struct {
 	BlockHeight int `json:"block_height"`
