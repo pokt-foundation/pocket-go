@@ -812,19 +812,18 @@ func (p *Provider) RelayWithCtx(ctx context.Context, rpcURL string, input *Relay
 	return parseRelaySuccesfulOutput(bodyBytes)
 }
 
-// TODO: REMOVE THIS HACKY FUNCTION
+// TODO: Remove this function after the node respond back to us with a statusCode along side with the response and the signature
 func extractStatusFromResponse(response string) string {
-	patterns := []string{
-		`"code"\s*:\s*(\d+)`,       // Matches `"code": 4XX` or similar if came from the node
-		`(\d+)\s+Not Found`,        // Matches `404 Not Found` or similar
-		`(\d+)\s+page not found`,   // Additional pattern for matching `404 page not found`
-		`HTTP\/\d\.\d\s+(\d+)`,     // Matches `HTTP/1.1 4XX` or similar, for HTTP responses
-		`"statusCode"\s*:\s*(\d+)`, // Matches `"statusCode": 4XX` or similar
+	patterns := []*regexp.Regexp{
+		regexp.MustCompile(`"code"\s*:\s*(\d+)`),       // Matches `"code": 4XX` or similar if came from the node
+		regexp.MustCompile(`(\d+)\s+Not Found`),        // Matches `404 Not Found` or similar
+		regexp.MustCompile(`(\d+)\s+page not found`),   // Additional pattern for matching `404 page not found`
+		regexp.MustCompile(`HTTP\/\d\.\d\s+(\d+)`),     // Matches `HTTP/1.1 4XX` or similar, for HTTP responses
+		regexp.MustCompile(`"statusCode"\s*:\s*(\d+)`), // Matches `"statusCode": 4XX` or similar
 	}
 
 	for _, pattern := range patterns {
-		re := regexp.MustCompile(pattern)
-		matches := re.FindStringSubmatch(response)
+		matches := pattern.FindStringSubmatch(response)
 		if len(matches) > 1 {
 			return matches[1] // Return the first captured group, which should be the status code.
 		}
