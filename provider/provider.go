@@ -812,7 +812,8 @@ func (p *Provider) RelayWithCtx(ctx context.Context, rpcURL string, input *Relay
 	return parseRelaySuccesfulOutput(bodyBytes)
 }
 
-// TODO: Remove this function after the node respond back to us with a statusCode along side with the response and the signature
+// TODO: Remove this function after the node responds back to us with a statusCode alongside with the response and the signature.
+// Returns "200" if none of the pre-defined internal regexes matches any return values.
 func extractStatusFromResponse(response string) string {
 	patterns := []*regexp.Regexp{
 		regexp.MustCompile(`"code"\s*:\s*(\d+)`),       // Matches `"code": 4XX` or similar if came from the node
