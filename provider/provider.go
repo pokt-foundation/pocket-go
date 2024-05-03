@@ -14,8 +14,9 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/pokt-foundation/pocket-go/utils"
 	"github.com/pokt-foundation/utils-go/client"
+
+	"github.com/pokt-foundation/pocket-go/utils"
 )
 
 var (
@@ -812,24 +813,34 @@ func (p *Provider) RelayWithCtx(ctx context.Context, rpcURL string, input *Relay
 	return parseRelaySuccesfulOutput(bodyBytes)
 }
 
-// TODO: Remove this function after the node responds back to us with a statusCode alongside with the response and the signature.
-// Returns "200" if none of the pre-defined internal regexes matches any return values.
-func extractStatusFromResponse(response string) string {
-	patterns := []*regexp.Regexp{
-		regexp.MustCompile(`"code"\s*:\s*(\d+)`),       // Matches `"code": 4XX` or similar if came from the node
-		regexp.MustCompile(`(\d+)\s+Not Found`),        // Matches `404 Not Found` or similar
-		regexp.MustCompile(`(\d+)\s+page not found`),   // Additional pattern for matching `404 page not found`
-		regexp.MustCompile(`HTTP\/\d\.\d\s+(\d+)`),     // Matches `HTTP/1.1 4XX` or similar, for HTTP responses
-		regexp.MustCompile(`"statusCode"\s*:\s*(\d+)`), // Matches `"statusCode": 4XX` or similar
-	}
+// Global patterns stored to avoid recompilation on each function call.
+var statusRegexPatterns = []*regexp.Regexp{
+	regexp.MustCompile(`"code"\s*:\s*(\d+)`),       // Matches `"code": 4XX`
+	regexp.MustCompile(`(\d+)\s+Not Found`),        // Matches `404 Not Found`
+	regexp.MustCompile(`(\d+)\s+page not found`),   // Matches `404 page not found`
+	regexp.MustCompile(`HTTP\/\d\.\d\s+(\d+)`),     // Matches HTTP status codes like `HTTP/1.1 404`
+	regexp.MustCompile(`"statusCode"\s*:\s*(\d+)`), // Matches `"statusCode": 4XX`
+}
 
-	for _, pattern := range patterns {
+const (
+	defaultSuccessStatusResponse = "200"
+)
+
+// TODO_TECHDEBT: Remove this function after the node responds back to us with a
+// statusCode alongside with the response and the signature.
+// Note: Returns "200" if none of the pre-defined internal regexes matches any return values.
+func extractStatusFromResponse(response string) string {
+	for _, pattern := range statusRegexPatterns {
 		matches := pattern.FindStringSubmatch(response)
 		if len(matches) > 1 {
 			return matches[1] // Return the first captured group, which should be the status code.
 		}
 	}
-	return "200"
+	// NOTE_HACK: Please note that if no error is found (per the list of regexes)
+	// above, we default to a successful status code of "200" instead of an "unknown".
+	// This is done intentionally to achieve parity with the prior design until
+	// a correct long-term solution is implemented.
+	return defaultSuccessStatusResponse
 }
 
 func parseRelaySuccesfulOutput(bodyBytes []byte) (*RelayOutput, *RelayOutputErr) {
