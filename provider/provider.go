@@ -12,6 +12,8 @@ import (
 	"math/big"
 	"net/http"
 	"regexp"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/pokt-foundation/pocket-go/utils"
@@ -31,6 +33,27 @@ var (
 	ErrNonJSONResponse = errors.New("non JSON response")
 
 	errOnRelayRequest = errors.New("error on relay request")
+
+	regexPatterns = []*regexp.Regexp{}
+
+	errorStatusMap = map[string]int{
+		"context deadline exceeded (Client.Timeout exceeded while awaiting headers)": 408, // Request Timeout
+		"connection reset by peer":            503, // Service Unavailable
+		"no such host":                        404, // Not Found
+		"network is unreachable":              503, // Service Unavailable
+		"connection refused":                  502, // Bad Gateway
+		"http: server closed idle connection": 499, // Client Closed Request (non-standard)
+		"tls: handshake failure":              525, // SSL Handshake Failed (Cloudflare specific, non-standard)
+		"i/o timeout":                         504, // Gateway Timeout
+		"bad gateway":                         502, // Bad Gateway
+		"service unavailable":                 503, // Service Unavailable
+		"gateway timeout":                     504, // Gateway Timeout
+	}
+)
+
+const (
+	defaultCode = 202
+	resultText  = "result"
 )
 
 // Provider struct handler por JSON RPC provider
@@ -46,6 +69,18 @@ func NewProvider(rpcURL string, dispatchers []string) *Provider {
 		rpcURL:      rpcURL,
 		dispatchers: dispatchers,
 		client:      client.NewDefaultClient(),
+	}
+}
+
+func init() {
+	regexPatterns = []*regexp.Regexp{
+		regexp.MustCompile(`"code"\s*:\s*(\d+)`),       // Matches and captures any numeric status code after `"code":`
+		regexp.MustCompile(`(\d+)\s+Not Found`),        // Matches and captures the status code from strings like `404 Not Found`
+		regexp.MustCompile(`(\d+)\s+page not found`),   // Matches and captures the status code from strings like `404 page not found`
+		regexp.MustCompile(`HTTP\/\d\.\d\s+(\d+)`),     // Matches and captures the status code from HTTP status lines like `HTTP/1.1 200`
+		regexp.MustCompile(`"statusCode"\s*:\s*(\d+)`), // Matches and captures any numeric status code after `"statusCode":`
+		regexp.MustCompile(`(\d+)\s+OK`),               // Matches and captures `200` in a response like `200 OK`
+		regexp.MustCompile(`"statusCode"\s*:\s*(\d+)`), // Matches and captures any numeric status code after `"statusCode":`, added redundantly for clarity in different contexts
 	}
 }
 
@@ -796,40 +831,61 @@ func (p *Provider) RelayWithCtx(ctx context.Context, rpcURL string, input *Relay
 
 	defer closeOrLog(rawOutput)
 
+	status := extractStatusFromRequest(rawOutput, reqErr)
+
 	if reqErr != nil && !errors.Is(reqErr, errOnRelayRequest) {
-		return nil, &RelayOutputErr{Error: reqErr, StatusCode: rawOutput.Status}
+		return nil, &RelayOutputErr{Error: reqErr, StatusCode: status}
 	}
 
 	bodyBytes, err := io.ReadAll(rawOutput.Body)
 	if err != nil {
-		return nil, &RelayOutputErr{Error: err, StatusCode: rawOutput.Status}
+		return nil, &RelayOutputErr{Error: err, StatusCode: status}
 	}
 
 	if errors.Is(reqErr, errOnRelayRequest) {
-		return nil, &RelayOutputErr{Error: parseRelayErrorOutput(bodyBytes, input.Proof.ServicerPubKey), StatusCode: rawOutput.Status}
+		return nil, &RelayOutputErr{Error: parseRelayErrorOutput(bodyBytes, input.Proof.ServicerPubKey), StatusCode: status}
 	}
 
 	return parseRelaySuccesfulOutput(bodyBytes)
 }
 
-// TODO: Remove this function after the node responds back to us with a statusCode alongside with the response and the signature.
-// Returns "200" if none of the pre-defined internal regexes matches any return values.
-func extractStatusFromResponse(response string) string {
-	patterns := []*regexp.Regexp{
-		regexp.MustCompile(`"code"\s*:\s*(\d+)`),       // Matches `"code": 4XX` or similar if came from the node
-		regexp.MustCompile(`(\d+)\s+Not Found`),        // Matches `404 Not Found` or similar
-		regexp.MustCompile(`(\d+)\s+page not found`),   // Additional pattern for matching `404 page not found`
-		regexp.MustCompile(`HTTP\/\d\.\d\s+(\d+)`),     // Matches `HTTP/1.1 4XX` or similar, for HTTP responses
-		regexp.MustCompile(`"statusCode"\s*:\s*(\d+)`), // Matches `"statusCode": 4XX` or similar
+func extractStatusFromRequest(rawOutput *http.Response, reqErr error) int {
+	statusCode := defaultCode
+
+	if reqErr != nil {
+		for key, status := range errorStatusMap {
+			if strings.Contains(reqErr.Error(), key) { // This checks if the actual error contains the key string
+				return status
+			}
+		}
+
+		// If we got an error and we can't identify it as a known error, will be mark as if the server failed
+		return http.StatusInternalServerError
 	}
 
-	for _, pattern := range patterns {
+	if rawOutput.StatusCode != http.StatusOK {
+		// If there's a response we'll use that as the status
+		// NOTE: We know that nodes are manipulating the output, for this reason we'll ignore the status if it's ok
+		statusCode = rawOutput.StatusCode
+	}
+
+	return statusCode
+}
+
+// TODO: Remove this function after the node responds back to us with a statusCode alongside with the response and the signature.
+// Returns "200" if none of the pre-defined internal regexes matches any return values.
+func extractStatusFromResponse(response string) int {
+	for _, pattern := range regexPatterns {
 		matches := pattern.FindStringSubmatch(response)
 		if len(matches) > 1 {
-			return matches[1] // Return the first captured group, which should be the status code.
+			code, err := strconv.Atoi(matches[1])
+			if err != nil || http.StatusText(code) == "" {
+				continue
+			}
+			return code
 		}
 	}
-	return "200"
+	return defaultCode
 }
 
 func parseRelaySuccesfulOutput(bodyBytes []byte) (*RelayOutput, *RelayOutputErr) {
@@ -840,7 +896,13 @@ func parseRelaySuccesfulOutput(bodyBytes []byte) (*RelayOutput, *RelayOutputErr)
 		return nil, &RelayOutputErr{Error: err}
 	}
 
-	output.StatusCode = extractStatusFromResponse(output.Response)
+	// Check if there's explicitly a result field, if there's on mark it as success, otherwise check what's the potential status.
+	// for REST chain that doesn't return result in any of the call will be defaulted to 202 in extractStatusFromResponse
+	if strings.Contains(output.Response, resultText) {
+		output.StatusCode = http.StatusOK
+	} else {
+		output.StatusCode = extractStatusFromResponse(output.Response)
+	}
 
 	if !json.Valid([]byte(output.Response)) {
 		return nil, &RelayOutputErr{Error: ErrNonJSONResponse, StatusCode: output.StatusCode}
