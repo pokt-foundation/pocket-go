@@ -831,21 +831,22 @@ func (p *Provider) RelayWithCtx(ctx context.Context, rpcURL string, input *Relay
 
 	defer closeOrLog(rawOutput)
 
-	status := extractStatusFromRequest(rawOutput, reqErr)
+	statusCode := extractStatusFromRequest(rawOutput, reqErr)
 
 	if reqErr != nil && !errors.Is(reqErr, errOnRelayRequest) {
-		return nil, &RelayOutputErr{Error: reqErr, StatusCode: status}
+		return nil, &RelayOutputErr{Error: reqErr, StatusCode: statusCode}
 	}
 
 	bodyBytes, err := io.ReadAll(rawOutput.Body)
 	if err != nil {
-		return nil, &RelayOutputErr{Error: err, StatusCode: status}
+		return nil, &RelayOutputErr{Error: err, StatusCode: statusCode}
 	}
 
 	if errors.Is(reqErr, errOnRelayRequest) {
-		return nil, &RelayOutputErr{Error: parseRelayErrorOutput(bodyBytes, input.Proof.ServicerPubKey), StatusCode: status}
+		return nil, &RelayOutputErr{Error: parseRelayErrorOutput(bodyBytes, input.Proof.ServicerPubKey), StatusCode: statusCode}
 	}
 
+	// The statusCode will be overwrrite based on the response
 	return parseRelaySuccesfulOutput(bodyBytes)
 }
 
@@ -873,7 +874,7 @@ func extractStatusFromRequest(rawOutput *http.Response, reqErr error) int {
 }
 
 // TODO: Remove this function after the node responds back to us with a statusCode alongside with the response and the signature.
-// Returns "200" if none of the pre-defined internal regexes matches any return values.
+// Returns 202 if none of the pre-defined internal regexes matches any return values.
 func extractStatusFromResponse(response string) int {
 	for _, pattern := range regexPatterns {
 		matches := pattern.FindStringSubmatch(response)
