@@ -172,30 +172,39 @@ func (r *Relayer) buildRelay(
 }
 
 // Relay does relay request with given input
+// Will always return with an output that includes the status code from the request
 func (r *Relayer) Relay(input *Input, options *provider.RelayRequestOptions) (*Output, error) {
 	return r.RelayWithCtx(context.Background(), input, options)
 }
 
 // RelayWithCtx does relay request with given input
+// Will always return with an output that includes the status code from the request
 func (r *Relayer) RelayWithCtx(ctx context.Context, input *Input, options *provider.RelayRequestOptions) (*Output, error) {
+	defaultOutput := &Output{
+		RelayOutput: &provider.RelayOutput{
+			StatusCode: provider.DefaultStatusCode,
+		},
+	}
+
 	err := r.validateRelayRequest(input)
 	if err != nil {
-		return nil, err
+		return defaultOutput, err
 	}
 
 	node, err := getNode(input)
 	if err != nil {
-		return nil, err
+		return defaultOutput, err
 	}
 
 	relayInput, err := r.buildRelay(node, input, options)
 	if err != nil {
-		return nil, err
+		return defaultOutput, err
 	}
 
-	relayOutput, err := r.provider.RelayWithCtx(ctx, node.ServiceURL, relayInput, options)
-	if err != nil {
-		return nil, err
+	relayOutput, relayErr := r.provider.RelayWithCtx(ctx, node.ServiceURL, relayInput, options)
+	if relayErr != nil {
+		defaultOutput.RelayOutput = relayOutput
+		return defaultOutput, relayErr
 	}
 
 	return &Output{
