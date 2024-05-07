@@ -36,7 +36,7 @@ var (
 
 	regexPatterns = []*regexp.Regexp{}
 
-	errorStatusMap = map[string]int{
+	errorStatusCodesMap = map[string]int{
 		"context deadline exceeded (Client.Timeout exceeded while awaiting headers)": 408, // Request Timeout
 		"connection reset by peer":            503, // Service Unavailable
 		"no such host":                        404, // Not Found
@@ -52,8 +52,11 @@ var (
 )
 
 const (
-	defaultCode = 202
-	resultText  = "result"
+	// 202 means the response was accepted but we don't know if it actually succeeded
+	defaultStatusCode = 202
+	// Use this contante to avoid the use of the hardcoded string result
+	// result is the field present in a successful response
+	resultText = "result"
 )
 
 // Provider struct handler por JSON RPC provider
@@ -846,15 +849,15 @@ func (p *Provider) RelayWithCtx(ctx context.Context, rpcURL string, input *Relay
 		return nil, &RelayOutputErr{Error: parseRelayErrorOutput(bodyBytes, input.Proof.ServicerPubKey), StatusCode: statusCode}
 	}
 
-	// The statusCode will be overwrrite based on the response
+	// The statusCode will be overwritten based on the response
 	return parseRelaySuccesfulOutput(bodyBytes)
 }
 
 func extractStatusFromRequest(rawOutput *http.Response, reqErr error) int {
-	statusCode := defaultCode
+	statusCode := defaultStatusCode
 
 	if reqErr != nil {
-		for key, status := range errorStatusMap {
+		for key, status := range errorStatusCodesMap {
 			if strings.Contains(reqErr.Error(), key) { // This checks if the actual error contains the key string
 				return status
 			}
@@ -886,7 +889,7 @@ func extractStatusFromResponse(response string) int {
 			return code
 		}
 	}
-	return defaultCode
+	return defaultStatusCode
 }
 
 func parseRelaySuccesfulOutput(bodyBytes []byte) (*RelayOutput, *RelayOutputErr) {
