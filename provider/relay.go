@@ -13,8 +13,15 @@ type RelayInput struct {
 
 // RelayOutput represents the Relay RPC output
 type RelayOutput struct {
-	Response  string `json:"response"`
-	Signature string `json:"signature"`
+	Response   string `json:"response"`
+	Signature  string `json:"signature"`
+	StatusCode int    `json:"statusCode"`
+}
+
+// RelayOutputErr represents the RPC output error
+type RelayOutputErr struct {
+	Error      error `json:"error"`
+	StatusCode int   `json:"statusCode"`
 }
 
 // RelayMeta represents metadata of a relay

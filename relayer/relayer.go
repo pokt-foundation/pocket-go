@@ -35,7 +35,7 @@ var (
 
 // Provider interface representing provider functions necessary for Relayer Package
 type Provider interface {
-	RelayWithCtx(ctx context.Context, rpcURL string, input *provider.RelayInput, options *provider.RelayRequestOptions) (*provider.RelayOutput, error)
+	RelayWithCtx(ctx context.Context, rpcURL string, input *provider.RelayInput, options *provider.RelayRequestOptions) (*provider.RelayOutput, *provider.RelayOutputErr)
 }
 
 // Signer interface representing signer functions necessary for Relayer Package
@@ -172,30 +172,30 @@ func (r *Relayer) buildRelay(
 }
 
 // Relay does relay request with given input
-func (r *Relayer) Relay(input *Input, options *provider.RelayRequestOptions) (*Output, error) {
+func (r *Relayer) Relay(input *Input, options *provider.RelayRequestOptions) (*Output, *provider.RelayOutputErr) {
 	return r.RelayWithCtx(context.Background(), input, options)
 }
 
 // RelayWithCtx does relay request with given input
-func (r *Relayer) RelayWithCtx(ctx context.Context, input *Input, options *provider.RelayRequestOptions) (*Output, error) {
+func (r *Relayer) RelayWithCtx(ctx context.Context, input *Input, options *provider.RelayRequestOptions) (*Output, *provider.RelayOutputErr) {
 	err := r.validateRelayRequest(input)
 	if err != nil {
-		return nil, err
+		return nil, &provider.RelayOutputErr{Error: err}
 	}
 
 	node, err := getNode(input)
 	if err != nil {
-		return nil, err
+		return nil, &provider.RelayOutputErr{Error: err}
 	}
 
 	relayInput, err := r.buildRelay(node, input, options)
 	if err != nil {
-		return nil, err
+		return nil, &provider.RelayOutputErr{Error: err}
 	}
 
-	relayOutput, err := r.provider.RelayWithCtx(ctx, node.ServiceURL, relayInput, options)
-	if err != nil {
-		return nil, err
+	relayOutput, relayErr := r.provider.RelayWithCtx(ctx, node.ServiceURL, relayInput, options)
+	if relayErr != nil {
+		return nil, relayErr
 	}
 
 	return &Output{
