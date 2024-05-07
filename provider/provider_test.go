@@ -776,7 +776,7 @@ func TestProvider_Relay(t *testing.T) {
 
 	relay, err = provider.Relay("https://dummy.com", &RelayInput{}, nil)
 	c.Equal(Err5xxOnConnection, err.Error)
-	c.Equal(fmt.Sprint(http.StatusInternalServerError), err.StatusCode)
+	c.Equal(http.StatusInternalServerError, err.StatusCode)
 	c.False(IsErrorCode(EmptyPayloadDataError, err.Error))
 	c.Empty(relay)
 
@@ -785,7 +785,7 @@ func TestProvider_Relay(t *testing.T) {
 	relay, err = provider.Relay("https://dummy.com", &RelayInput{Proof: &RelayProof{ServicerPubKey: "PJOG"}}, nil)
 	c.Equal("Request failed with code: 25, codespace: pocketcore and message: the payload data of the relay request is empty\nWith ServicerPubKey: PJOG", err.Error.Error())
 	c.True(IsErrorCode(EmptyPayloadDataError, err.Error))
-	c.Equal(fmt.Sprint(http.StatusBadRequest), err.StatusCode)
+	c.Equal(http.StatusInternalServerError, err.StatusCode)
 	c.Empty(relay)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientRelayRoute), http.StatusOK, "samples/client_relay_non_json.json")
@@ -813,7 +813,7 @@ func TestProvider_RelayWithCtx(t *testing.T) {
 
 	relay, err = provider.RelayWithCtx(context.Background(), "https://dummy.com", &RelayInput{}, nil)
 	c.Equal(Err5xxOnConnection, err.Error)
-	c.Equal(fmt.Sprint(http.StatusInternalServerError), err.StatusCode)
+	c.Equal(http.StatusInternalServerError, err.StatusCode)
 	c.False(IsErrorCode(EmptyPayloadDataError, err.Error))
 	c.Empty(relay)
 
@@ -822,7 +822,7 @@ func TestProvider_RelayWithCtx(t *testing.T) {
 	relay, err = provider.RelayWithCtx(context.Background(), "https://dummy.com", &RelayInput{Proof: &RelayProof{ServicerPubKey: "PJOG"}}, nil)
 	c.Equal("Request failed with code: 25, codespace: pocketcore and message: the payload data of the relay request is empty\nWith ServicerPubKey: PJOG", err.Error.Error())
 	c.True(IsErrorCode(EmptyPayloadDataError, err.Error))
-	c.Equal(fmt.Sprint(http.StatusBadRequest), err.StatusCode)
+	c.Equal(http.StatusInternalServerError, err.StatusCode)
 	c.Empty(relay)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientRelayRoute), http.StatusOK, "samples/client_relay_non_json.json")
