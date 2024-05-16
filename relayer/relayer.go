@@ -10,6 +10,7 @@ import (
 	"errors"
 	"math"
 	"math/big"
+	"net/http"
 
 	"golang.org/x/crypto/sha3"
 
@@ -35,7 +36,7 @@ var (
 
 // Provider interface representing provider functions necessary for Relayer Package
 type Provider interface {
-	RelayWithCtx(ctx context.Context, rpcURL string, input *provider.RelayInput, options *provider.RelayRequestOptions) (*provider.RelayOutput, *provider.RelayOutputErr)
+	RelayWithCtx(ctx context.Context, rpcURL string, input *provider.RelayInput, options *provider.RelayRequestOptions) (*provider.RelayOutput, int, error)
 }
 
 // Signer interface representing signer functions necessary for Relayer Package
@@ -172,37 +173,37 @@ func (r *Relayer) buildRelay(
 }
 
 // Relay does relay request with given input
-func (r *Relayer) Relay(input *Input, options *provider.RelayRequestOptions) (*Output, *provider.RelayOutputErr) {
+func (r *Relayer) Relay(input *Input, options *provider.RelayRequestOptions) (*Output, int, error) {
 	return r.RelayWithCtx(context.Background(), input, options)
 }
 
 // RelayWithCtx does relay request with given input
-func (r *Relayer) RelayWithCtx(ctx context.Context, input *Input, options *provider.RelayRequestOptions) (*Output, *provider.RelayOutputErr) {
+func (r *Relayer) RelayWithCtx(ctx context.Context, input *Input, options *provider.RelayRequestOptions) (*Output, int, error) {
 	err := r.validateRelayRequest(input)
 	if err != nil {
-		return nil, &provider.RelayOutputErr{Error: err}
+		return nil, http.StatusBadRequest, err
 	}
 
 	node, err := getNode(input)
 	if err != nil {
-		return nil, &provider.RelayOutputErr{Error: err}
+		return nil, provider.DefaultStatusCode, err
 	}
 
 	relayInput, err := r.buildRelay(node, input, options)
 	if err != nil {
-		return nil, &provider.RelayOutputErr{Error: err}
+		return nil, provider.DefaultStatusCode, err
 	}
 
-	relayOutput, relayErr := r.provider.RelayWithCtx(ctx, node.ServiceURL, relayInput, options)
+	relayOutput, statusCode, relayErr := r.provider.RelayWithCtx(ctx, node.ServiceURL, relayInput, options)
 	if relayErr != nil {
-		return nil, relayErr
+		return nil, statusCode, relayErr
 	}
 
 	return &Output{
 		RelayOutput: relayOutput,
 		Proof:       relayInput.Proof,
 		Node:        node,
-	}, nil
+	}, statusCode, nil
 }
 
 // GetRandomSessionNode returns a random node from given session
