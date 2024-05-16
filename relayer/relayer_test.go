@@ -79,7 +79,7 @@ func TestRelayer_Relay(t *testing.T) {
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", provider.ClientRelayRoute),
 		http.StatusBadRequest, "../provider/samples/client_relay_error.json")
 
-	var error *provider.RelayError
+	var error error
 
 	relay, err = relayer.Relay(input, nil)
 	c.ErrorAs(err, &error)
@@ -164,7 +164,7 @@ func TestRelayer_RelayWithCtx(t *testing.T) {
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", provider.ClientRelayRoute),
 		http.StatusBadRequest, "../provider/samples/client_relay_error.json")
 
-	var error *provider.RelayError
+	var error error
 
 	relay, err = relayer.RelayWithCtx(context.Background(), input, nil)
 	c.ErrorAs(err, &error)
