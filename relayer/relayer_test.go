@@ -23,8 +23,8 @@ func TestRelayer_Relay(t *testing.T) {
 	input := &Input{}
 
 	relay, err := relayer.Relay(input, nil)
-	c.Equal(ErrNoSigner, err.Error)
-	c.Empty(relay)
+	c.Equal(ErrNoSigner, err)
+	c.Empty(relay.RelayOutput.Response)
 
 	signer, signerErrr := signer.NewRandomSigner()
 	c.NoError(signerErrr)
@@ -32,39 +32,39 @@ func TestRelayer_Relay(t *testing.T) {
 	relayer.signer = signer
 
 	relay, err = relayer.Relay(input, nil)
-	c.Equal(ErrNoProvider, err.Error)
-	c.Empty(relay)
+	c.Equal(ErrNoProvider, err)
+	c.Empty(relay.RelayOutput.Response)
 
 	relayer.provider = provider.NewProvider("https://dummy.com", []string{"https://dummy.com"})
 
 	relay, err = relayer.Relay(input, nil)
-	c.Equal(ErrNoSession, err.Error)
-	c.Empty(relay)
+	c.Equal(ErrNoSession, err)
+	c.Empty(relay.RelayOutput.Response)
 
 	input.Session = &provider.Session{}
 
 	relay, err = relayer.Relay(input, nil)
-	c.Equal(ErrNoPocketAAT, err.Error)
-	c.Empty(relay)
+	c.Equal(ErrNoPocketAAT, err)
+	c.Empty(relay.RelayOutput.Response)
 
 	input.PocketAAT = &provider.PocketAAT{}
 
 	relay, err = relayer.Relay(input, nil)
-	c.Equal(ErrSessionHasNoNodes, err.Error)
-	c.Empty(relay)
+	c.Equal(ErrSessionHasNoNodes, err)
+	c.Empty(relay.RelayOutput.Response)
 
 	input.Session.Nodes = []provider.Node{{PublicKey: "AOG"}}
 
 	relay, err = relayer.Relay(input, nil)
-	c.Equal(ErrNoSessionHeader, err.Error)
-	c.Empty(relay)
+	c.Equal(ErrNoSessionHeader, err)
+	c.Empty(relay.RelayOutput.Response)
 
 	input.Session.Header = provider.SessionHeader{Chain: "chain"}
 	input.Node = &provider.Node{PublicKey: "PJOG"}
 
 	relay, err = relayer.Relay(input, nil)
-	c.Equal(ErrNodeNotInSession, err.Error)
-	c.Empty(relay)
+	c.Equal(ErrNodeNotInSession, err)
+	c.Empty(relay.RelayOutput.Response)
 
 	input.Node = nil
 
@@ -73,17 +73,17 @@ func TestRelayer_Relay(t *testing.T) {
 
 	relay, err = relayer.Relay(input, nil)
 	c.NotNil(err)
-	c.Equal(provider.Err5xxOnConnection, err.Error)
-	c.Empty(relay)
+	c.Equal(provider.Err5xxOnConnection, err)
+	c.Empty(relay.RelayOutput.Response)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", provider.ClientRelayRoute),
 		http.StatusBadRequest, "../provider/samples/client_relay_error.json")
 
-	var error *provider.RelayError
+	var error error
 
 	relay, err = relayer.Relay(input, nil)
-	c.ErrorAs(err.Error, &error)
-	c.Empty(relay)
+	c.ErrorAs(err, &error)
+	c.Empty(relay.RelayOutput.Response)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", provider.ClientRelayRoute),
 		http.StatusOK, "../provider/samples/client_relay.json")
@@ -109,8 +109,8 @@ func TestRelayer_RelayWithCtx(t *testing.T) {
 	input := &Input{}
 
 	relay, err := relayer.RelayWithCtx(context.Background(), input, nil)
-	c.Equal(ErrNoSigner, err.Error)
-	c.Empty(relay)
+	c.Equal(ErrNoSigner, err)
+	c.Empty(relay.RelayOutput.Response)
 
 	signer, signerErr := signer.NewRandomSigner()
 	c.NoError(signerErr)
@@ -118,39 +118,39 @@ func TestRelayer_RelayWithCtx(t *testing.T) {
 	relayer.signer = signer
 
 	relay, err = relayer.RelayWithCtx(context.Background(), input, nil)
-	c.Equal(ErrNoProvider, err.Error)
-	c.Empty(relay)
+	c.Equal(ErrNoProvider, err)
+	c.Empty(relay.RelayOutput.Response)
 
 	relayer.provider = provider.NewProvider("https://dummy.com", []string{"https://dummy.com"})
 
 	relay, err = relayer.RelayWithCtx(context.Background(), input, nil)
-	c.Equal(ErrNoSession, err.Error)
-	c.Empty(relay)
+	c.Equal(ErrNoSession, err)
+	c.Empty(relay.RelayOutput.Response)
 
 	input.Session = &provider.Session{}
 
 	relay, err = relayer.RelayWithCtx(context.Background(), input, nil)
-	c.Equal(ErrNoPocketAAT, err.Error)
-	c.Empty(relay)
+	c.Equal(ErrNoPocketAAT, err)
+	c.Empty(relay.RelayOutput.Response)
 
 	input.PocketAAT = &provider.PocketAAT{}
 
 	relay, err = relayer.RelayWithCtx(context.Background(), input, nil)
-	c.Equal(ErrSessionHasNoNodes, err.Error)
-	c.Empty(relay)
+	c.Equal(ErrSessionHasNoNodes, err)
+	c.Empty(relay.RelayOutput.Response)
 
 	input.Session.Nodes = []provider.Node{{PublicKey: "AOG"}}
 
 	relay, err = relayer.RelayWithCtx(context.Background(), input, nil)
-	c.Equal(ErrNoSessionHeader, err.Error)
-	c.Empty(relay)
+	c.Equal(ErrNoSessionHeader, err)
+	c.Empty(relay.RelayOutput.Response)
 
 	input.Session.Header = provider.SessionHeader{Chain: "chain"}
 	input.Node = &provider.Node{PublicKey: "PJOG"}
 
 	relay, err = relayer.RelayWithCtx(context.Background(), input, nil)
-	c.Equal(ErrNodeNotInSession, err.Error)
-	c.Empty(relay)
+	c.Equal(ErrNodeNotInSession, err)
+	c.Empty(relay.RelayOutput.Response)
 
 	input.Node = nil
 
@@ -158,17 +158,17 @@ func TestRelayer_RelayWithCtx(t *testing.T) {
 		http.StatusInternalServerError, "../provider/samples/client_relay.json")
 
 	relay, err = relayer.RelayWithCtx(context.Background(), input, nil)
-	c.Equal(provider.Err5xxOnConnection, err.Error)
-	c.Empty(relay)
+	c.Equal(provider.Err5xxOnConnection, err)
+	c.Empty(relay.RelayOutput.Response)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", provider.ClientRelayRoute),
 		http.StatusBadRequest, "../provider/samples/client_relay_error.json")
 
-	var error *provider.RelayError
+	var error error
 
 	relay, err = relayer.RelayWithCtx(context.Background(), input, nil)
-	c.ErrorAs(err.Error, &error)
-	c.Empty(relay)
+	c.ErrorAs(err, &error)
+	c.Empty(relay.RelayOutput.Response)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", provider.ClientRelayRoute),
 		http.StatusOK, "../provider/samples/client_relay.json")

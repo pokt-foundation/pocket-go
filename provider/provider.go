@@ -52,8 +52,8 @@ var (
 )
 
 const (
-	// 202 means the response was accepted but we don't know if it actually succeeded
-	defaultStatusCode = 202
+	// DefaultStatusCode means the response was accepted but we don't know if it actually succeeded
+	DefaultStatusCode = http.StatusAccepted
 	// Use this contante to avoid the use of the hardcoded string result
 	// result is the field present in a successful response
 	resultText = "result"
@@ -824,37 +824,43 @@ func (p *Provider) DispatchWithCtx(ctx context.Context, appPublicKey, chain stri
 }
 
 // Relay does request to be relayed to a target blockchain
-func (p *Provider) Relay(rpcURL string, input *RelayInput, options *RelayRequestOptions) (*RelayOutput, *RelayOutputErr) {
+// Will always return with an output that includes the status code from the request
+func (p *Provider) Relay(rpcURL string, input *RelayInput, options *RelayRequestOptions) (*RelayOutput, error) {
 	return p.RelayWithCtx(context.Background(), rpcURL, input, options)
 }
 
 // RelayWithCtx does request to be relayed to a target blockchain
-func (p *Provider) RelayWithCtx(ctx context.Context, rpcURL string, input *RelayInput, options *RelayRequestOptions) (*RelayOutput, *RelayOutputErr) {
+// Will always return with an output that includes the status code from the request
+func (p *Provider) RelayWithCtx(ctx context.Context, rpcURL string, input *RelayInput, options *RelayRequestOptions) (*RelayOutput, error) {
 	rawOutput, reqErr := p.doPostRequest(ctx, rpcURL, input, ClientRelayRoute, http.Header{})
 
 	defer closeOrLog(rawOutput)
 
 	statusCode := extractStatusFromRequest(rawOutput, reqErr)
 
+	defaultOutput := &RelayOutput{
+		StatusCode: statusCode,
+	}
+
 	if reqErr != nil && !errors.Is(reqErr, errOnRelayRequest) {
-		return nil, &RelayOutputErr{Error: reqErr, StatusCode: statusCode}
+		return defaultOutput, reqErr
 	}
 
 	bodyBytes, err := io.ReadAll(rawOutput.Body)
 	if err != nil {
-		return nil, &RelayOutputErr{Error: err, StatusCode: statusCode}
+		return defaultOutput, err
 	}
 
 	if errors.Is(reqErr, errOnRelayRequest) {
-		return nil, &RelayOutputErr{Error: parseRelayErrorOutput(bodyBytes, input.Proof.ServicerPubKey), StatusCode: statusCode}
+		return defaultOutput, parseRelayErrorOutput(bodyBytes, input.Proof.ServicerPubKey)
 	}
 
 	// The statusCode will be overwritten based on the response
-	return parseRelaySuccesfulOutput(bodyBytes)
+	return parseRelaySuccesfulOutput(bodyBytes, statusCode)
 }
 
 func extractStatusFromRequest(rawOutput *http.Response, reqErr error) int {
-	statusCode := defaultStatusCode
+	statusCode := DefaultStatusCode
 
 	if reqErr != nil {
 		for key, status := range errorStatusCodesMap {
@@ -889,15 +895,17 @@ func extractStatusFromResponse(response string) int {
 			return code
 		}
 	}
-	return defaultStatusCode
+	return DefaultStatusCode
 }
 
-func parseRelaySuccesfulOutput(bodyBytes []byte) (*RelayOutput, *RelayOutputErr) {
-	output := RelayOutput{}
+func parseRelaySuccesfulOutput(bodyBytes []byte, requestStatusCode int) (*RelayOutput, error) {
+	output := RelayOutput{
+		StatusCode: requestStatusCode,
+	}
 
 	err := json.Unmarshal(bodyBytes, &output)
 	if err != nil {
-		return nil, &RelayOutputErr{Error: err}
+		return &output, err
 	}
 
 	// Check if there's explicitly a result field, if there's on mark it as success, otherwise check what's the potential status.
@@ -909,7 +917,7 @@ func parseRelaySuccesfulOutput(bodyBytes []byte) (*RelayOutput, *RelayOutputErr)
 	}
 
 	if !json.Valid([]byte(output.Response)) {
-		return nil, &RelayOutputErr{Error: ErrNonJSONResponse, StatusCode: output.StatusCode}
+		return &output, ErrNonJSONResponse
 	}
 
 	return &output, nil

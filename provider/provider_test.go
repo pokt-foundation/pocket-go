@@ -775,24 +775,24 @@ func TestProvider_Relay(t *testing.T) {
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientRelayRoute), http.StatusInternalServerError, "samples/client_relay.json")
 
 	relay, err = provider.Relay("https://dummy.com", &RelayInput{}, nil)
-	c.Equal(Err5xxOnConnection, err.Error)
-	c.Equal(http.StatusInternalServerError, err.StatusCode)
-	c.False(IsErrorCode(EmptyPayloadDataError, err.Error))
-	c.Empty(relay)
+	c.Equal(Err5xxOnConnection, err)
+	c.Equal(http.StatusInternalServerError, relay.StatusCode)
+	c.False(IsErrorCode(EmptyPayloadDataError, err))
+	c.Empty(relay.Response)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientRelayRoute), http.StatusBadRequest, "samples/client_relay_error.json")
 
 	relay, err = provider.Relay("https://dummy.com", &RelayInput{Proof: &RelayProof{ServicerPubKey: "PJOG"}}, nil)
-	c.Equal("Request failed with code: 25, codespace: pocketcore and message: the payload data of the relay request is empty\nWith ServicerPubKey: PJOG", err.Error.Error())
-	c.True(IsErrorCode(EmptyPayloadDataError, err.Error))
-	c.Equal(http.StatusInternalServerError, err.StatusCode)
-	c.Empty(relay)
+	c.Equal("Request failed with code: 25, codespace: pocketcore and message: the payload data of the relay request is empty\nWith ServicerPubKey: PJOG", err.Error())
+	c.True(IsErrorCode(EmptyPayloadDataError, err))
+	c.Equal(http.StatusInternalServerError, relay.StatusCode)
+	c.Empty(relay.Response)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientRelayRoute), http.StatusOK, "samples/client_relay_non_json.json")
 
 	relay, err = provider.Relay("https://dummy.com", &RelayInput{}, nil)
-	c.Equal(ErrNonJSONResponse, err.Error)
-	c.Empty(relay)
+	c.Equal(ErrNonJSONResponse, err)
+	c.Empty(relay.Response)
 }
 
 func TestProvider_RelayWithCtx(t *testing.T) {
@@ -812,22 +812,22 @@ func TestProvider_RelayWithCtx(t *testing.T) {
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientRelayRoute), http.StatusInternalServerError, "samples/client_relay.json")
 
 	relay, err = provider.RelayWithCtx(context.Background(), "https://dummy.com", &RelayInput{}, nil)
-	c.Equal(Err5xxOnConnection, err.Error)
-	c.Equal(http.StatusInternalServerError, err.StatusCode)
-	c.False(IsErrorCode(EmptyPayloadDataError, err.Error))
-	c.Empty(relay)
+	c.Equal(Err5xxOnConnection, err)
+	c.Equal(http.StatusInternalServerError, relay.StatusCode)
+	c.False(IsErrorCode(EmptyPayloadDataError, err))
+	c.Empty(relay.Response)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientRelayRoute), http.StatusBadRequest, "samples/client_relay_error.json")
 
 	relay, err = provider.RelayWithCtx(context.Background(), "https://dummy.com", &RelayInput{Proof: &RelayProof{ServicerPubKey: "PJOG"}}, nil)
-	c.Equal("Request failed with code: 25, codespace: pocketcore and message: the payload data of the relay request is empty\nWith ServicerPubKey: PJOG", err.Error.Error())
-	c.True(IsErrorCode(EmptyPayloadDataError, err.Error))
-	c.Equal(http.StatusInternalServerError, err.StatusCode)
-	c.Empty(relay)
+	c.Equal("Request failed with code: 25, codespace: pocketcore and message: the payload data of the relay request is empty\nWith ServicerPubKey: PJOG", err.Error())
+	c.True(IsErrorCode(EmptyPayloadDataError, err))
+	c.Equal(http.StatusInternalServerError, relay.StatusCode)
+	c.Empty(relay.Response)
 
 	mock.AddMockedResponseFromFile(http.MethodPost, fmt.Sprintf("%s%s", "https://dummy.com", ClientRelayRoute), http.StatusOK, "samples/client_relay_non_json.json")
 
 	relay, err = provider.RelayWithCtx(context.Background(), "https://dummy.com", &RelayInput{}, nil)
-	c.Equal(ErrNonJSONResponse, err.Error)
-	c.Empty(relay)
+	c.Equal(ErrNonJSONResponse, err)
+	c.Empty(relay.Response)
 }
