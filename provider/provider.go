@@ -3,7 +3,6 @@ package provider
 
 import (
 	"context"
-	"crypto/rand"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -27,8 +26,6 @@ var (
 	Err5xxOnConnection = errors.New("rpc responded with 5xx")
 	// ErrUnexpectedCodeOnConnection error when RPC responds with unexpected code
 	ErrUnexpectedCodeOnConnection = errors.New("rpc responded with unexpected code")
-	// ErrNoDispatchers error when dispatch call is requested with no dispatchers set
-	ErrNoDispatchers = errors.New("no dispatchers")
 	// ErrNonJSONResponse error when provider does not respond with a JSON
 	ErrNonJSONResponse = errors.New("non JSON response")
 
@@ -61,16 +58,14 @@ const (
 
 // Provider struct handler por JSON RPC provider
 type Provider struct {
-	rpcURL      string
-	dispatchers []string
+	fullNodeURL string
 	client      *client.Client
 }
 
 // NewProvider returns Provider instance from input
-func NewProvider(rpcURL string, dispatchers []string) *Provider {
+func NewProvider(fullNodeURL string) *Provider {
 	return &Provider{
-		rpcURL:      rpcURL,
-		dispatchers: dispatchers,
+		fullNodeURL: fullNodeURL,
 		client:      client.NewDefaultClient(),
 	}
 }
@@ -112,17 +107,7 @@ func (p *Provider) getFinalRPCURL(rpcURL string, route V1RPCRoute) (string, erro
 	if rpcURL != "" {
 		return rpcURL, nil
 	}
-
-	if route == ClientDispatchRoute {
-		index, err := rand.Int(rand.Reader, big.NewInt(int64(len(p.dispatchers))))
-		if err != nil {
-			return "", err
-		}
-
-		return p.dispatchers[index.Int64()], nil
-	}
-
-	return p.rpcURL, nil
+	return p.fullNodeURL, nil
 }
 
 func (p *Provider) doPostRequest(ctx context.Context, rpcURL string, params any, route V1RPCRoute, headers http.Header) (*http.Response, error) {
@@ -782,10 +767,6 @@ func (p *Provider) Dispatch(appPublicKey, chain string, options *DispatchRequest
 
 // DispatchWithCtx sends a dispatch request to the network and gets the nodes that will be servicing the requests for the session.
 func (p *Provider) DispatchWithCtx(ctx context.Context, appPublicKey, chain string, options *DispatchRequestOptions) (*DispatchOutput, error) {
-	if len(p.dispatchers) == 0 {
-		return nil, ErrNoDispatchers
-	}
-
 	params := map[string]any{
 		"app_public_key": appPublicKey,
 		"chain":          chain,
