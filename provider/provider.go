@@ -785,6 +785,10 @@ func (p *Provider) GetSession(ctx context.Context, chain, appPublicKey string) (
 		return Session{}, err
 	}
 
+	if output.Session == nil {
+		return Session{}, fmt.Errorf("GetSession: received nil session for chain %s, application public key: %s", chain, appPublicKey)
+	}
+
 	return *output.Session, nil
 }
 
