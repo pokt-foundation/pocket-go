@@ -760,6 +760,35 @@ func (p *Provider) GetAccountsWithCtx(ctx context.Context, options *GetAccountsO
 	return &output, nil
 }
 
+// GetSession returns the session for the input application (identified by its public key) and chain.
+func (p *Provider) GetSession(ctx context.Context, appPublicKey, chain string) (Session, error) {
+	params := map[string]any{
+		"app_public_key": appPublicKey,
+		"chain":          chain,
+	}
+
+	rawOutput, err := p.doPostRequest(ctx, "", params, ClientDispatchRoute, http.Header{})
+	defer closeOrLog(rawOutput)
+	if err != nil {
+		return Session{}, err
+	}
+
+	bodyBytes, err := ioutil.ReadAll(rawOutput.Body)
+	if err != nil {
+		return Session{}, err
+	}
+
+	var output DispatchOutput
+
+	err = json.Unmarshal(bodyBytes, &output)
+	if err != nil {
+		return Session{}, err
+	}
+
+	return *output.Session, nil
+}
+
+// TODO_TECHDEBT: Dispatch and DispatchWithCtx are deprecated and will be removed in the next major release: use GetSession instead.
 // Dispatch sends a dispatch request to the network and gets the nodes that will be servicing the requests for the session.
 func (p *Provider) Dispatch(appPublicKey, chain string, options *DispatchRequestOptions) (*DispatchOutput, error) {
 	return p.DispatchWithCtx(context.Background(), appPublicKey, chain, options)
