@@ -595,6 +595,22 @@ func (p *Provider) GetNodeWithCtx(ctx context.Context, address string, options *
 	return &output, nil
 }
 
+// GetAllApps returns all on-chain applications by choosing correct values for options when sending an apps query to a full node.
+// This is a convenience function to allow getting the list of all on-chain applications with no need for setting any options.
+func (p *Provider) GetAllApps(ctx context.Context) ([]App, error) {
+	output, err := p.GetAppsWithCtx(ctx, &GetAppsOptions{PerPage: 2300})
+	if err != nil {
+		return nil, err
+	}
+
+	apps := make([]App, len(output.Result))
+	for i, app := range output.Result {
+		apps[i] = *app
+	}
+
+	return apps, nil
+}
+
 // GetApps returns a page of applications known at the specified height and staking status
 // empty ("") staking_status returns all apps, page < 1 returns the first page, per_page < 1 returns 10000 elements per page
 func (p *Provider) GetApps(options *GetAppsOptions) (*GetAppsOutput, error) {
