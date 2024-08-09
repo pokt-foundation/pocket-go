@@ -761,7 +761,7 @@ func (p *Provider) GetAccountsWithCtx(ctx context.Context, options *GetAccountsO
 }
 
 // GetSession returns the session for the input application (identified by its public key) and chain.
-func (p *Provider) GetSession(ctx context.Context, appPublicKey, chain string) (Session, error) {
+func (p *Provider) GetSession(ctx context.Context, chain, appPublicKey string) (Session, error) {
 	params := map[string]any{
 		"app_public_key": appPublicKey,
 		"chain":          chain,
