@@ -786,7 +786,11 @@ func (p *Provider) GetSession(ctx context.Context, chain, appPublicKey string) (
 	}
 
 	if output.Session == nil {
-		return Session{}, fmt.Errorf("GetSession: received nil session for chain %s, application public key: %s", chain, appPublicKey)
+		return Session{}, fmt.Errorf("GetSession: received nil session for chain %s, application public key %s", chain, appPublicKey)
+	}
+
+	if len(output.Session.Nodes) == 0 {
+		return Session{}, fmt.Errorf("GetSession call returned session with no nodes for chain %s, application public key %s", chain, appPublicKey)
 	}
 
 	return *output.Session, nil
