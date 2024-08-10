@@ -3,7 +3,6 @@ package provider
 
 import (
 	"context"
-	"crypto/rand"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -27,8 +26,6 @@ var (
 	Err5xxOnConnection = errors.New("rpc responded with 5xx")
 	// ErrUnexpectedCodeOnConnection error when RPC responds with unexpected code
 	ErrUnexpectedCodeOnConnection = errors.New("rpc responded with unexpected code")
-	// ErrNoDispatchers error when dispatch call is requested with no dispatchers set
-	ErrNoDispatchers = errors.New("no dispatchers")
 	// ErrNonJSONResponse error when provider does not respond with a JSON
 	ErrNonJSONResponse = errors.New("non JSON response")
 
@@ -61,16 +58,14 @@ const (
 
 // Provider struct handler por JSON RPC provider
 type Provider struct {
-	rpcURL      string
-	dispatchers []string
+	fullNodeURL string
 	client      *client.Client
 }
 
 // NewProvider returns Provider instance from input
-func NewProvider(rpcURL string, dispatchers []string) *Provider {
+func NewProvider(fullNodeURL string) *Provider {
 	return &Provider{
-		rpcURL:      rpcURL,
-		dispatchers: dispatchers,
+		fullNodeURL: fullNodeURL,
 		client:      client.NewDefaultClient(),
 	}
 }
@@ -112,17 +107,7 @@ func (p *Provider) getFinalRPCURL(rpcURL string, route V1RPCRoute) (string, erro
 	if rpcURL != "" {
 		return rpcURL, nil
 	}
-
-	if route == ClientDispatchRoute {
-		index, err := rand.Int(rand.Reader, big.NewInt(int64(len(p.dispatchers))))
-		if err != nil {
-			return "", err
-		}
-
-		return p.dispatchers[index.Int64()], nil
-	}
-
-	return p.rpcURL, nil
+	return p.fullNodeURL, nil
 }
 
 func (p *Provider) doPostRequest(ctx context.Context, rpcURL string, params any, route V1RPCRoute, headers http.Header) (*http.Response, error) {
@@ -610,6 +595,22 @@ func (p *Provider) GetNodeWithCtx(ctx context.Context, address string, options *
 	return &output, nil
 }
 
+// GetAllApps returns all on-chain applications by choosing correct values for options when sending an apps query to a full node.
+// This is a convenience function to allow getting the list of all on-chain applications with no need for setting any options.
+func (p *Provider) GetAllApps(ctx context.Context) ([]App, error) {
+	output, err := p.GetAppsWithCtx(ctx, &GetAppsOptions{PerPage: 2300})
+	if err != nil {
+		return nil, err
+	}
+
+	apps := make([]App, len(output.Result))
+	for i, app := range output.Result {
+		apps[i] = *app
+	}
+
+	return apps, nil
+}
+
 // GetApps returns a page of applications known at the specified height and staking status
 // empty ("") staking_status returns all apps, page < 1 returns the first page, per_page < 1 returns 10000 elements per page
 func (p *Provider) GetApps(options *GetAppsOptions) (*GetAppsOutput, error) {
@@ -775,6 +776,43 @@ func (p *Provider) GetAccountsWithCtx(ctx context.Context, options *GetAccountsO
 	return &output, nil
 }
 
+// GetSession returns the session for the input application (identified by its public key) and chain.
+func (p *Provider) GetSession(ctx context.Context, chain, appPublicKey string) (Session, error) {
+	params := map[string]any{
+		"app_public_key": appPublicKey,
+		"chain":          chain,
+	}
+
+	rawOutput, err := p.doPostRequest(ctx, "", params, ClientDispatchRoute, http.Header{})
+	defer closeOrLog(rawOutput)
+	if err != nil {
+		return Session{}, err
+	}
+
+	bodyBytes, err := ioutil.ReadAll(rawOutput.Body)
+	if err != nil {
+		return Session{}, err
+	}
+
+	var output DispatchOutput
+
+	err = json.Unmarshal(bodyBytes, &output)
+	if err != nil {
+		return Session{}, err
+	}
+
+	if output.Session == nil {
+		return Session{}, fmt.Errorf("GetSession: received nil session for chain %s, application public key %s", chain, appPublicKey)
+	}
+
+	if len(output.Session.Nodes) == 0 {
+		return Session{}, fmt.Errorf("GetSession call returned session with no nodes for chain %s, application public key %s", chain, appPublicKey)
+	}
+
+	return *output.Session, nil
+}
+
+// TODO_TECHDEBT: Dispatch and DispatchWithCtx are deprecated and will be removed in the next major release: use GetSession instead.
 // Dispatch sends a dispatch request to the network and gets the nodes that will be servicing the requests for the session.
 func (p *Provider) Dispatch(appPublicKey, chain string, options *DispatchRequestOptions) (*DispatchOutput, error) {
 	return p.DispatchWithCtx(context.Background(), appPublicKey, chain, options)
@@ -782,10 +820,6 @@ func (p *Provider) Dispatch(appPublicKey, chain string, options *DispatchRequest
 
 // DispatchWithCtx sends a dispatch request to the network and gets the nodes that will be servicing the requests for the session.
 func (p *Provider) DispatchWithCtx(ctx context.Context, appPublicKey, chain string, options *DispatchRequestOptions) (*DispatchOutput, error) {
-	if len(p.dispatchers) == 0 {
-		return nil, ErrNoDispatchers
-	}
-
 	params := map[string]any{
 		"app_public_key": appPublicKey,
 		"chain":          chain,

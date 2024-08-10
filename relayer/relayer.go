@@ -171,6 +171,13 @@ func (r *Relayer) buildRelay(
 	}, nil
 }
 
+// SendRelay uses RelayWithCtx to send a relay.
+// This function is only introduced to make it easier to read the code using the SDK.
+// TODO_TECHDEBT: Both `Relay` and `RelayWithCtx` should be deprecated and removed once their functionality is moved here, to be replaced by `SendRelay`.
+func (r *Relayer) SendRelay(ctx context.Context, input *Input) (*Output, error) {
+	return r.RelayWithCtx(ctx, input, nil)
+}
+
 // Relay does relay request with given input
 // Will always return with an output that includes the status code from the request
 func (r *Relayer) Relay(input *Input, options *provider.RelayRequestOptions) (*Output, error) {
