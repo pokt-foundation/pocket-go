@@ -948,12 +948,12 @@ func parseRelaySuccessfulOutput(bodyBytes []byte, requestStatusCode int) (*Relay
 
 	isValidJson := json.Valid([]byte(output.Response))
 
-	// Check if there's explicitly a "result" text field.
-	// 	- result present -> 200 (success)
-	// 	- result not present -> check the status (if available)
+	// Check if there's explicitly a "result" text field (most JSON RPC chains)
+	//  - result present -> 200 (success)
+	//  - result not present -> check the status (if available)
 	// LEGACY_TECHDEBT: REST chains do not have a result field, so there's no perfect
 	// solution here.
-	// 	- Result not present && json is valid -> 200
+	//  - result not present && json is valid -> 200
 	//  - result not present && json is invalid -> extract from response
 	if strings.Contains(output.Response, resultText) {
 		output.StatusCode = http.StatusOK
