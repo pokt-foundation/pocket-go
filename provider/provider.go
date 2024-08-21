@@ -15,8 +15,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pokt-foundation/pocket-go/utils"
 	"github.com/pokt-foundation/utils-go/client"
+
+	"github.com/pokt-foundation/pocket-go/utils"
 )
 
 var (
@@ -51,8 +52,8 @@ var (
 const (
 	// DefaultStatusCode means the response was accepted but we don't know if it actually succeeded
 	DefaultStatusCode = http.StatusAccepted
-	// Use this contante to avoid the use of the hardcoded string result
-	// result is the field present in a successful response
+	// "result" is expected to be present in a successful response.
+	// This is used to determine the type of status code to return.
 	resultText = "result"
 )
 
@@ -870,6 +871,8 @@ func (p *Provider) RelayWithCtx(ctx context.Context, rpcURL string, input *Relay
 
 	defer closeOrLog(rawOutput)
 
+	// LEGACY_TECHDEBT: This status code is ALWAYS overwritten in parseRelaySuccessfulOutput.
+	// Not cleaning this up since the repo is just in maintenance mode.
 	statusCode := extractStatusFromRequest(rawOutput, reqErr)
 
 	defaultOutput := &RelayOutput{
@@ -890,7 +893,7 @@ func (p *Provider) RelayWithCtx(ctx context.Context, rpcURL string, input *Relay
 	}
 
 	// The statusCode will be overwritten based on the response
-	return parseRelaySuccesfulOutput(bodyBytes, statusCode)
+	return parseRelaySuccessfulOutput(bodyBytes, statusCode)
 }
 
 func extractStatusFromRequest(rawOutput *http.Response, reqErr error) int {
@@ -916,7 +919,8 @@ func extractStatusFromRequest(rawOutput *http.Response, reqErr error) int {
 	return statusCode
 }
 
-// TODO: Remove this function after the node responds back to us with a statusCode alongside with the response and the signature.
+// TODO: Remove this function after the node responds back to us with a statusCode
+// alongside with the response and the signature.
 // Returns 202 if none of the pre-defined internal regexes matches any return values.
 func extractStatusFromResponse(response string) int {
 	for _, pattern := range regexPatterns {
@@ -932,7 +936,7 @@ func extractStatusFromResponse(response string) int {
 	return DefaultStatusCode
 }
 
-func parseRelaySuccesfulOutput(bodyBytes []byte, requestStatusCode int) (*RelayOutput, error) {
+func parseRelaySuccessfulOutput(bodyBytes []byte, requestStatusCode int) (*RelayOutput, error) {
 	output := RelayOutput{
 		StatusCode: requestStatusCode,
 	}
@@ -942,15 +946,24 @@ func parseRelaySuccesfulOutput(bodyBytes []byte, requestStatusCode int) (*RelayO
 		return &output, err
 	}
 
-	// Check if there's explicitly a result field, if there's on mark it as success, otherwise check what's the potential status.
-	// for REST chain that doesn't return result in any of the call will be defaulted to 202 in extractStatusFromResponse
+	isValidJson := json.Valid([]byte(output.Response))
+
+	// Check if there's explicitly a "result" text field.
+	// 	- result present -> 200 (success)
+	// 	- result not present -> check the status (if available)
+	// LEGACY_TECHDEBT: REST chains do not have a result field, so there's no perfect
+	// solution here.
+	// 	- Result not present && json is valid -> 200
+	//  - result not present && json is invalid -> extract from response
 	if strings.Contains(output.Response, resultText) {
+		output.StatusCode = http.StatusOK
+	} else if isValidJson {
 		output.StatusCode = http.StatusOK
 	} else {
 		output.StatusCode = extractStatusFromResponse(output.Response)
 	}
 
-	if !json.Valid([]byte(output.Response)) {
+	if !isValidJson {
 		return &output, ErrNonJSONResponse
 	}
 
