@@ -51,7 +51,9 @@ var (
 
 const (
 	// DefaultStatusCode means the response was accepted but we don't know if it actually succeeded
-	DefaultStatusCode = http.StatusAccepted
+	// DEV_NOTE: This used to be http.StatusAccepted (202), which is logical but causing
+	// more harm than good due to unexpected behaviour.
+	DefaultStatusCode = http.StatusOK
 	// "result" is expected to be present in a successful response.
 	// This is used to determine the type of status code to return.
 	resultText = "result"
