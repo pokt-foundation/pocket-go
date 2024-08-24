@@ -175,7 +175,7 @@ type DispatchOutput struct {
 // Session represents session output from RPC request
 type Session struct {
 	Header SessionHeader `json:"header"`
-	Key    string         `json:"key"`
+	Key    string        `json:"key"`
 	Nodes  []Node        `json:"nodes"`
 }
 
@@ -188,15 +188,16 @@ type SessionHeader struct {
 
 // Node represents node output from RPC request
 type Node struct {
-	Address       string    `json:"address"`
-	Chains        []string  `json:"chains"`
-	Jailed        bool      `json:"jailed"`
-	PublicKey     string    `json:"public_key"`
-	ServiceURL    string    `json:"service_url"`
-	Status        int       `json:"status"`
-	Tokens        string    `json:"tokens"`
-	UnstakingTime time.Time `json:"unstaking_time"`
-	OutputAddress string    `json:"output_address"`
+	Address          string            `json:"address"`
+	Chains           []string          `json:"chains"`
+	Jailed           bool              `json:"jailed"`
+	PublicKey        string            `json:"public_key"`
+	ServiceURL       string            `json:"service_url"`
+	Status           int               `json:"status"`
+	Tokens           string            `json:"tokens"`
+	UnstakingTime    time.Time         `json:"unstaking_time"`
+	OutputAddress    string            `json:"output_address"`
+	RewardDelegators map[string]uint32 `json:"reward_delegators,omitempty"`
 }
 
 // RPCError reprensents error output from RPC request
